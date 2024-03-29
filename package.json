@@ -1,0 +1,24 @@
+{
+	"name": "subs",
+	"private": true,
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"lint": "turbo lint",
+		"format": "prettier --write \"**/*.{css,js,ts,tsx,json}\""
+	},
+	"devDependencies": {
+		"@subs/eslint-config": "*",
+		"@subs/typescript-config": "*",
+		"prettier": "^3.2.5",
+		"turbo": "latest"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"packageManager": "yarn@1.22.5",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	]
+}
