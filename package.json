@@ -1,5 +1,5 @@
 {
-	"name": "subs",
+	"name": "mysubs",
 	"private": true,
 	"scripts": {
 		"build": "turbo build",
@@ -8,8 +8,8 @@
 		"format": "prettier --write \"**/*.{css,js,ts,tsx,json}\""
 	},
 	"devDependencies": {
-		"@subs/eslint-config": "*",
-		"@subs/typescript-config": "*",
+		"@mysubs/eslint-config": "*",
+		"@mysubs/typescript-config": "*",
 		"prettier": "^3.2.5",
 		"turbo": "latest"
 	},

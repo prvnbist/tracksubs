@@ -5,7 +5,7 @@ import '@mantine/core/styles.css'
 import theme from './theme'
 
 export const metadata = {
-	title: 'Track Subscriptions by Praveen Bisht',
+	title: 'Track mysubscriptions by Praveen Bisht',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
