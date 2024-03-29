@@ -9,7 +9,9 @@
 		"lint": "eslint . --max-warnings 0"
 	},
 	"dependencies": {
-		"@kinde-oss/kinde-auth-nextjs": "^2.2.2",
+		"@clerk/clerk-react": "^4.30.7",
+		"@clerk/nextjs": "^4.29.9",
+		"@clerk/themes": "^1.7.10",
 		"@mantine/core": "^7.7.0",
 		"@mantine/hooks": "^7.7.0",
 		"next": "^14.1.1",

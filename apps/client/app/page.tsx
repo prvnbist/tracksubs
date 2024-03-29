@@ -1,14 +1,25 @@
-import { Button, Text, Title } from '@mantine/core'
-import { RegisterLink, LoginLink } from '@kinde-oss/kinde-auth-nextjs/components'
+'use client'
+import Link from 'next/link'
+
+import { useUser } from '@clerk/nextjs'
+import { Button, Title } from '@mantine/core'
 
 export default function Page(): JSX.Element {
+	const { isLoaded, isSignedIn } = useUser()
 	return (
 		<main>
-			<Title>Headings</Title>
-			<Text>Paragraph</Text>
-			<Button>Submit</Button>
-			<LoginLink>Sign in</LoginLink>
-			<RegisterLink>Sign up</RegisterLink>
+			<Title>Homepage</Title>
+			{isLoaded ? (
+				isSignedIn ? (
+					<Link href="/dashboard">
+						<Button>Dashboard</Button>
+					</Link>
+				) : (
+					<Link href="/login">
+						<Button>Login</Button>
+					</Link>
+				)
+			) : null}
 		</main>
 	)
 }

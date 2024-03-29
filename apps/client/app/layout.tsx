@@ -1,3 +1,5 @@
+import { ClerkProvider } from '@clerk/nextjs'
+
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 
 import '@mantine/core/styles.css'
@@ -5,7 +7,7 @@ import '@mantine/core/styles.css'
 import theme from './theme'
 
 export const metadata = {
-	title: 'Track mysubscriptions by Praveen Bisht',
+	title: 'Track subscriptions by Praveen Bisht',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -15,9 +17,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<ColorSchemeScript defaultColorScheme="dark" />
 			</head>
 			<body>
-				<MantineProvider defaultColorScheme="dark" theme={theme}>
-					{children}
-				</MantineProvider>
+				<ClerkProvider>
+					<MantineProvider defaultColorScheme="dark" theme={theme}>
+						{children}
+					</MantineProvider>
+				</ClerkProvider>
 			</body>
 		</html>
 	)
