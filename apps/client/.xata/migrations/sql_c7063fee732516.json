@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_c7063fee732516",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.subscription ADD CONSTRAINT subscription_user_id_foreign FOREIGN KEY (user_id) REFERENCES \"user\" (id)"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_c7063fee732516",
+  "parent": "sql_e2a99dfc961d85",
+  "startedAt": "2024-03-30T06:47:35.715352Z"
+}

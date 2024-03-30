@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_19123f7e51c1d4",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.\"user\" (id uuid, auth_id varchar(255) NOT NULL, first_name varchar(255), last_name varchar(255), email varchar(255), CONSTRAINT user_pkey PRIMARY KEY (id))"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_19123f7e51c1d4",
+  "parent": "sql_c0be74ea186a43",
+  "startedAt": "2024-03-29T18:01:24.338256Z"
+}

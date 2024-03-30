@@ -1,0 +1,77 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_co3rbd7difft4ad8ltbg",
+    "operations": [
+      {
+        "set_replica_identity": {
+          "table": "transaction",
+          "identity": {
+            "type": "full",
+            "index": ""
+          }
+        }
+      },
+      {
+        "add_column": {
+          "up": "now()",
+          "table": "transaction",
+          "column": {
+            "name": "xata_updatedat",
+            "type": "timestamptz",
+            "default": "now()",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "add_column": {
+          "table": "transaction",
+          "column": {
+            "name": "xata_id",
+            "type": "text",
+            "check": {
+              "name": "transaction_xata_id_length_xata_id",
+              "constraint": "length(\"xata_id\") < 256"
+            },
+            "unique": true,
+            "default": "'rec_' || xata_private.xid()",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "add_column": {
+          "table": "transaction",
+          "column": {
+            "name": "xata_version",
+            "type": "integer",
+            "default": "0",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "add_column": {
+          "table": "transaction",
+          "column": {
+            "name": "xata_createdat",
+            "type": "timestamptz",
+            "default": "now()",
+            "nullable": false
+          }
+        }
+      },
+      {
+        "sql": {
+          "up": "CREATE TRIGGER xata_maintain_metadata_trigger_pgroll\n  BEFORE INSERT OR UPDATE\n  ON \"transaction\"\n  FOR EACH ROW\n  EXECUTE FUNCTION xata_private.maintain_metadata_trigger_pgroll()",
+          "onComplete": true
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_co3rbd7difft4ad8ltbg",
+  "parent": "mig_co3rbc2g71l8r6rp3ev0",
+  "startedAt": "2024-03-30T06:48:20.378872Z"
+}

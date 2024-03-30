@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_da841c06b320df",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.payment_method (id uuid DEFAULT gen_random_uuid(), title varchar(255) NOT NULL, user_id uuid NOT NULL, CONSTRAINT payment_method_pkey PRIMARY KEY (id))"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_da841c06b320df",
+  "parent": "sql_c7063fee732516",
+  "startedAt": "2024-03-30T06:47:41.78856Z"
+}

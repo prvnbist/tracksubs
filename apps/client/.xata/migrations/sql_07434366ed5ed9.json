@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_07434366ed5ed9",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.\"user\" (id uuid DEFAULT gen_random_uuid(), auth_id varchar(255) NOT NULL, first_name varchar(255), last_name varchar(255), email varchar(255) NOT NULL, CONSTRAINT user_pkey PRIMARY KEY (id))"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_07434366ed5ed9",
+  "parent": "mig_co3ranig71l8r6rp3er0",
+  "startedAt": "2024-03-30T06:47:03.627233Z"
+}

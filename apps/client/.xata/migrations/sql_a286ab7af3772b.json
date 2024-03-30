@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_a286ab7af3772b",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE subscription ADD CONSTRAINT subscription_payment_method_id_foreign FOREIGN KEY (payment_method_id) REFERENCES payment_method (id)"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_a286ab7af3772b",
+  "parent": "sql_2e5a725bed8f6a",
+  "startedAt": "2024-03-30T07:53:04.985941Z"
+}

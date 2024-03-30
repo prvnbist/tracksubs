@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_ed8629cdb56e1b",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.\"user\" ADD CONSTRAINT user_auth_id_unique UNIQUE (auth_id)"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_ed8629cdb56e1b",
+  "parent": "sql_0fa6b5b0239846",
+  "startedAt": "2024-03-29T18:20:56.826701Z"
+}

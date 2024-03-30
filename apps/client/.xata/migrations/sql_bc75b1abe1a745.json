@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_bc75b1abe1a745",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE subscription ALTER COLUMN \"interval\" DROP DEFAULT"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_bc75b1abe1a745",
+  "parent": "sql_15dc2a253e2285",
+  "startedAt": "2024-03-30T07:52:56.133658Z"
+}

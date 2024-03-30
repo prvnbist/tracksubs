@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_04e2bcf0892c7c",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.\"user\" ADD CONSTRAINT user_email_unique UNIQUE (email)"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_04e2bcf0892c7c",
+  "parent": "sql_ed8629cdb56e1b",
+  "startedAt": "2024-03-29T18:20:56.826701Z"
+}

@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_f890ca9e8a77f8",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE bb_c59lmqcph168hepgkv9oil4en4_atlnm6.payment_method ADD CONSTRAINT payment_method_user_id_foreign FOREIGN KEY (user_id) REFERENCES \"user\" (id)"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_f890ca9e8a77f8",
+  "parent": "sql_5b3a18f4984272",
+  "startedAt": "2024-03-30T06:29:47.130564Z"
+}
