@@ -25,8 +25,8 @@ const Header = (): JSX.Element => {
 					size="xs"
 					radius="xl"
 					title="Subscriptions"
-					onClick={() => router.push('/subscriptions')}
-					variant={pathname === '/subscriptions' ? 'filled' : 'subtle'}
+					onClick={() => router.push('/dashboard/subscriptions')}
+					variant={pathname === '/dashboard/subscriptions' ? 'filled' : 'subtle'}
 				>
 					Subscriptions
 				</Button>
