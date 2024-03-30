@@ -1,0 +1,12 @@
+{
+	"name": "MySubs",
+	"short_name": "MySubs",
+	"description": "Manage subscriptions hassle-free. Track, organize, and save with ease.",
+	"icons": [
+		{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+	],
+	"theme_color": "#ffd43bb",
+	"background_color": "#242424",
+	"display": "standalone"
+}

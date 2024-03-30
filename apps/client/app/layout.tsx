@@ -7,7 +7,8 @@ import '@mantine/core/styles.css'
 import theme from './theme'
 
 export const metadata = {
-	title: 'Track subscriptions by Praveen Bisht',
+	title: 'MySubs | Praveen Bisht',
+	description: 'Manage subscriptions hassle-free. Track, organize, and save with ease.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang="en">
 			<head>
 				<ColorSchemeScript defaultColorScheme="dark" />
+				<link rel="apple-touch-icon" sizes="180x180" href="/logos/apple-touch-icon.png" />
+				<link rel="icon" type="image/png" sizes="32x32" href="/logos/favicon-32x32.png" />
+				<link rel="icon" type="image/png" sizes="16x16" href="/logos/favicon-16x16.png" />
+				<link rel="manifest" href="public/site.webmanifest" />
 			</head>
 			<body>
 				<ClerkProvider>

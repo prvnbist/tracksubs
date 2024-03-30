@@ -1,9 +1,12 @@
 'use client'
 
+import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useClerk } from '@clerk/clerk-react'
 
 import { Button, Flex } from '@mantine/core'
+
+import Logo from '../../assets/svgs/logo'
 
 const Header = (): JSX.Element => {
 	const router = useRouter()
@@ -11,6 +14,9 @@ const Header = (): JSX.Element => {
 	const { signOut } = useClerk()
 	return (
 		<Flex h={64} component="header" align="center" justify="space-between">
+			<Link href="/" title="Home">
+				<Logo size={32} />
+			</Link>
 			<Flex gap="sm">
 				<Button
 					size="xs"
@@ -19,7 +25,7 @@ const Header = (): JSX.Element => {
 					onClick={() => router.push('/dashboard')}
 					variant={pathname === '/dashboard' ? 'filled' : 'subtle'}
 				>
-					Home
+					Dashboard
 				</Button>
 				<Button
 					size="xs"

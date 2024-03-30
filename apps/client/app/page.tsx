@@ -5,6 +5,7 @@ import { useUser } from '@clerk/nextjs'
 import { Button, Flex, Space, Text, Title } from '@mantine/core'
 
 import classes from './page.module.css'
+import Logo from '../assets/svgs/logo'
 
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()
@@ -12,6 +13,8 @@ export default function Page(): JSX.Element {
 		<main>
 			<Flex component="header" align="center" h="100dvh" className={classes.header}>
 				<Flex direction="column" align="center" justify="center" w="100%">
+					<Logo size={120} />
+					<Space h={8} />
 					<Title>MySubs</Title>
 					<Space h={8} />
 					<Text ta="center" size="18px" w={320} style={{ lineHeight: '24px' }}>
