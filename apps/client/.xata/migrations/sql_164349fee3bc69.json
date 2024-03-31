@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_164349fee3bc69",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE subscription ALTER COLUMN title TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_164349fee3bc69",
+  "parent": "sql_005412872d0bfe",
+  "startedAt": "2024-03-31T11:46:32.431317Z"
+}

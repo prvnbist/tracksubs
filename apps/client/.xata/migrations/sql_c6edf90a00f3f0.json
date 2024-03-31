@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_c6edf90a00f3f0",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE subscription ALTER COLUMN \"interval\" TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_c6edf90a00f3f0",
+  "parent": "sql_e3445fd7ba6e53",
+  "startedAt": "2024-03-31T11:46:32.431317Z"
+}

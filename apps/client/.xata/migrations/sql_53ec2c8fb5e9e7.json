@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_53ec2c8fb5e9e7",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE payment_method ALTER COLUMN title TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_53ec2c8fb5e9e7",
+  "parent": "sql_c6edf90a00f3f0",
+  "startedAt": "2024-03-31T11:46:32.431317Z"
+}

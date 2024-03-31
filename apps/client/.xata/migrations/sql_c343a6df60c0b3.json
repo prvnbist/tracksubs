@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_c343a6df60c0b3",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE \"user\" ALTER COLUMN last_name TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_c343a6df60c0b3",
+  "parent": "sql_6e5d6dd36425fa",
+  "startedAt": "2024-03-31T11:49:37.422931Z"
+}

@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_6e5d6dd36425fa",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE \"user\" ALTER COLUMN first_name TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_6e5d6dd36425fa",
+  "parent": "sql_4cc12d16846124",
+  "startedAt": "2024-03-31T11:49:37.422931Z"
+}

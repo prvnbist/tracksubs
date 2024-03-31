@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_e3445fd7ba6e53",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE subscription ALTER COLUMN currency TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_e3445fd7ba6e53",
+  "parent": "sql_c539b845078e52",
+  "startedAt": "2024-03-31T11:46:32.431317Z"
+}

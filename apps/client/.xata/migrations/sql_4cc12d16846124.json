@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_4cc12d16846124",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE \"user\" ALTER COLUMN auth_id TYPE text"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_4cc12d16846124",
+  "parent": "sql_fb65e7ce16145f",
+  "startedAt": "2024-03-31T11:49:37.422931Z"
+}
