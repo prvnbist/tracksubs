@@ -1,6 +1,12 @@
 {
 	"extends": "@mysubs/typescript-config/nextjs.json",
 	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@/libs/*": ["libs/*"],
+			"@/assets/*": ["assets/*"],
+			"@/constants/*": ["constants/*"]
+		},
 		"plugins": [
 			{
 				"name": "next"

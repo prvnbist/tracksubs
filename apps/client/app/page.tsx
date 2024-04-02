@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
 import { Button, Flex, Space, Text, Title } from '@mantine/core'
 
+import Logo from '@/assets/svgs/logo'
+
 import classes from './page.module.css'
-import Logo from '../assets/svgs/logo'
 
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()

@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
 import { useClerk } from '@clerk/clerk-react'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { Button, Flex } from '@mantine/core'
 
-import Logo from '../../assets/svgs/logo'
+import Logo from '@/assets/svgs/logo'
 
 const Header = (): JSX.Element => {
 	const router = useRouter()
