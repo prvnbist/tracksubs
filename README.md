@@ -2,7 +2,9 @@
 
 Manage subscriptions hassle-free. Track, organize, and save with ease.
 
-![Homepage](https://res.cloudinary.com/prvnbist/image/upload/v1711819044/mysubs_homepage.png)
+|Homepage|Subscriptions Empty View|
+|--|--|
+|![Homepage](https://res.cloudinary.com/prvnbist/image/upload/v1711819044/mysubs_homepage.png)|![Subscriptions](https://res.cloudinary.com/prvnbist/image/upload/v1711957643/mysubs_empty_subscriptions.png)|
 
 ### Tech Stack
 1. [NextJs](https://nextjs.org/): Client App

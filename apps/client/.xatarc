@@ -1,6 +1,0 @@
-{
-  "databaseURL": "https://Praveen-Bisht-s-workspace-atlnm6.eu-west-1.xata.sh/db/my-subs",
-  "codegen": {
-    "output": "./libs/xata.ts"
-  }
-}

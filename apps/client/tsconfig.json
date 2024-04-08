@@ -1,12 +1,7 @@
 {
 	"extends": "@mysubs/typescript-config/nextjs.json",
 	"compilerOptions": {
-		"baseUrl": ".",
-		"paths": {
-			"@/libs/*": ["libs/*"],
-			"@/assets/*": ["assets/*"],
-			"@/constants/*": ["constants/*"]
-		},
+		"baseUrl": "./src",
 		"plugins": [
 			{
 				"name": "next"
@@ -19,7 +14,8 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"postcss.config.ts"
+		"postcss.config.ts",
+		"knexfile.js"
 	],
 	"exclude": ["node_modules"]
 }

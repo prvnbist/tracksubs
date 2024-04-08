@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { Button, Flex } from '@mantine/core'
 
-import Logo from '@/assets/svgs/logo'
+import Logo from 'assets/svgs/logo'
 
 const Header = (): JSX.Element => {
 	const router = useRouter()
