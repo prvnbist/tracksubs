@@ -14,9 +14,9 @@ interface Service {
 	website: string
 }
 
-const INITITAL_STATE: { user: { id: string | null }; services: Service[] } = {
+const INITITAL_STATE: { user: { id: string | null }; services: Record<string, Service> } = {
 	user: { id: null },
-	services: [],
+	services: {},
 }
 
 const Context = createContext(INITITAL_STATE)
@@ -40,7 +40,13 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 	useEffect(() => {
 		;(async () => {
 			const data = await services()
-			setData(existing => ({ ...existing, services: data as Service[] }))
+			setData(existing => ({
+				...existing,
+				services: (data as Service[]).reduce((acc: Record<string, Service>, curr) => {
+					acc[curr.key] = curr
+					return acc
+				}, {}),
+			}))
 		})()
 	}, [])
 

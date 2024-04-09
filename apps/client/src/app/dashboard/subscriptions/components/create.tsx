@@ -10,21 +10,24 @@ import { useGlobal } from 'state/global'
 import { subscriptions_create } from 'actions'
 import { CURRENCIES, CYCLES } from 'constants/index'
 
+import { ISubscription } from '../page'
+
 const Create = () => {
 	const { user, services } = useGlobal()
 	const [service, setService] = useState<string | null>(null)
 
 	const memoizedCurrencies = useMemo(() => CURRENCIES, [])
 	const cachedServices = useMemo(
-		() => services.map(s => ({ value: s.key, label: s.title })),
+		() => Object.values(services).map(s => ({ value: s.key, label: s.title })),
 		[services]
 	)
 
-	const form = useForm({
+	const form = useForm<Omit<ISubscription, 'id' | 'user_id' | 'payment_method_id'>>({
 		initialValues: {
 			title: '',
 			website: '',
 			amount: 0,
+			service: null,
 			currency: 'INR',
 			next_billing_date: null,
 			interval: 'MONTHLY',
@@ -34,24 +37,26 @@ const Create = () => {
 			amount: value => (value === 0 ? 'Please enter a valid amount' : ''),
 			next_billing_date: value => (!value ? 'Please select billing date' : ''),
 		},
-		transformValues: values => ({
-			...values,
-			next_billing_date: dayjs(values.next_billing_date).format('YYYY-MM-DD'),
-		}),
 	})
 
 	useEffect(() => {
 		if (service) {
-			const selected = services.find(s => s.key === service)
+			const selected = services[service]
 			if (selected) {
 				form.setFieldValue('title', selected.title)
 				form.setFieldValue('website', selected.website)
+				form.setFieldValue('service', service)
 			}
 		}
 	}, [service])
 
 	const handleSubmit = async () => {
 		try {
+			const data = { ...form.values }
+
+			data.amount = data.amount * 100
+			data.next_billing_date = dayjs(data.next_billing_date).format('YYYY-MM-DD')
+
 			const result = await subscriptions_create({ user_id: user.id, ...form.values })
 			if (result.status === 'ERROR') {
 				// handle error
@@ -67,7 +72,6 @@ const Create = () => {
 	return (
 		<>
 			<Select
-				clearable
 				searchable
 				label="Service"
 				value={service}

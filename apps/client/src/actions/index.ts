@@ -29,11 +29,13 @@ export const subscriptions_list = async (userId: string) => {
 				'currency',
 				'interval',
 				'user_id',
+				'service',
 				'next_billing_date',
 				'payment_method_id'
 			)
 			.from('subscription')
 			.where('user_id', userId)
+			.orderBy('next_billing_date', 'asc')
 		return { status: 'SUCCESS', data: result }
 	} catch (error) {
 		return { status: 'ERROR', data: [] }
@@ -43,6 +45,7 @@ export const subscriptions_list = async (userId: string) => {
 export const subscriptions_create = async (body: any) => {
 	try {
 		const result = await knex('subscription').returning('id').insert(body)
+
 		return { status: 'SUCCESS', data: result }
 	} catch (error) {
 		console.log(error)

@@ -1,7 +1,7 @@
 export const CYCLES = [
 	{ value: 'MONTHLY', label: 'Monthly' },
 	{ value: 'QUARTERLY', label: 'Quarterly' },
-	{ value: 'YEARLY', label: 'yearly' },
+	{ value: 'YEARLY', label: 'Yearly' },
 ]
 
 let currencyNames = new Intl.DisplayNames(['en'], { type: 'currency' })
