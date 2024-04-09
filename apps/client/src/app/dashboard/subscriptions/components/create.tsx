@@ -8,13 +8,17 @@ import { Button, Group, NumberInput, Select, Space, TextInput } from '@mantine/c
 
 import { useGlobal } from 'state/global'
 import { subscriptions_create } from 'actions'
-import { CURRENCIES, CYCLES, SERVICES } from 'constants/index'
+import { CURRENCIES, CYCLES } from 'constants/index'
 
 const Create = () => {
-	const { user } = useGlobal()
+	const { user, services } = useGlobal()
 	const [service, setService] = useState<string | null>(null)
 
 	const memoizedCurrencies = useMemo(() => CURRENCIES, [])
+	const cachedServices = useMemo(
+		() => services.map(s => ({ value: s.key, label: s.title })),
+		[services]
+	)
 
 	const form = useForm({
 		initialValues: {
@@ -38,7 +42,7 @@ const Create = () => {
 
 	useEffect(() => {
 		if (service) {
-			const selected = SERVICES.find(s => s.key === service)
+			const selected = services.find(s => s.key === service)
 			if (selected) {
 				form.setFieldValue('title', selected.title)
 				form.setFieldValue('website', selected.website)
@@ -67,12 +71,9 @@ const Create = () => {
 				searchable
 				label="Service"
 				value={service}
-				onChange={value => {
-					setService(value)
-					console.log(value)
-				}}
+				data={cachedServices}
+				onChange={setService}
 				placeholder="Select a service"
-				data={SERVICES.map(s => ({ value: s.key, label: s.title }))}
 			/>
 			<Space h={16} />
 			<TextInput

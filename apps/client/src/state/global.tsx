@@ -5,10 +5,18 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 import { useAuth } from '@clerk/clerk-react'
 
-import { user } from 'actions'
+import { services, user } from 'actions'
 
-const INITITAL_STATE: { user: { id: string | null } } = {
+interface Service {
+	id: string
+	key: string
+	title: string
+	website: string
+}
+
+const INITITAL_STATE: { user: { id: string | null }; services: Service[] } = {
 	user: { id: null },
+	services: [],
 }
 
 const Context = createContext(INITITAL_STATE)
@@ -24,10 +32,17 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 		if (isLoaded) {
 			;(async () => {
 				const result = await user()
-				setData({ ...INITITAL_STATE, user: { ...result } })
+				setData(existing => ({ ...existing, user: { ...result } }))
 			})()
 		}
 	}, [isLoaded, userId])
+
+	useEffect(() => {
+		;(async () => {
+			const data = await services()
+			setData(existing => ({ ...existing, services: data as Service[] }))
+		})()
+	}, [])
 
 	return <Context.Provider value={data}>{children}</Context.Provider>
 }

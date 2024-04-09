@@ -2,13 +2,14 @@
 import { useEffect, useState } from 'react'
 
 import { modals } from '@mantine/modals'
-import { Button, Center, Loader, Title } from '@mantine/core'
+import { ActionIcon, Button, Center, Flex, Loader, Title } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
 import { subscriptions_list } from 'actions'
 import { CreateEmptyState } from 'components'
 
 import { Create } from './components'
+import { IconPlus } from '@tabler/icons-react'
 
 interface Subscription {
 	id: string
@@ -65,9 +66,14 @@ export default function Page(): JSX.Element {
 
 	return (
 		<main>
-			<Title order={2} mt="md" mb="md">
-				Subscriptions
-			</Title>
+			<Flex component="header" mt="md" mb="md" gap="sm" align="center">
+				<Title order={2}>Subscriptions</Title>
+				{status !== 'EMPTY' && (
+					<ActionIcon onClick={create} title="Create Subscription">
+						<IconPlus size={18} />
+					</ActionIcon>
+				)}
+			</Flex>
 			{status === 'LOADING' && (
 				<Center>
 					<Loader />
@@ -78,7 +84,9 @@ export default function Page(): JSX.Element {
 					title="Create a subscription"
 					description="You don't have any subscriptions yet, let's start by creating one!"
 				>
-					<Button onClick={create}>Create Subscription</Button>
+					<Button title="Create Subscription" onClick={create}>
+						Create Subscription
+					</Button>
 				</CreateEmptyState>
 			)}
 			{status === 'SUCCESS' && <div>{subscriptions.length}</div>}

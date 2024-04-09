@@ -49,3 +49,15 @@ export const subscriptions_create = async (body: any) => {
 		return { status: 'ERROR', data: null }
 	}
 }
+
+export const services = async () => {
+	try {
+		const data = await knex
+			.select('id', 'key', ' title', 'website')
+			.from('service')
+			.orderBy('title', 'asc')
+		return data
+	} catch (error) {
+		console.log(error)
+	}
+}

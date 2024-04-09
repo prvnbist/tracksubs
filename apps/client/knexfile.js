@@ -1,3 +1,7 @@
+require('dotenv').config({
+	path: './.env.local',
+})
+
 module.exports = {
 	client: 'pg',
 	connection: {
@@ -10,5 +14,8 @@ module.exports = {
 	},
 	migrations: {
 		directory: './migrations',
+	},
+	seeds: {
+		directory: './seeds',
 	},
 }
