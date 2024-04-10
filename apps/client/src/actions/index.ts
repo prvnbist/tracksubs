@@ -53,6 +53,17 @@ export const subscriptions_create = async (body: any) => {
 	}
 }
 
+export const subscriptions_delete = async (id: string) => {
+	try {
+		const result = await knex('subscription').where('id', id).del(['id'])
+
+		return { status: 'SUCCESS', data: result }
+	} catch (error) {
+		console.log(error)
+		return { status: 'ERROR', data: null }
+	}
+}
+
 export const services = async () => {
 	try {
 		const data = await knex

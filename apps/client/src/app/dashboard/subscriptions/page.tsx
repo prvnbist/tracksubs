@@ -4,10 +4,11 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { IconPlus } from '@tabler/icons-react'
+import { IconPlus, IconTrash } from '@tabler/icons-react'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
+import { useHover } from '@mantine/hooks'
 import {
 	ActionIcon,
 	Badge,
@@ -17,6 +18,7 @@ import {
 	Flex,
 	Group,
 	Loader,
+	Overlay,
 	SimpleGrid,
 	Stack,
 	Text,
@@ -24,8 +26,8 @@ import {
 } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
-import { subscriptions_list } from 'actions'
 import { CreateEmptyState } from 'components'
+import { subscriptions_delete, subscriptions_list } from 'actions'
 
 import { Create } from './components'
 
@@ -111,7 +113,7 @@ export default function Page(): JSX.Element {
 				</CreateEmptyState>
 			)}
 			{status === 'SUCCESS' && (
-				<SimpleGrid cols={3} component="ul" m={0} p={0}>
+				<SimpleGrid cols={3}>
 					{subscriptions.map(subscription => (
 						<Subscription key={subscription.id} subscription={subscription} />
 					))}
@@ -124,12 +126,25 @@ export default function Page(): JSX.Element {
 const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 	const { services } = useGlobal()
 
+	const { hovered, ref } = useHover()
+
 	const service = subscription.service ? services[subscription.service] : null
 
 	const dueIn = dayjs(subscription.next_billing_date).diff(dayjs(new Date()), 'week')
 	const isDueThisWeek = dueIn === 0
+
+	const deleteSubscription = () =>
+		modals.openConfirmModal({
+			title: 'Delete Subscription',
+			children: <Text size="sm">Are you sure you want to delete this subscription?</Text>,
+			labels: { confirm: 'Yes, Delete', cancel: 'Cancel' },
+			onConfirm: async () => {
+				await subscriptions_delete(subscription.id)
+			},
+		})
+
 	return (
-		<Card component="li" shadow="sm" padding="lg" radius="md" withBorder>
+		<Card ref={ref} shadow="sm" padding="lg" radius="md" withBorder>
 			<Group justify="space-between">
 				<Group gap={16}>
 					{service && (
@@ -152,17 +167,31 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 					</Stack>
 				</Group>
 				<Stack gap={2} align="flex-end">
-					<Badge radius="sm" variant="light">
+					<Badge size="sm" radius="sm" variant="light">
 						{subscription.interval}
 					</Badge>
 					<Text size="lg">
 						{new Intl.NumberFormat('en-IN', {
 							style: 'currency',
-							currency: 'INR',
+							currency: subscription.currency,
 						}).format(subscription.amount / 100)}
 					</Text>
 				</Stack>
 			</Group>
+			{hovered && (
+				<Overlay blur={3} color="#000" backgroundOpacity={0.5}>
+					<Center h="100%">
+						<ActionIcon
+							color="red.4"
+							variant="default"
+							title="Delete Subscription"
+							onClick={deleteSubscription}
+						>
+							<IconTrash size={18} />
+						</ActionIcon>
+					</Center>
+				</Overlay>
+			)}
 		</Card>
 	)
 }
