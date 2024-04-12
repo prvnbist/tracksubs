@@ -17,6 +17,7 @@
 		"@mantine/form": "^7.7.1",
 		"@mantine/hooks": "^7.7.0",
 		"@mantine/modals": "^7.7.1",
+		"@mantine/notifications": "^7.7.1",
 		"@tabler/icons-react": "^3.1.0",
 		"dayjs": "^1.11.10",
 		"dotenv": "^16.4.5",

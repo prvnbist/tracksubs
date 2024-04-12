@@ -48,7 +48,6 @@ export const subscriptions_create = async (body: any) => {
 
 		return { status: 'SUCCESS', data: result }
 	} catch (error) {
-		console.log(error)
 		return { status: 'ERROR', data: null }
 	}
 }
@@ -59,7 +58,6 @@ export const subscriptions_delete = async (id: string) => {
 
 		return { status: 'SUCCESS', data: result }
 	} catch (error) {
-		console.log(error)
 		return { status: 'ERROR', data: null }
 	}
 }

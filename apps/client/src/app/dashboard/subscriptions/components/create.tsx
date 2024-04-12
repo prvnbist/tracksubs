@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { DatePickerInput } from '@mantine/dates'
+import { notifications } from '@mantine/notifications'
 import { Button, Group, NumberInput, Select, Space, TextInput } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
@@ -51,21 +52,31 @@ const Create = () => {
 	}, [service])
 
 	const handleSubmit = async () => {
-		try {
-			const data = { ...form.values }
+		const data = { ...form.values }
 
+		try {
 			data.amount = data.amount * 100
 			data.next_billing_date = dayjs(data.next_billing_date).format('YYYY-MM-DD')
 
 			const result = await subscriptions_create({ user_id: user.id, ...form.values })
 			if (result.status === 'ERROR') {
-				// handle error
+				throw Error()
 			}
+
+			notifications.show({
+				color: 'green',
+				title: 'Success',
+				message: `Successfully created the subscription - ${data.title}`,
+			})
 
 			form.reset()
 			modals.closeAll()
 		} catch (error) {
-			console.log(error)
+			notifications.show({
+				color: 'red',
+				title: 'Failed',
+				message: `Failed to create the subscription - ${data.title}`,
+			})
 		}
 	}
 

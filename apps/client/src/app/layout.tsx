@@ -1,9 +1,11 @@
 import { ClerkProvider } from '@clerk/nextjs'
 
+import { Notifications } from '@mantine/notifications'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
+import '@mantine/notifications/styles.css'
 
 import theme from './theme'
 
@@ -25,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<body>
 				<ClerkProvider>
 					<MantineProvider defaultColorScheme="dark" theme={theme}>
+						<Notifications />
 						{children}
 					</MantineProvider>
 				</ClerkProvider>

@@ -8,7 +8,7 @@ import { IconPlus, IconTrash } from '@tabler/icons-react'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
-import { useHover } from '@mantine/hooks'
+import { notifications } from '@mantine/notifications'
 import {
 	ActionIcon,
 	Badge,
@@ -30,6 +30,7 @@ import { CreateEmptyState } from 'components'
 import { subscriptions_delete, subscriptions_list } from 'actions'
 
 import { Create } from './components'
+import classes from './page.module.css'
 
 export interface ISubscription {
 	id: string
@@ -61,12 +62,11 @@ export default function Page(): JSX.Element {
 					const result = await subscriptions_list(user.id!)
 
 					if (result.status === 'ERROR') {
-						// handle error
+						throw Error()
 					}
 
 					if (result.data.length === 0) {
 						setSubscriptions([])
-
 						setStatus('EMPTY')
 						return
 					}
@@ -75,6 +75,11 @@ export default function Page(): JSX.Element {
 					setStatus('SUCCESS')
 				} catch (error) {
 					setStatus('ERROR')
+					notifications.show({
+						color: 'red',
+						title: 'Failed',
+						message: `Failed to fetch the subscriptions`,
+					})
 				}
 			})()
 		}
@@ -113,7 +118,7 @@ export default function Page(): JSX.Element {
 				</CreateEmptyState>
 			)}
 			{status === 'SUCCESS' && (
-				<SimpleGrid cols={3}>
+				<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
 					{subscriptions.map(subscription => (
 						<Subscription key={subscription.id} subscription={subscription} />
 					))}
@@ -126,8 +131,6 @@ export default function Page(): JSX.Element {
 const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 	const { services } = useGlobal()
 
-	const { hovered, ref } = useHover()
-
 	const service = subscription.service ? services[subscription.service] : null
 
 	const dueIn = dayjs(subscription.next_billing_date).diff(dayjs(new Date()), 'week')
@@ -139,12 +142,29 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 			children: <Text size="sm">Are you sure you want to delete this subscription?</Text>,
 			labels: { confirm: 'Yes, Delete', cancel: 'Cancel' },
 			onConfirm: async () => {
-				await subscriptions_delete(subscription.id)
+				try {
+					const result = await subscriptions_delete(subscription.id)
+
+					if (result.status === 'ERROR') {
+						throw Error()
+					}
+
+					notifications.show({
+						color: 'green',
+						message: `Successfully deleted the subscription - ${subscription.title}`,
+					})
+				} catch (error) {
+					notifications.show({
+						color: 'red',
+						title: 'Failed',
+						message: `Failed to delete the subscription - ${subscription.title}`,
+					})
+				}
 			},
 		})
 
 	return (
-		<Card ref={ref} shadow="sm" padding="lg" radius="md" withBorder>
+		<Card shadow="sm" padding="lg" radius="md" withBorder className={classes.card__subscription}>
 			<Group justify="space-between">
 				<Group gap={16}>
 					{service && (
@@ -178,20 +198,23 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 					</Text>
 				</Stack>
 			</Group>
-			{hovered && (
-				<Overlay blur={3} color="#000" backgroundOpacity={0.5}>
-					<Center h="100%">
-						<ActionIcon
-							color="red.4"
-							variant="default"
-							title="Delete Subscription"
-							onClick={deleteSubscription}
-						>
-							<IconTrash size={18} />
-						</ActionIcon>
-					</Center>
-				</Overlay>
-			)}
+			<Overlay
+				blur={3}
+				color="#000"
+				backgroundOpacity={0.5}
+				className={classes.subscription__card__overlay}
+			>
+				<Center h="100%">
+					<ActionIcon
+						color="red.4"
+						variant="light"
+						title="Delete Subscription"
+						onClick={deleteSubscription}
+					>
+						<IconTrash size={18} />
+					</ActionIcon>
+				</Center>
+			</Overlay>
 		</Card>
 	)
 }
