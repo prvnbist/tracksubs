@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -7,13 +8,14 @@ import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
 import { Button, Group, NumberInput, Select, Space, TextInput } from '@mantine/core'
 
+import { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { subscriptions_create } from 'actions'
 import { CURRENCIES, CYCLES } from 'constants/index'
 
-import { ISubscription } from '../page'
-
 const Create = () => {
+	const queryClient = useQueryClient()
+
 	const { user, services } = useGlobal()
 	const [service, setService] = useState<string | null>(null)
 
@@ -58,7 +60,7 @@ const Create = () => {
 			data.amount = data.amount * 100
 			data.next_billing_date = dayjs(data.next_billing_date).format('YYYY-MM-DD')
 
-			const result = await subscriptions_create({ user_id: user.id, ...form.values })
+			const result = await subscriptions_create({ user_id: user.id, ...data })
 			if (result.status === 'ERROR') {
 				throw Error()
 			}
@@ -68,6 +70,8 @@ const Create = () => {
 				title: 'Success',
 				message: `Successfully created the subscription - ${data.title}`,
 			})
+
+			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 
 			form.reset()
 			modals.closeAll()

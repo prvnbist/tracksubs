@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs'
 
 import knex from 'lib/db'
+import { ActionResponse, ISubscription } from 'types'
 
 export const user = async () => {
 	const { userId } = auth()
@@ -18,7 +19,7 @@ export const user = async () => {
 	}
 }
 
-export const subscriptions_list = async (userId: string) => {
+export const subscriptions_list = async (userId: string): ActionResponse<ISubscription[]> => {
 	try {
 		const result = await knex
 			.select(
@@ -36,9 +37,9 @@ export const subscriptions_list = async (userId: string) => {
 			.from('subscription')
 			.where('user_id', userId)
 			.orderBy('next_billing_date', 'asc')
-		return { status: 'SUCCESS', data: result }
+		return result
 	} catch (error) {
-		return { status: 'ERROR', data: [] }
+		throw new Error('Failed to fetch the subscriptions')
 	}
 }
 

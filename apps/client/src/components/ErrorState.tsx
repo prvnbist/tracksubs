@@ -2,13 +2,13 @@ import { Center, Space, Stack, Text, Title } from '@mantine/core'
 
 import NoiseBackground from 'assets/svgs/noise_background.svg'
 
-const CreateEmptyState = ({
+const ErrorState = ({
 	title = '',
 	description = '',
 	children,
 }: {
 	title: string
-	description: string
+	description?: string
 	children?: JSX.Element
 }) => {
 	return (
@@ -37,4 +37,4 @@ const CreateEmptyState = ({
 	)
 }
 
-export default CreateEmptyState
+export default ErrorState

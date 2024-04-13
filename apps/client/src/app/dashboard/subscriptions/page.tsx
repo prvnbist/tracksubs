@@ -3,8 +3,11 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
+
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
@@ -25,65 +28,37 @@ import {
 	Title,
 } from '@mantine/core'
 
+import { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
-import { CreateEmptyState } from 'components'
+import { CreateEmptyState, ErrorState } from 'components'
 import { subscriptions_delete, subscriptions_list } from 'actions'
 
 import { Create } from './components'
 import classes from './page.module.css'
 
-export interface ISubscription {
-	id: string
-	title: string
-	website: string
-	amount: number
-	currency: string
-	interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
-	user_id: string
-	next_billing_date: string | null
-	payment_method_id: string
-	service: null | string
-}
-
 dayjs.extend(relativeTime)
 
 export default function Page(): JSX.Element {
 	const { user } = useGlobal()
+	const router = useRouter()
 
-	const [status, setStatus] = useState('LOADING')
-
-	const [subscriptions, setSubscriptions] = useState<ISubscription[]>([])
+	const { status, data, error } = useQuery({
+		retry: 0,
+		enabled: !!user.id,
+		refetchOnWindowFocus: false,
+		queryKey: ['subscriptions', user.id],
+		queryFn: () => subscriptions_list(user.id!),
+	})
 
 	useEffect(() => {
-		if (user.id) {
-			;(async () => {
-				try {
-					setStatus('LOADING')
-					const result = await subscriptions_list(user.id!)
-
-					if (result.status === 'ERROR') {
-						throw Error()
-					}
-
-					if (result.data.length === 0) {
-						setSubscriptions([])
-						setStatus('EMPTY')
-						return
-					}
-
-					setSubscriptions(result.data)
-					setStatus('SUCCESS')
-				} catch (error) {
-					setStatus('ERROR')
-					notifications.show({
-						color: 'red',
-						title: 'Failed',
-						message: `Failed to fetch the subscriptions`,
-					})
-				}
-			})()
+		if (status === 'error' && error) {
+			notifications.show({
+				color: 'red',
+				title: 'Failed',
+				message: error.message,
+			})
 		}
-	}, [user])
+	}, [status, error])
 
 	const create = () => {
 		modals.open({
@@ -96,33 +71,46 @@ export default function Page(): JSX.Element {
 		<main>
 			<Flex component="header" mt="md" mb="md" gap="sm" align="center">
 				<Title order={2}>Subscriptions</Title>
-				{status !== 'EMPTY' && (
-					<ActionIcon onClick={create} title="Create Subscription">
-						<IconPlus size={18} />
-					</ActionIcon>
-				)}
+				<ActionIcon
+					onClick={create}
+					title="Create Subscription"
+					loading={status === 'pending'}
+					disabled={status === 'pending'}
+				>
+					<IconPlus size={18} />
+				</ActionIcon>
 			</Flex>
-			{status === 'LOADING' && (
+			{status === 'pending' && (
 				<Center>
 					<Loader />
 				</Center>
 			)}
-			{status === 'EMPTY' && (
-				<CreateEmptyState
-					title="Create a subscription"
-					description="You don't have any subscriptions yet, let's start by creating one!"
-				>
-					<Button title="Create Subscription" onClick={create}>
-						Create Subscription
+			{status === 'error' && (
+				<ErrorState title="Something went wrong!">
+					<Button title="Refresh Page" onClick={() => router.refresh()}>
+						Refresh Page
 					</Button>
-				</CreateEmptyState>
+				</ErrorState>
 			)}
-			{status === 'SUCCESS' && (
-				<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-					{subscriptions.map(subscription => (
-						<Subscription key={subscription.id} subscription={subscription} />
-					))}
-				</SimpleGrid>
+			{status === 'success' && Array.isArray(data) && (
+				<>
+					{data.length ? (
+						<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+							{data.map(subscription => (
+								<Subscription key={subscription.id} subscription={subscription} />
+							))}
+						</SimpleGrid>
+					) : (
+						<CreateEmptyState
+							title="Create a subscription"
+							description="You don't have any subscriptions yet, let's start by creating one!"
+						>
+							<Button title="Create Subscription" onClick={create}>
+								Create Subscription
+							</Button>
+						</CreateEmptyState>
+					)}
+				</>
 			)}
 		</main>
 	)
@@ -130,6 +118,7 @@ export default function Page(): JSX.Element {
 
 const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 	const { services } = useGlobal()
+	const queryClient = useQueryClient()
 
 	const service = subscription.service ? services[subscription.service] : null
 
@@ -153,6 +142,8 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 						color: 'green',
 						message: `Successfully deleted the subscription - ${subscription.title}`,
 					})
+
+					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 				} catch (error) {
 					notifications.show({
 						color: 'red',
