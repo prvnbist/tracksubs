@@ -1,3 +1,5 @@
+'use client'
+
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -13,7 +15,7 @@ import { useGlobal } from 'state/global'
 import { subscriptions_create } from 'actions'
 import { CURRENCIES, CYCLES } from 'constants/index'
 
-const Create = () => {
+const CreateModal = () => {
 	const queryClient = useQueryClient()
 
 	const { user, services } = useGlobal()
@@ -155,4 +157,4 @@ const Create = () => {
 	)
 }
 
-export default Create
+export default CreateModal

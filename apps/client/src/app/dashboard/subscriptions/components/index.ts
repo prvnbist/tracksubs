@@ -1,2 +1,2 @@
-export { default as Create } from './create'
-export { default as Subscription } from './subscription'
+export { default as CreateSubscriptionButton } from './createSubscriptionButton'
+export { default as Subscriptions } from './subscriptions'
