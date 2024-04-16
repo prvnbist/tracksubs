@@ -74,6 +74,7 @@ const CreateModal = () => {
 			})
 
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+			queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
 
 			form.reset()
 			modals.closeAll()

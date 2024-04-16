@@ -1,9 +1,13 @@
 'use server'
 
+import dayjs from 'dayjs'
 import { auth } from '@clerk/nextjs'
+import weekday from 'dayjs/plugin/weekday'
 
 import knex from 'lib/db'
 import { ActionResponse, ISubscription } from 'types'
+
+dayjs.extend(weekday)
 
 export const user = async () => {
 	const { userId } = auth()
@@ -60,6 +64,22 @@ export const subscriptions_delete = async (id: string) => {
 		return { status: 'SUCCESS', data: result }
 	} catch (error) {
 		return { status: 'ERROR', data: null }
+	}
+}
+
+export const subscriptions_analytics_weekly = async (user_id: string) => {
+	try {
+		const data = await knex('subscription')
+			.select('currency')
+			.count()
+			.sum('amount')
+			.groupBy('currency')
+			.where('user_id', '=', user_id)
+			.andWhere('next_billing_date', '>', dayjs().weekday(0).format('YYYY-MM-DD'))
+			.andWhere('next_billing_date', '<=', dayjs().weekday(7).format('YYYY-MM-DD'))
+		return data
+	} catch (error) {
+		throw new Error('Failed to fetch weekly subscriptions data.')
 	}
 }
 

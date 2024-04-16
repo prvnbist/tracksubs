@@ -12,6 +12,7 @@
 		"@clerk/clerk-react": "^4.30.7",
 		"@clerk/nextjs": "^4.29.9",
 		"@clerk/themes": "^1.7.10",
+		"@mantine/charts": "^7.8.0",
 		"@mantine/core": "^7.7.0",
 		"@mantine/dates": "^7.7.1",
 		"@mantine/form": "^7.7.1",
@@ -26,7 +27,8 @@
 		"next": "^14.1.1",
 		"pg": "^8.11.5",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"recharts": "2"
 	},
 	"devDependencies": {
 		"@mysubs/eslint-config": "*",

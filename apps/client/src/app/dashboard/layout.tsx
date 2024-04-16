@@ -4,6 +4,8 @@ import { Container, Divider } from '@mantine/core'
 import QueryProvider from 'state/query'
 import { GlobalProvider } from 'state/global'
 
+import '@mantine/charts/styles.css'
+
 import Header from './Header'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
