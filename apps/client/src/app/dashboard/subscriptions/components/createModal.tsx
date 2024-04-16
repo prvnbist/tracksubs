@@ -27,7 +27,7 @@ const CreateModal = () => {
 		[services]
 	)
 
-	const form = useForm<Omit<ISubscription, 'id' | 'user_id' | 'payment_method_id'>>({
+	const form = useForm<Omit<ISubscription, 'id' | 'user_id' | 'payment_method_id' | 'is_active'>>({
 		initialValues: {
 			title: '',
 			website: '',

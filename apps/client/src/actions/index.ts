@@ -23,7 +23,10 @@ export const user = async () => {
 	}
 }
 
-export const subscriptions_list = async (userId: string): ActionResponse<ISubscription[]> => {
+export const subscriptions_list = async (
+	userId: string,
+	interval: string = 'ALL'
+): ActionResponse<ISubscription[]> => {
 	try {
 		const result = await knex
 			.select(
@@ -35,11 +38,19 @@ export const subscriptions_list = async (userId: string): ActionResponse<ISubscr
 				'interval',
 				'user_id',
 				'service',
+				'is_active',
 				'next_billing_date',
 				'payment_method_id'
 			)
 			.from('subscription')
 			.where('user_id', userId)
+			.andWhere(builder =>
+				builder.whereIn(
+					'interval',
+					interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval]
+				)
+			)
+			.orderBy('is_active', 'desc')
 			.orderBy('next_billing_date', 'asc')
 		return result
 	} catch (error) {
@@ -75,6 +86,7 @@ export const subscriptions_analytics_weekly = async (user_id: string) => {
 			.sum('amount')
 			.groupBy('currency')
 			.where('user_id', '=', user_id)
+			.andWhere('is_active', '=', true)
 			.andWhere('next_billing_date', '>', dayjs().weekday(0).format('YYYY-MM-DD'))
 			.andWhere('next_billing_date', '<=', dayjs().weekday(7).format('YYYY-MM-DD'))
 		return data

@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { Button, Center, Loader, SimpleGrid } from '@mantine/core'
+import { Button, Center, Group, Loader, SegmentedControl, SimpleGrid } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
+import { CYCLES } from 'constants/index'
 import { subscriptions_list } from 'actions'
 import { CreateEmptyState, ErrorState } from 'components'
 
@@ -19,12 +20,14 @@ const Subscriptions = () => {
 	const { user } = useGlobal()
 	const router = useRouter()
 
+	const [interval, setInterval] = useState('ALL')
+
 	const { status, data, error } = useQuery({
 		retry: 0,
 		enabled: !!user.id,
 		refetchOnWindowFocus: false,
-		queryKey: ['subscriptions', user.id],
-		queryFn: () => subscriptions_list(user.id!),
+		queryKey: ['subscriptions', user.id, interval],
+		queryFn: () => subscriptions_list(user.id!, interval),
 	})
 
 	useEffect(() => {
@@ -46,6 +49,16 @@ const Subscriptions = () => {
 
 	return (
 		<>
+			<Group mb={16}>
+				<SegmentedControl
+					size="sm"
+					radius="sm"
+					value={interval}
+					onChange={setInterval}
+					withItemsBorders={false}
+					data={[{ value: 'ALL', label: 'All' }, ...CYCLES]}
+				/>
+			</Group>
 			{status === 'pending' && (
 				<Center>
 					<Loader />

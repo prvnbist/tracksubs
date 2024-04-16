@@ -75,11 +75,17 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 					)}
 					<Stack gap={0}>
 						<Title order={4}>{subscription.title}</Title>
-						<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
-							{isDueThisWeek
-								? `Due ${dayjs(subscription.next_billing_date).fromNow()}`
-								: `Due: ${dayjs(subscription.next_billing_date).format('MMM DD, YYYY')}`}
-						</Text>
+						{subscription.is_active ? (
+							<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
+								{isDueThisWeek
+									? `Due ${dayjs(subscription.next_billing_date).fromNow()}`
+									: `Due: ${dayjs(subscription.next_billing_date).format('MMM DD, YYYY')}`}
+							</Text>
+						) : (
+							<Text size="sm" c="dimmed">
+								Paused
+							</Text>
+						)}
 					</Stack>
 				</Group>
 				<Stack gap={2} align="flex-end">

@@ -9,6 +9,7 @@ export interface ISubscription {
 	next_billing_date: string | null
 	payment_method_id: string
 	service: null | string
+	is_active: boolean
 }
 
 export type ActionResponse<T> = Promise<T | Error>
