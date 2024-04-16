@@ -95,6 +95,42 @@ export const subscriptions_analytics_weekly = async (user_id: string) => {
 	}
 }
 
+export const subscriptions_analytics_top_five_most_expensive = async (user_id: string) => {
+	try {
+		const data = await knex
+			.with(
+				'active_subscriptions',
+				knex.raw(
+					`SELECT amount, interval, currency, title FROM subscription WHERE user_id = ? AND is_active = true`,
+					user_id
+				)
+			)
+			.select(
+				'title',
+				'currency',
+				'interval',
+				knex.raw(
+					`CASE WHEN interval = 'MONTHLY' THEN amount * 12 WHEN interval = 'QUARTERLY' THEN amount * 4 ELSE amount END AS amount`
+				)
+			)
+			.from('active_subscriptions')
+			.orderBy('amount', 'desc')
+
+		const transformed = data.reduce((acc, curr) => {
+			if (!(curr.currency in acc)) {
+				acc[curr.currency] = [curr]
+			} else {
+				acc[curr.currency].push(curr)
+			}
+			return acc
+		}, {})
+
+		return transformed
+	} catch (error) {
+		throw new Error('Failed to fetch top five most expensive subscriptions.')
+	}
+}
+
 export const services = async () => {
 	try {
 		const data = await knex
