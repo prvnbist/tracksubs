@@ -6,7 +6,16 @@ import { useQuery } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { Button, Center, Group, Loader, SegmentedControl, SimpleGrid } from '@mantine/core'
+import {
+	Button,
+	Card,
+	Center,
+	Group,
+	Loader,
+	SegmentedControl,
+	SimpleGrid,
+	Skeleton,
+} from '@mantine/core'
 
 import { useGlobal } from 'state/global'
 import { CYCLES } from 'constants/index'
@@ -59,11 +68,7 @@ const Subscriptions = () => {
 					data={[{ value: 'ALL', label: 'All' }, ...CYCLES]}
 				/>
 			</Group>
-			{status === 'pending' && (
-				<Center>
-					<Loader />
-				</Center>
-			)}
+			{status === 'pending' && <LoadingSkeleton />}
 			{status === 'error' && (
 				<ErrorState title="Something went wrong!">
 					<Button title="Refresh Page" onClick={() => router.refresh()}>
@@ -96,3 +101,35 @@ const Subscriptions = () => {
 }
 
 export default Subscriptions
+
+const LoadingSkeleton = () => {
+	return (
+		<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+			<Card h={88} shadow="sm" padding="lg" radius="md" withBorder>
+				<Skeleton height={62} w="70%" circle />
+				<Skeleton height={62} w="30%" circle my={8} />
+				<Skeleton height={62} w="50%" circle />
+			</Card>
+			<Card h={88} shadow="sm" padding="lg" radius="md" withBorder>
+				<Skeleton height={62} w="40%" circle />
+				<Skeleton height={62} w="70%" circle my={8} />
+				<Skeleton height={62} w="30%" circle />
+			</Card>
+			<Card h={88} shadow="sm" padding="lg" radius="md" withBorder>
+				<Skeleton height={62} w="90%" circle />
+				<Skeleton height={62} w="60%" circle my={8} />
+				<Skeleton height={62} w="40%" circle />
+			</Card>
+			<Card h={88} shadow="sm" padding="lg" radius="md" withBorder>
+				<Skeleton height={62} w="50%" circle />
+				<Skeleton height={62} w="80%" circle my={8} />
+				<Skeleton height={62} w="40%" circle />
+			</Card>
+			<Card h={88} shadow="sm" padding="lg" radius="md" withBorder>
+				<Skeleton height={62} w="70%" circle />
+				<Skeleton height={62} w="40%" circle my={8} />
+				<Skeleton height={62} w="60%" circle />
+			</Card>
+		</SimpleGrid>
+	)
+}
