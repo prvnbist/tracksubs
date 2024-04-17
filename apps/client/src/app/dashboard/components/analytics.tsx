@@ -60,22 +60,20 @@ export const WeeklySubscriptions = () => {
 			)}
 			{status === 'success' && (
 				<ScrollArea h={180} offsetScrollbars="x">
-					<Table stickyHeader>
+					<Table stickyHeader striped>
 						<Table.Thead>
 							<Table.Tr>
-								<Table.Th pl={0}>Currency</Table.Th>
-								<Table.Th pr={0} ta="right">
-									Total
-								</Table.Th>
+								<Table.Th>Currency</Table.Th>
+								<Table.Th ta="right">Total</Table.Th>
 							</Table.Tr>
 						</Table.Thead>
 						<Table.Tbody>
 							{data.map(datum => (
 								<Table.Tr key={datum.currency}>
-									<Table.Td pl={0}>
+									<Table.Td>
 										{datum.currency} [{datum.count}]
 									</Table.Td>
-									<Table.Td pr={0} ta="right">
+									<Table.Td ta="right" ff="monospace">
 										{currencyFormatter(datum.sum / 100, datum.currency)}
 									</Table.Td>
 								</Table.Tr>
@@ -144,24 +142,22 @@ export const TopFiveMostExpensiveSubscriptions = () => {
 						))}
 					</Tabs.List>
 					{tabs.map(tab => (
-						<Tabs.Panel key={tab} value={tab}>
+						<Tabs.Panel key={tab} value={tab} pt={8}>
 							<ScrollArea h={180} offsetScrollbars="x">
-								<Table stickyHeader>
+								<Table stickyHeader striped>
 									<Table.Thead>
 										<Table.Tr>
-											<Table.Th pl={0}>Title</Table.Th>
-											<Table.Th pl={0}>Interval</Table.Th>
-											<Table.Th pr={0} ta="right">
-												Yearly Total
-											</Table.Th>
+											<Table.Th>Title</Table.Th>
+											<Table.Th>Interval</Table.Th>
+											<Table.Th ta="right">Yearly Total</Table.Th>
 										</Table.Tr>
 									</Table.Thead>
 									<Table.Tbody>
 										{data[tab].map((datum: any) => (
 											<Table.Tr key={datum.title}>
-												<Table.Td pl={0}>{datum.title}</Table.Td>
-												<Table.Td pl={0}>{datum.interval}</Table.Td>
-												<Table.Td pr={0} ta="right">
+												<Table.Td>{datum.title}</Table.Td>
+												<Table.Td>{datum.interval}</Table.Td>
+												<Table.Td ta="right" ff="monospace">
 													{currencyFormatter(datum.amount / 100, datum.currency)}
 												</Table.Td>
 											</Table.Tr>

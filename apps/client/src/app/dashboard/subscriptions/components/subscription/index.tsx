@@ -92,7 +92,7 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 					<Badge size="sm" radius="sm" variant="light">
 						{subscription.interval}
 					</Badge>
-					<Text size="lg">
+					<Text size="md" ff="monospace">
 						{new Intl.NumberFormat('en-IN', {
 							style: 'currency',
 							currency: subscription.currency,
