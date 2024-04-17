@@ -33,7 +33,7 @@ const CreateModal = () => {
 			website: '',
 			amount: 0,
 			service: null,
-			currency: 'INR',
+			currency: user.currency || 'INR',
 			next_billing_date: null,
 			interval: 'MONTHLY',
 		},

@@ -13,13 +13,32 @@ export const user = async () => {
 	const { userId } = auth()
 	try {
 		const data = await knex
-			.select('id', 'first_name', ' last_name', 'email', 'auth_id')
+			.select(
+				'id',
+				'first_name',
+				'last_name',
+				'email',
+				'auth_id',
+				'is_onboarded',
+				'timezone',
+				'currency'
+			)
 			.from('user')
 			.where('auth_id', userId)
 			.first()
 		return data
 	} catch (error) {
 		console.log(error)
+	}
+}
+
+export const user_update = async (body: any) => {
+	const { userId } = auth()
+	try {
+		const data = await knex('user').where('auth_id', userId).update(body).returning('id')
+		return data
+	} catch (error) {
+		throw new Error('Failed to update the user!')
 	}
 }
 
