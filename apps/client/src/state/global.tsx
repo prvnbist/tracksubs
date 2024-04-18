@@ -64,13 +64,15 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 	useEffect(() => {
 		;(async () => {
 			const data = await services()
-			setData(existing => ({
-				...existing,
-				services: (data as Service[]).reduce((acc: Record<string, Service>, curr) => {
-					acc[curr.key] = curr
-					return acc
-				}, {}),
-			}))
+			if (Array.isArray(data) && data.length > 0) {
+				setData(existing => ({
+					...existing,
+					services: (data as Service[]).reduce((acc: Record<string, Service>, curr) => {
+						acc[curr.key] = curr
+						return acc
+					}, {}),
+				}))
+			}
 		})()
 	}, [])
 

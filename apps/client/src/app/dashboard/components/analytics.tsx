@@ -15,6 +15,7 @@ import {
 	Table,
 	Tabs,
 	Text,
+	Title,
 } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
@@ -59,28 +60,36 @@ export const WeeklySubscriptions = () => {
 				</Center>
 			)}
 			{status === 'success' && (
-				<ScrollArea h={180} offsetScrollbars="x">
-					<Table stickyHeader striped>
-						<Table.Thead>
-							<Table.Tr>
-								<Table.Th>Currency</Table.Th>
-								<Table.Th ta="right">Total</Table.Th>
-							</Table.Tr>
-						</Table.Thead>
-						<Table.Tbody>
-							{data.map(datum => (
-								<Table.Tr key={datum.currency}>
-									<Table.Td>
-										{datum.currency} [{datum.count}]
-									</Table.Td>
-									<Table.Td ta="right" ff="monospace">
-										{currencyFormatter(datum.sum / 100, datum.currency)}
-									</Table.Td>
-								</Table.Tr>
-							))}
-						</Table.Tbody>
-					</Table>
-				</ScrollArea>
+				<>
+					{data.length > 0 ? (
+						<ScrollArea h={180} offsetScrollbars="x">
+							<Table stickyHeader striped>
+								<Table.Thead>
+									<Table.Tr>
+										<Table.Th>Currency</Table.Th>
+										<Table.Th ta="right">Total</Table.Th>
+									</Table.Tr>
+								</Table.Thead>
+								<Table.Tbody>
+									{data.map(datum => (
+										<Table.Tr key={datum.currency}>
+											<Table.Td>
+												{datum.currency} [{datum.count}]
+											</Table.Td>
+											<Table.Td ta="right" ff="monospace">
+												{currencyFormatter(datum.sum / 100, datum.currency)}
+											</Table.Td>
+										</Table.Tr>
+									))}
+								</Table.Tbody>
+							</Table>
+						</ScrollArea>
+					) : (
+						<Center h={180}>
+							<Title order={4}>No data yet</Title>
+						</Center>
+					)}
+				</>
 			)}
 		</Paper>
 	)
@@ -133,41 +142,49 @@ export const TopFiveMostExpensiveSubscriptions = () => {
 				</Center>
 			)}
 			{status === 'success' && (
-				<Tabs defaultValue={defaultActiveTab}>
-					<Tabs.List>
-						{tabs.map(tab => (
-							<Tabs.Tab key={tab} value={tab}>
-								{tab}
-							</Tabs.Tab>
-						))}
-					</Tabs.List>
-					{tabs.map(tab => (
-						<Tabs.Panel key={tab} value={tab} pt={8}>
-							<ScrollArea h={180} offsetScrollbars="x">
-								<Table stickyHeader striped>
-									<Table.Thead>
-										<Table.Tr>
-											<Table.Th>Title</Table.Th>
-											<Table.Th>Interval</Table.Th>
-											<Table.Th ta="right">Yearly Total</Table.Th>
-										</Table.Tr>
-									</Table.Thead>
-									<Table.Tbody>
-										{data[tab].map((datum: any) => (
-											<Table.Tr key={datum.title}>
-												<Table.Td>{datum.title}</Table.Td>
-												<Table.Td>{datum.interval}</Table.Td>
-												<Table.Td ta="right" ff="monospace">
-													{currencyFormatter(datum.amount / 100, datum.currency)}
-												</Table.Td>
-											</Table.Tr>
-										))}
-									</Table.Tbody>
-								</Table>
-							</ScrollArea>
-						</Tabs.Panel>
-					))}
-				</Tabs>
+				<>
+					{tabs.length === 0 ? (
+						<Center h={180}>
+							<Title order={4}>No data yet</Title>
+						</Center>
+					) : (
+						<Tabs defaultValue={defaultActiveTab}>
+							<Tabs.List>
+								{tabs.map(tab => (
+									<Tabs.Tab key={tab} value={tab}>
+										{tab}
+									</Tabs.Tab>
+								))}
+							</Tabs.List>
+							{tabs.map(tab => (
+								<Tabs.Panel key={tab} value={tab} pt={8}>
+									<ScrollArea h={180} offsetScrollbars="x">
+										<Table stickyHeader striped>
+											<Table.Thead>
+												<Table.Tr>
+													<Table.Th>Title</Table.Th>
+													<Table.Th>Interval</Table.Th>
+													<Table.Th ta="right">Yearly Total</Table.Th>
+												</Table.Tr>
+											</Table.Thead>
+											<Table.Tbody>
+												{data[tab].map((datum: any) => (
+													<Table.Tr key={datum.title}>
+														<Table.Td>{datum.title}</Table.Td>
+														<Table.Td>{datum.interval}</Table.Td>
+														<Table.Td ta="right" ff="monospace">
+															{currencyFormatter(datum.amount / 100, datum.currency)}
+														</Table.Td>
+													</Table.Tr>
+												))}
+											</Table.Tbody>
+										</Table>
+									</ScrollArea>
+								</Tabs.Panel>
+							))}
+						</Tabs>
+					)}
+				</>
 			)}
 		</Paper>
 	)
