@@ -7,6 +7,8 @@ import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 
+import StatsigWrapper from 'state/statsig'
+
 import theme from './theme'
 
 export const metadata = {
@@ -25,12 +27,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<link rel="manifest" href="/site.webmanifest" />
 			</head>
 			<body>
-				<ClerkProvider>
-					<MantineProvider defaultColorScheme="dark" theme={theme}>
-						<Notifications />
-						{children}
-					</MantineProvider>
-				</ClerkProvider>
+				<StatsigWrapper>
+					<ClerkProvider>
+						<MantineProvider defaultColorScheme="dark" theme={theme}>
+							<Notifications />
+							{children}
+						</MantineProvider>
+					</ClerkProvider>
+				</StatsigWrapper>
 			</body>
 		</html>
 	)

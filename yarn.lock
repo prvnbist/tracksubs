@@ -2897,6 +2897,11 @@ js-cookie@3.0.1:
   resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.1.tgz#9e39b4c6c2f56563708d7d31f6f5f21873a92414"
   integrity sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==
 
+js-sha256@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/js-sha256/-/js-sha256-0.11.0.tgz#256a921d9292f7fe98905face82e367abaca9576"
+  integrity sha512-6xNlKayMZvds9h1Y1VWc0fQHQ82BxTXizWPEtEeGvmOUYpBRy4gbWroHLpzowe6xiQhHpelCQiE7HEdznyBL9Q==
+
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -4098,6 +4103,21 @@ split2@^4.1.0:
   resolved "https://registry.yarnpkg.com/split2/-/split2-4.2.0.tgz#c9c5920904d148bab0b9f67145f245a86aadbfa4"
   integrity sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==
 
+statsig-js@4.51.0:
+  version "4.51.0"
+  resolved "https://registry.yarnpkg.com/statsig-js/-/statsig-js-4.51.0.tgz#3b7b26ecd81a59961d621734e9b7db60487f837d"
+  integrity sha512-EbCWfrDHwqntUA1zK4nlnjLMBV+5OAHaZCqmjiw2vOFFp0YTLNNj205lkhP3hbyfNEyPldzJ+ooYwLSifHvAMA==
+  dependencies:
+    js-sha256 "^0.11.0"
+    uuid "^8.3.2"
+
+statsig-react@^1.38.1:
+  version "1.38.1"
+  resolved "https://registry.yarnpkg.com/statsig-react/-/statsig-react-1.38.1.tgz#2700d80d467f001a28747cea13c8ee94b44f4d90"
+  integrity sha512-8tqYk8ucCJxcqMuH+gqkDRywFHUDQOSgkbAlVoBtupNlwuRxMak+BgGX0LeqwNaF0DnFYwyJlr0Z4R2uxqysQQ==
+  dependencies:
+    statsig-js "4.51.0"
+
 streamsearch@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-1.1.0.tgz#404dd1e2247ca94af554e841a8ef0eaa238da764"
@@ -4584,6 +4604,11 @@ util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
+
+uuid@^8.3.2:
+  version "8.3.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
+  integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
 validate-npm-package-license@^3.0.1:
   version "3.0.4"

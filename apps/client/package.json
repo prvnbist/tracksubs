@@ -29,12 +29,13 @@
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"recharts": "2",
+		"statsig-react": "^1.38.1",
 		"svix": "^1.21.0"
 	},
 	"devDependencies": {
+		"@next/eslint-plugin-next": "^14.1.1",
 		"@tracksubs/eslint-config": "*",
 		"@tracksubs/typescript-config": "*",
-		"@next/eslint-plugin-next": "^14.1.1",
 		"@types/eslint": "^8.56.5",
 		"@types/node": "^20.11.24",
 		"@types/pg": "^8.11.4",

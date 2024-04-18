@@ -2,6 +2,7 @@
 import Link from 'next/link'
 
 import { useUser } from '@clerk/nextjs'
+import { useGate } from 'statsig-react'
 import { Button, Flex, Space, Text, Title } from '@mantine/core'
 
 import Logo from 'assets/svgs/logo'
@@ -10,6 +11,7 @@ import classes from './page.module.css'
 
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()
+	const { value: is_signup_allowed } = useGate('is_signup_allowed')
 	return (
 		<main>
 			<Flex component="header" align="center" h="100dvh" className={classes.header}>
@@ -22,7 +24,7 @@ export default function Page(): JSX.Element {
 						Manage subscriptions hassle-free. Track, organize, and save with ease.
 					</Text>
 					<Space h={16} />
-					{isLoaded ? (
+					{is_signup_allowed && isLoaded ? (
 						isSignedIn ? (
 							<Link href="/dashboard">
 								<Button>Go to dashboard</Button>
