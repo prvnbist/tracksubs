@@ -1,14 +1,14 @@
 'use client'
 
+import { useAuth } from '@clerk/clerk-react'
+import { IconBug } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { useAuth } from '@clerk/clerk-react'
+import { Center, Loader, Stack, Text, Title } from '@mantine/core'
 
 import { services, user } from 'actions'
 import { Onboarding } from 'components'
-import { Center, Loader, Stack, Text, Title } from '@mantine/core'
-import { IconBug } from '@tabler/icons-react'
 
 interface Service {
 	id: string

@@ -6,16 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import {
-	Button,
-	Card,
-	Center,
-	Group,
-	Loader,
-	SegmentedControl,
-	SimpleGrid,
-	Skeleton,
-} from '@mantine/core'
+import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
 import { CYCLES } from 'constants/index'
