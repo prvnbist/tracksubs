@@ -1,4 +1,4 @@
-## MySubs🚧
+## TrackSubs 🚧
 
 Manage subscriptions hassle-free. Track, organize, and save with ease.
 

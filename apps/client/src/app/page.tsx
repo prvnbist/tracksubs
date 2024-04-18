@@ -16,7 +16,7 @@ export default function Page(): JSX.Element {
 				<Flex direction="column" align="center" justify="center" w="100%">
 					<Logo size={120} />
 					<Space h={8} />
-					<Title>MySubs</Title>
+					<Title>Track Subs</Title>
 					<Space h={8} />
 					<Text ta="center" size="18px" w={320} style={{ lineHeight: '24px' }}>
 						Manage subscriptions hassle-free. Track, organize, and save with ease.

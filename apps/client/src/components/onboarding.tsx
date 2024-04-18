@@ -70,7 +70,7 @@ const Onboarding = () => {
 			<Card withBorder w={480} p={16}>
 				<Group gap={8} align="center" justify="center">
 					<Logo size={48} />
-					<Title order={2}>MySubs</Title>
+					<Title order={2}>TrackSubs</Title>
 				</Group>
 				<Space h={24} />
 				<Stack gap={4}>

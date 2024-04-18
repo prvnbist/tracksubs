@@ -1,6 +1,6 @@
 {
-	"name": "MySubs",
-	"short_name": "MySubs",
+	"name": "Track Subs",
+	"short_name": "Track Subs",
 	"description": "Manage subscriptions hassle-free. Track, organize, and save with ease.",
 	"icons": [
 		{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },

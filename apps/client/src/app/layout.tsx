@@ -10,7 +10,7 @@ import '@mantine/notifications/styles.css'
 import theme from './theme'
 
 export const metadata = {
-	title: 'MySubs | Praveen Bisht',
+	title: 'TrackSubs | Praveen Bisht',
 	description: 'Manage subscriptions hassle-free. Track, organize, and save with ease.',
 }
 

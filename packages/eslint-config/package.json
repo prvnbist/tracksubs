@@ -1,5 +1,5 @@
 {
-	"name": "@mysubs/eslint-config",
+	"name": "@tracksubs/eslint-config",
 	"version": "0.0.0",
 	"private": true,
 	"files": [
