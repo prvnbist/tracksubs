@@ -13,8 +13,8 @@ import StatsigWrapper from 'state/statsig'
 import theme from './theme'
 
 export const metadata = {
-	title: 'TrackSubs | Praveen Bisht',
-	description: 'Manage subscriptions hassle-free. Track, organize, and save with ease.',
+	title: 'TrackSubs',
+	description: 'Streamline your finances and stay on top of recurring expenses effortlessly.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

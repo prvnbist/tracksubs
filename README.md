@@ -1,6 +1,6 @@
 ## TrackSubs 🚧
 
-Manage subscriptions hassle-free. Track, organize, and save with ease.
+Streamline your finances and stay on top of recurring expenses effortlessly.
 
 |Homepage|Dashboard|
 |--|--|

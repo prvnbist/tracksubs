@@ -4,3 +4,16 @@
 	background-position: center center;
 	background-image: url('../assets/svgs/background.svg');
 }
+
+@media screen and (max-width: 536px) {
+	.header {
+		background-size: auto;
+	}
+}
+
+.coming_soon {
+	position: absolute;
+	top: 24px;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
