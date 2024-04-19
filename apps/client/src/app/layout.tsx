@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 import { Notifications } from '@mantine/notifications'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<link rel="icon" type="image/png" sizes="32x32" href="/logos/favicon-32x32.png" />
 				<link rel="icon" type="image/png" sizes="16x16" href="/logos/favicon-16x16.png" />
 				<link rel="manifest" href="/site.webmanifest" />
+				<GoogleAnalytics gaId="G-9HQWT4K0XG" />
 			</head>
 			<body>
 				<StatsigWrapper>
