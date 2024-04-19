@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<link rel="icon" type="image/png" sizes="32x32" href="/logos/favicon-32x32.png" />
 				<link rel="icon" type="image/png" sizes="16x16" href="/logos/favicon-16x16.png" />
 				<link rel="manifest" href="/site.webmanifest" />
-				<GoogleAnalytics gaId="G-9HQWT4K0XG" />
+				{process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-9HQWT4K0XG" />}
 			</head>
 			<body>
 				<StatsigWrapper>

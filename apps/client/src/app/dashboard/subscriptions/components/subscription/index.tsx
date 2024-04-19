@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { IconTrash } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { sendGAEvent } from '@next/third-parties/google'
 
 import relativeTime from 'dayjs/plugin/relativeTime'
 
@@ -49,6 +50,8 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 
 					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 					queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
+
+					sendGAEvent({ event: 'subscription-delete' })
 				} catch (error) {
 					notifications.show({
 						color: 'red',

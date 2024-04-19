@@ -5,7 +5,15 @@
 		"build": {
 			"dependsOn": ["^build"],
 			"outputs": [".next/**", "!.next/cache/**"],
-			"env": ["DB_HOST", "DB_PORT", "DB_USER", "DB_NAME", "DB_PASS"]
+			"env": [
+				"DB_HOST",
+				"DB_PORT",
+				"DB_USER",
+				"DB_NAME",
+				"DB_PASS",
+				"CLERK_WEBHOOK_SECRET",
+				"NODE_ENV"
+			]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]

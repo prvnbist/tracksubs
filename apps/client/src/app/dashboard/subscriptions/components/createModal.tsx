@@ -3,6 +3,7 @@
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { sendGAEvent } from '@next/third-parties/google'
 
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -75,6 +76,8 @@ const CreateModal = () => {
 
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
+
+			sendGAEvent({ event: 'subscription-create' })
 
 			form.reset()
 			modals.closeAll()
