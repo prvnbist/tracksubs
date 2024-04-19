@@ -77,7 +77,7 @@ const CreateModal = () => {
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
 
-			sendGAEvent({ event: 'subscription-create' })
+			sendGAEvent({ event: 'subscription', value: 'create' })
 
 			form.reset()
 			modals.closeAll()

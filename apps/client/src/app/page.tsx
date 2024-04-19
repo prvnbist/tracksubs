@@ -3,7 +3,9 @@ import Link from 'next/link'
 
 import { useUser } from '@clerk/nextjs'
 import { useGate } from 'statsig-react'
-import { Badge, Button, Center, Flex, Space, Text, Title } from '@mantine/core'
+import { IconBrandGithub } from '@tabler/icons-react'
+import { sendGAEvent } from '@next/third-parties/google'
+import { Badge, Button, Flex, Group, Space, Text, Title } from '@mantine/core'
 
 import Logo from 'assets/svgs/logo'
 
@@ -28,17 +30,33 @@ export default function Page(): JSX.Element {
 					Streamline your finances and stay on top of recurring expenses effortlessly.
 				</Text>
 				<Space h={16} />
-				{is_signup_allowed && isLoaded ? (
-					isSignedIn ? (
-						<Link href="/dashboard">
-							<Button>Go to dashboard</Button>
-						</Link>
-					) : (
-						<Link href="/login">
-							<Button>Get Started</Button>
-						</Link>
-					)
-				) : null}
+				<Group gap={16}>
+					{is_signup_allowed && isLoaded ? (
+						isSignedIn ? (
+							<Link href="/dashboard">
+								<Button>Go to dashboard</Button>
+							</Link>
+						) : (
+							<Link href="/login">
+								<Button>Get Started</Button>
+							</Link>
+						)
+					) : null}
+					<Link
+						target="_blank"
+						rel="noreferrer noopener"
+						href="https://github.com/prvnbist/mysubs"
+						onClick={() => sendGAEvent({ event: 'button', value: 'Github' })}
+					>
+						<Button
+							variant="filled"
+							color="dark.5"
+							leftSection={<IconBrandGithub size={18} />}
+						>
+							Github
+						</Button>
+					</Link>
+				</Group>
 			</Flex>
 		</Flex>
 	)
