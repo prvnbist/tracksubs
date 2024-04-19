@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { GoogleAnalytics } from '@next/third-parties/google'
 
@@ -12,7 +13,7 @@ import StatsigWrapper from 'state/statsig'
 
 import theme from './theme'
 
-export const metadata = {
+export const metadata: Metadata = {
 	title: 'TrackSubs',
 	description: 'Streamline your finances and stay on top of recurring expenses effortlessly.',
 }
