@@ -16,6 +16,33 @@ import theme from './theme'
 export const metadata: Metadata = {
 	title: 'TrackSubs',
 	description: 'Streamline your finances and stay on top of recurring expenses effortlessly.',
+	keywords: [
+		'Subscription',
+		'Tracker',
+		'Tracking',
+		'Transaction',
+		'Renewal',
+		'Subscription management software',
+		'Subscription tracking tool',
+		'Subscription monitoring service',
+		'Recurring payment tracker',
+		'Subscription analytics platform',
+		'Subscription billing solution',
+		'Subscription renewal reminder',
+		'Manage recurring payments',
+		'Subscription lifecycle management',
+		'Track subscription expenses',
+		'Subscription invoice tracking',
+		'Automated subscription management',
+		'Subscription revenue tracking',
+		'Monitor subscription churn',
+		'Subscription billing management',
+		'Subscription tracking app',
+		'Subscription payment tracker',
+		'Subscription tracking dashboard',
+		'Subscription tracking system',
+		'Subscription optimization tool',
+	],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

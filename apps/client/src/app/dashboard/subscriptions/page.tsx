@@ -1,6 +1,11 @@
+import { Metadata } from 'next'
 import { Flex, Title } from '@mantine/core'
 
 import { CreateSubscriptionButton, Subscriptions } from './components'
+
+export const metadata: Metadata = {
+	title: 'Subscriptions | TrackSubs',
+}
 
 export default function Page(): JSX.Element {
 	return (

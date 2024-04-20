@@ -1,9 +1,12 @@
-'use client'
-
 import Link from 'next/link'
+import { Metadata } from 'next'
 import { IconArrowLeft } from '@tabler/icons-react'
 
 import { Button, Container, List, Space, Text, Title } from '@mantine/core'
+
+export const metadata: Metadata = {
+	title: 'Terms of Service | TrackSubs',
+}
 
 export default function Page() {
 	return (
@@ -51,8 +54,8 @@ export default function Page() {
 				service providers below:
 			</Text>
 			<Space h={16} />
-			<List>
-				<List.Item c="dimmed">
+			<ul>
+				<li>
 					<Link
 						target="_blank"
 						rel="noreferrer noopener"
@@ -60,8 +63,8 @@ export default function Page() {
 					>
 						Google Analytics
 					</Link>
-				</List.Item>
-			</List>
+				</li>
+			</ul>
 			<Space h={16} />
 			<Text c="dimmed">
 				It's important to note that there are certain circumstances for which tracksubs.co

@@ -1,9 +1,12 @@
-'use client'
-
 import Link from 'next/link'
+import { Metadata } from 'next'
 import { IconArrowLeft } from '@tabler/icons-react'
 
-import { Button, Container, List, Space, Text, Title } from '@mantine/core'
+import { Button, Container, Space, Text, Title } from '@mantine/core'
+
+export const metadata: Metadata = {
+	title: 'Privacy | TrackSubs',
+}
 
 export default function Page() {
 	return (
@@ -46,8 +49,8 @@ export default function Page() {
 				third-party services that collect information for identification purposes.
 			</Text>
 			<Space h={16} />
-			<List>
-				<List.Item c="dimmed">
+			<ul>
+				<li>
 					<Link
 						target="_blank"
 						rel="noreferrer noopener"
@@ -55,8 +58,8 @@ export default function Page() {
 					>
 						Google Analytics
 					</Link>
-				</List.Item>
-			</List>
+				</li>
+			</ul>
 			<Space h={24} />
 			<Title order={3}>Log Data</Title>
 			<Space h={16} />
@@ -86,12 +89,20 @@ export default function Page() {
 				I may employ third-party companies and individuals due to the following reasons:
 			</Text>
 			<Space h={16} />
-			<List>
-				<List.Item c="dimmed">To facilitate our Service;</List.Item>
-				<List.Item c="dimmed">To provide the Service on our behalf;</List.Item>
-				<List.Item c="dimmed">To perform Service-related services; or</List.Item>
-				<List.Item c="dimmed">To assist us in analyzing how our Service is used.</List.Item>
-			</List>
+			<ul>
+				<Text component="li" c="dimmed">
+					To facilitate our Service;
+				</Text>
+				<Text component="li" c="dimmed">
+					To provide the Service on our behalf;
+				</Text>
+				<Text component="li" c="dimmed">
+					To perform Service-related services; or
+				</Text>
+				<Text component="li" c="dimmed">
+					To assist us in analyzing how our Service is used.
+				</Text>
+			</ul>
 			<Space h={16} />
 			<Text c="dimmed">
 				I wish to inform users of this Service that third parties may have access to their
