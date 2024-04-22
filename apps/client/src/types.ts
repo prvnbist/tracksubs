@@ -9,6 +9,13 @@ export interface User {
 	email: string
 }
 
+export interface Service {
+	id: string
+	key: string
+	title: string
+	website: string
+}
+
 export interface ISubscription {
 	id: string
 	title: string

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { IconCheck } from '@tabler/icons-react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import {
 	Button,
@@ -18,7 +19,6 @@ import type { ComboboxItem, ComboboxLikeRenderOptionInput } from '@mantine/core'
 
 import Logo from 'assets/svgs/logo'
 import { user_update } from 'actions'
-import { useGlobal } from 'state/global'
 import { CURRENCIES, TIMEZONES_DISPLAY } from 'constants/index'
 
 const renderOption = ({
@@ -37,7 +37,7 @@ const renderOption = ({
 )
 
 const Onboarding = () => {
-	const { setData } = useGlobal()
+	const queryClient = useQueryClient()
 
 	const [timezone, setTimezone] = useState<string | null>(null)
 	const [currency, setCurrency] = useState<string | null>(null)
@@ -54,10 +54,7 @@ const Onboarding = () => {
 		try {
 			await user_update({ timezone, currency, is_onboarded: true })
 
-			setData?.((existing: any) => ({
-				...existing,
-				user: { ...existing.user, currency, timezone, is_onboarded: true },
-			}))
+			queryClient.invalidateQueries({ queryKey: ['user'] })
 		} catch (error) {
 			notifications.show({
 				title: 'Error',

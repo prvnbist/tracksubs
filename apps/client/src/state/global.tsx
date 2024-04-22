@@ -1,27 +1,18 @@
 'use client'
 
-import { useAuth } from '@clerk/clerk-react'
-import { IconBug } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext } from 'react'
+import { useQueries } from '@tanstack/react-query'
 
-import { Center, Loader, Stack, Text, Title } from '@mantine/core'
+import { Center, Loader } from '@mantine/core'
 
-import { User } from 'types'
+import { Service, User } from 'types'
 import { services, user } from 'actions'
 import { Onboarding } from 'components'
-
-interface Service {
-	id: string
-	key: string
-	title: string
-	website: string
-}
 
 interface ContextState {
 	user: User
 	services: Record<string, Service>
-	setData?: (data: any) => void
 }
 
 const INITITAL_STATE: ContextState = {
@@ -43,60 +34,51 @@ const Context = createContext(INITITAL_STATE)
 export const useGlobal = () => useContext(Context)
 
 export const GlobalProvider = ({ children }: PropsWithChildren) => {
-	const { isLoaded, userId } = useAuth()
-
-	const [status, setStatus] = useState('LOADING')
-
-	const [data, setData] = useState(INITITAL_STATE)
-
-	useEffect(() => {
-		if (isLoaded) {
-			;(async () => {
-				setStatus('LOADING')
-				try {
-					const result = await user()
-					setData(existing => ({ ...existing, user: { ...result } }))
-					setStatus('SUCCESS')
-				} catch (error) {
-					setStatus('ERROR')
-				}
-			})()
-		}
-	}, [isLoaded, userId])
-
-	useEffect(() => {
-		;(async () => {
-			const data = await services()
-			if (Array.isArray(data) && data.length > 0) {
-				setData(existing => ({
-					...existing,
-					services: (data as Service[]).reduce((acc: Record<string, Service>, curr) => {
-						acc[curr.key] = curr
-						return acc
-					}, {}),
-				}))
+	const { data, isPending } = useQueries({
+		queries: [
+			{
+				retry: 2,
+				queryKey: ['user'],
+				refetchOnWindowFocus: false,
+				queryFn: (): Promise<User | Error> => user(),
+			},
+			{
+				retry: 2,
+				queryKey: ['services'],
+				refetchOnWindowFocus: false,
+				queryFn: (): Promise<Record<string, Service> | Error> => services(),
+			},
+		],
+		combine: results => {
+			return {
+				data: {
+					user: results[0].data as User,
+					services: results[1].data as Record<string, Service>,
+				},
+				isPending: results.some(result => result.isPending),
 			}
-		})()
-	}, [])
+		},
+	})
 
-	if (status === 'LOADING')
+	if (isPending)
 		return (
 			<Center pt={80}>
 				<Loader />
 			</Center>
 		)
-	if (status === 'ERROR')
-		return (
-			<Center pt={80}>
-				<Stack align="center" gap={16}>
-					<IconBug size={40} color="var(--mantine-color-dark-3)" />
-					<Title order={2}>404</Title>
-					<Text c="dimmed">Something went wrong, please refresh the page.</Text>
-				</Stack>
-			</Center>
-		)
+	// if (status === 'ERROR')
+	// 	return (
+	// 		<Center pt={80}>
+	// 			<Stack align="center" gap={16}>
+	// 				<IconBug size={40} color="var(--mantine-color-dark-3)" />
+	// 				<Title order={2}>404</Title>
+	// 				<Text c="dimmed">Something went wrong, please refresh the page.</Text>
+	// 			</Stack>
+	// 		</Center>
+	// 	)
+
 	return (
-		<Context.Provider value={{ ...data, setData }}>
+		<Context.Provider value={data}>
 			{data.user.is_onboarded ? children : <Onboarding />}
 		</Context.Provider>
 	)

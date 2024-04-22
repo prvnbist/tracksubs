@@ -5,11 +5,11 @@ import { auth } from '@clerk/nextjs'
 import weekday from 'dayjs/plugin/weekday'
 
 import knex from 'lib/db'
-import { ActionResponse, ISubscription } from 'types'
+import type { ActionResponse, ISubscription, Service, User } from 'types'
 
 dayjs.extend(weekday)
 
-export const user = async () => {
+export const user = async (): ActionResponse<User> => {
 	const { userId } = auth()
 	try {
 		const data = await knex
@@ -29,7 +29,7 @@ export const user = async () => {
 			.first()
 		return data
 	} catch (error) {
-		console.log(error)
+		throw new Error('Failed to fetch the user.')
 	}
 }
 
@@ -151,14 +151,18 @@ export const subscriptions_analytics_top_five_most_expensive = async (user_id: s
 	}
 }
 
-export const services = async () => {
+export const services = async (): ActionResponse<Record<string, Service>> => {
 	try {
 		const data = await knex
 			.select('id', 'key', ' title', 'website')
 			.from('service')
 			.orderBy('title', 'asc')
-		return data
+
+		return data.reduce((acc, curr) => {
+			acc[curr.key] = curr
+			return acc
+		}, {})
 	} catch (error) {
-		console.log(error)
+		throw new Error('Failed to fetch services.')
 	}
 }
