@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useClerk } from '@clerk/clerk-react'
-import { IconLogout } from '@tabler/icons-react'
+import { IconLogout, IconSettings } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { Avatar, Button, Flex, Menu } from '@mantine/core'
@@ -56,6 +56,13 @@ const Header = (): JSX.Element => {
 				</Menu.Target>
 
 				<Menu.Dropdown>
+					<Menu.Item
+						title="Settings"
+						leftSection={<IconSettings size={18} />}
+						onClick={() => router.push('/dashboard/settings/profile')}
+					>
+						Settings
+					</Menu.Item>
 					<Menu.Item
 						color="red"
 						title="Logout"

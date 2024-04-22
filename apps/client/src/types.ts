@@ -1,3 +1,14 @@
+export interface User {
+	id: string | null
+	currency: string | null
+	timezone: string | null
+	is_onboarded: boolean
+	image_url: string | null
+	first_name: string
+	last_name: string
+	email: string
+}
+
 export interface ISubscription {
 	id: string
 	title: string

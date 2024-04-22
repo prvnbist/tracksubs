@@ -7,6 +7,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 import { Center, Loader, Stack, Text, Title } from '@mantine/core'
 
+import { User } from 'types'
 import { services, user } from 'actions'
 import { Onboarding } from 'components'
 
@@ -17,16 +18,6 @@ interface Service {
 	website: string
 }
 
-interface User {
-	id: string | null
-	currency: string | null
-	timezone: string | null
-	is_onboarded: boolean
-	image_url: string | null
-	first_name: string
-	last_name: string
-}
-
 interface ContextState {
 	user: User
 	services: Record<string, Service>
@@ -35,7 +26,16 @@ interface ContextState {
 
 const INITITAL_STATE: ContextState = {
 	services: {},
-	user: { id: null, is_onboarded: false, currency: null, timezone: null, image_url: null },
+	user: {
+		id: null,
+		is_onboarded: false,
+		currency: null,
+		timezone: null,
+		image_url: null,
+		first_name: '',
+		last_name: '',
+		email: '',
+	},
 }
 
 const Context = createContext(INITITAL_STATE)
