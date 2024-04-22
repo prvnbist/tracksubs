@@ -22,6 +22,9 @@ interface User {
 	currency: string | null
 	timezone: string | null
 	is_onboarded: boolean
+	image_url: string | null
+	first_name: string
+	last_name: string
 }
 
 interface ContextState {
@@ -32,7 +35,7 @@ interface ContextState {
 
 const INITITAL_STATE: ContextState = {
 	services: {},
-	user: { id: null, is_onboarded: false, currency: null, timezone: null },
+	user: { id: null, is_onboarded: false, currency: null, timezone: null, image_url: null },
 }
 
 const Context = createContext(INITITAL_STATE)

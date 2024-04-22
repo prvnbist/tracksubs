@@ -21,7 +21,8 @@ export const user = async () => {
 				'auth_id',
 				'is_onboarded',
 				'timezone',
-				'currency'
+				'currency',
+				'image_url'
 			)
 			.from('user')
 			.where('auth_id', userId)

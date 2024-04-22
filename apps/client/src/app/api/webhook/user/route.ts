@@ -33,6 +33,7 @@ export async function POST(request: Request) {
 					email: email_address,
 					first_name: data.first_name,
 					last_name: data.last_name,
+					...(data.has_image && { image_url: data.image_url }),
 				})
 				.returning('id')
 
