@@ -50,8 +50,9 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 
 					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 					queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
-
-					sendGAEvent({ event: 'subscription', value: 'delete' })
+					queryClient.invalidateQueries({
+						queryKey: ['subscriptions_analytics_top_five_most_expensive'],
+					})
 				} catch (error) {
 					notifications.show({
 						color: 'red',

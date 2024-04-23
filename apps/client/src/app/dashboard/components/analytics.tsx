@@ -18,7 +18,6 @@ import {
 	Title,
 } from '@mantine/core'
 
-import { useGlobal } from 'state/global'
 import { currencyFormatter } from 'utils'
 import {
 	subscriptions_analytics_top_five_most_expensive,
@@ -26,14 +25,11 @@ import {
 } from 'actions'
 
 export const WeeklySubscriptions = () => {
-	const { user } = useGlobal()
-
 	const { status, error, data } = useQuery({
 		retry: 0,
-		enabled: !!user.id,
 		refetchOnWindowFocus: false,
-		queryKey: ['subscriptions_analytics_weekly', user.id],
-		queryFn: () => subscriptions_analytics_weekly(user.id!),
+		queryKey: ['subscriptions_analytics_weekly'],
+		queryFn: () => subscriptions_analytics_weekly(),
 	})
 
 	return (
@@ -44,7 +40,7 @@ export const WeeklySubscriptions = () => {
 				</Text>
 			</Group>
 			<Space h={16} />
-			{status === 'error' && error && (
+			{((status === 'error' && error) || data?.status === 'ERROR') && (
 				<Center h={180}>
 					<Stack gap={8} align="center">
 						<IconAlertTriangle color="var(--mantine-color-red-4)" />
@@ -59,9 +55,9 @@ export const WeeklySubscriptions = () => {
 					<Loader />
 				</Center>
 			)}
-			{status === 'success' && (
+			{status === 'success' && data.status === 'SUCCESS' && (
 				<>
-					{data.length > 0 ? (
+					{data.data.length > 0 ? (
 						<ScrollArea h={180} offsetScrollbars="x">
 							<Table stickyHeader striped>
 								<Table.Thead>
@@ -71,7 +67,7 @@ export const WeeklySubscriptions = () => {
 									</Table.Tr>
 								</Table.Thead>
 								<Table.Tbody>
-									{data.map(datum => (
+									{data.data.map(datum => (
 										<Table.Tr key={datum.currency}>
 											<Table.Td>
 												{datum.currency} [{datum.count}]
@@ -96,20 +92,18 @@ export const WeeklySubscriptions = () => {
 }
 
 export const TopFiveMostExpensiveSubscriptions = () => {
-	const { user } = useGlobal()
-
 	const { status, error, data } = useQuery({
 		retry: 0,
-		enabled: !!user.id,
 		refetchOnWindowFocus: false,
-		queryKey: ['subscriptions_analytics_top_five_most_expensive', user.id],
-		queryFn: () => subscriptions_analytics_top_five_most_expensive(user.id!),
+		queryKey: ['subscriptions_analytics_top_five_most_expensive'],
+		queryFn: () => subscriptions_analytics_top_five_most_expensive(),
 	})
 
 	const { tabs, defaultActiveTab } = useMemo(() => {
-		if (!data || data.size === 0) return { tabs: [], defaultActiveTab: null }
+		if ((status === 'error' && error) || data?.status === 'ERROR')
+			return { tabs: [], defaultActiveTab: null }
 
-		const tabs = Object.keys(data).sort((a, b) => a.localeCompare(b))
+		const tabs = Object.keys(data?.data ?? {}).sort((a, b) => a.localeCompare(b))
 		return { tabs, defaultActiveTab: tabs?.[0] ?? null }
 	}, [data])
 
@@ -126,7 +120,7 @@ export const TopFiveMostExpensiveSubscriptions = () => {
 				</Text>
 			</Group>
 			<Space h={16} />
-			{status === 'error' && error && (
+			{((status === 'error' && error) || data?.status === 'ERROR') && (
 				<Center h={180}>
 					<Stack gap={8} align="center">
 						<IconAlertTriangle color="var(--mantine-color-red-4)" />
@@ -141,7 +135,7 @@ export const TopFiveMostExpensiveSubscriptions = () => {
 					<Loader />
 				</Center>
 			)}
-			{status === 'success' && (
+			{status === 'success' && data.status === 'SUCCESS' && data.data && (
 				<>
 					{tabs.length === 0 ? (
 						<Center h={180}>
@@ -156,32 +150,38 @@ export const TopFiveMostExpensiveSubscriptions = () => {
 									</Tabs.Tab>
 								))}
 							</Tabs.List>
-							{tabs.map(tab => (
-								<Tabs.Panel key={tab} value={tab} pt={8}>
-									<ScrollArea h={180} offsetScrollbars="x">
-										<Table stickyHeader striped>
-											<Table.Thead>
-												<Table.Tr>
-													<Table.Th>Title</Table.Th>
-													<Table.Th>Interval</Table.Th>
-													<Table.Th ta="right">Yearly Total</Table.Th>
-												</Table.Tr>
-											</Table.Thead>
-											<Table.Tbody>
-												{data[tab].map((datum: any) => (
-													<Table.Tr key={datum.title}>
-														<Table.Td>{datum.title}</Table.Td>
-														<Table.Td>{datum.interval}</Table.Td>
-														<Table.Td ta="right" ff="monospace">
-															{currencyFormatter(datum.amount / 100, datum.currency)}
-														</Table.Td>
+							{tabs.map(tab => {
+								const list = data.data[tab]!
+								return (
+									<Tabs.Panel key={tab} value={tab} pt={8}>
+										<ScrollArea h={180} offsetScrollbars="x">
+											<Table stickyHeader striped>
+												<Table.Thead>
+													<Table.Tr>
+														<Table.Th>Title</Table.Th>
+														<Table.Th>Interval</Table.Th>
+														<Table.Th ta="right">Yearly Total</Table.Th>
 													</Table.Tr>
-												))}
-											</Table.Tbody>
-										</Table>
-									</ScrollArea>
-								</Tabs.Panel>
-							))}
+												</Table.Thead>
+												<Table.Tbody>
+													{list.map((datum: any) => (
+														<Table.Tr key={datum.title}>
+															<Table.Td>{datum.title}</Table.Td>
+															<Table.Td>{datum.interval}</Table.Td>
+															<Table.Td ta="right" ff="monospace">
+																{currencyFormatter(
+																	datum.amount / 100,
+																	datum.currency
+																)}
+															</Table.Td>
+														</Table.Tr>
+													))}
+												</Table.Tbody>
+											</Table>
+										</ScrollArea>
+									</Tabs.Panel>
+								)
+							})}
 						</Tabs>
 					)}
 				</>

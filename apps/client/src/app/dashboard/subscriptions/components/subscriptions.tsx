@@ -8,7 +8,6 @@ import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton } from '@mantine/core'
 
-import { useGlobal } from 'state/global'
 import { CYCLES } from 'constants/index'
 import { subscriptions_list } from 'actions'
 import { CreateEmptyState, ErrorState } from 'components'
@@ -17,28 +16,26 @@ import CreateModal from './createModal'
 import Subscription from './subscription'
 
 const Subscriptions = () => {
-	const { user } = useGlobal()
 	const router = useRouter()
 
 	const [interval, setInterval] = useState('ALL')
 
 	const { status, data, error } = useQuery({
 		retry: 0,
-		enabled: !!user.id,
 		refetchOnWindowFocus: false,
-		queryKey: ['subscriptions', user.id, interval],
-		queryFn: () => subscriptions_list(user.id!, interval),
+		queryKey: ['subscriptions', interval],
+		queryFn: () => subscriptions_list(interval),
 	})
 
 	useEffect(() => {
-		if (status === 'error' && error) {
+		if ((status === 'error' && error) || data?.status === 'ERROR') {
 			notifications.show({
 				color: 'red',
 				title: 'Failed',
-				message: error.message,
+				message: data?.message,
 			})
 		}
-	}, [status, error])
+	}, [status, data, error])
 
 	const create = () => {
 		modals.open({
@@ -67,11 +64,11 @@ const Subscriptions = () => {
 					</Button>
 				</ErrorState>
 			)}
-			{status === 'success' && Array.isArray(data) && (
+			{status === 'success' && Array.isArray(data.data) && (
 				<>
-					{data.length ? (
+					{data.data.length ? (
 						<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-							{data.map(subscription => (
+							{data.data.map(subscription => (
 								<Subscription key={subscription.id} subscription={subscription} />
 							))}
 						</SimpleGrid>

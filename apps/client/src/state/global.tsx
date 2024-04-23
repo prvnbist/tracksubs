@@ -40,20 +40,20 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 				retry: 2,
 				queryKey: ['user'],
 				refetchOnWindowFocus: false,
-				queryFn: (): Promise<User | Error> => user(),
+				queryFn: () => user(),
 			},
 			{
 				retry: 2,
 				queryKey: ['services'],
 				refetchOnWindowFocus: false,
-				queryFn: (): Promise<Record<string, Service> | Error> => services(),
+				queryFn: () => services(),
 			},
 		],
 		combine: results => {
 			return {
 				data: {
-					user: results[0].data as User,
-					services: results[1].data as Record<string, Service>,
+					user: results[0].data?.data!,
+					services: results[1].data?.data!,
 				},
 				isPending: results.some(result => result.isPending),
 			}

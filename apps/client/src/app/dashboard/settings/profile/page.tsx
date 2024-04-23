@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { IconCheck } from '@tabler/icons-react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
@@ -50,6 +51,8 @@ interface FormState {
 export default function Page() {
 	const { user } = useGlobal()
 
+	const queryClient = useQueryClient()
+
 	const form = useForm<FormState>({
 		initialValues: {
 			first_name: user.first_name,
@@ -76,7 +79,7 @@ export default function Page() {
 			await user_update(values)
 			notifications.show({ title: 'Success', message: 'Successfully saved profile details.' })
 
-			// TODO: invalidate user query
+			queryClient.invalidateQueries({ queryKey: ['user'] })
 		} catch (error) {
 			notifications.show({ title: 'Error', message: 'Failed to save profile details.' })
 		}

@@ -35,4 +35,6 @@ export interface ISubscription {
 	is_active: boolean
 }
 
-export type ActionResponse<T> = Promise<T | Error>
+export type ActionResponse<T, E> = Promise<
+	{ status: 'SUCCESS'; data: T; message?: never } | { status: 'ERROR'; message: E; data?: never }
+>

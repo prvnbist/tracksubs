@@ -3,7 +3,6 @@
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { sendGAEvent } from '@next/third-parties/google'
 
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -63,7 +62,8 @@ const CreateModal = () => {
 			data.amount = data.amount * 100
 			data.next_billing_date = dayjs(data.next_billing_date).format('YYYY-MM-DD')
 
-			const result = await subscriptions_create({ user_id: user.id, ...data })
+			const result = await subscriptions_create(data)
+
 			if (result.status === 'ERROR') {
 				throw Error()
 			}
@@ -76,8 +76,9 @@ const CreateModal = () => {
 
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
-
-			sendGAEvent({ event: 'subscription', value: 'create' })
+			queryClient.invalidateQueries({
+				queryKey: ['subscriptions_analytics_top_five_most_expensive'],
+			})
 
 			form.reset()
 			modals.closeAll()

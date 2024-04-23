@@ -6,13 +6,18 @@ import weekday from 'dayjs/plugin/weekday'
 import type { JwtPayload } from '@clerk/types'
 
 import knex from 'lib/db'
-import type { ActionResponse, ISubscription, Service, User } from 'types'
+import type { ActionResponse, ISubscription, PaymentMethod, Service, User } from 'types'
 
 dayjs.extend(weekday)
 
-export const user = async (): ActionResponse<User> => {
-	const { userId } = auth()
+export const user = async (): ActionResponse<User, string> => {
 	try {
+		const { userId } = auth()
+
+		if (!userId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
 		const data = await knex
 			.select(
 				'id',
@@ -28,28 +33,46 @@ export const user = async (): ActionResponse<User> => {
 			.from('user')
 			.where('auth_id', userId)
 			.first()
-		return data
+
+		if (!data) return { status: 'ERROR', message: 'No such user found.' }
+
+		return { status: 'SUCCESS', data }
 	} catch (error) {
-		throw new Error('Failed to fetch the user.')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
 export const user_update = async (body: any) => {
-	const { userId } = auth()
 	try {
+		const { userId } = auth()
+
+		if (!userId) return { status: 'ERROR', message: 'User is not authorized.' }
+
 		const data = await knex('user').where('auth_id', userId).update(body).returning('id')
-		return data
+
+		return { status: 'SUCCESS', data }
 	} catch (error) {
-		throw new Error('Failed to update the user!')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
+type SessionClaim = JwtPayload & { metadata: { user_id: string } }
+
+const getUserId = () => {
+	const { sessionClaims } = auth()
+
+	return (sessionClaims as SessionClaim)?.metadata?.user_id
+}
+
 export const subscriptions_list = async (
-	userId: string,
 	interval: string = 'ALL'
-): ActionResponse<ISubscription[]> => {
+): ActionResponse<ISubscription[], string> => {
 	try {
-		const result = await knex
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex
 			.select(
 				'id',
 				'title',
@@ -64,7 +87,7 @@ export const subscriptions_list = async (
 				'payment_method_id'
 			)
 			.from('subscription')
-			.where('user_id', userId)
+			.where('user_id', user_id)
 			.andWhere(builder =>
 				builder.whereIn(
 					'interval',
@@ -73,34 +96,56 @@ export const subscriptions_list = async (
 			)
 			.orderBy('is_active', 'desc')
 			.orderBy('next_billing_date', 'asc')
-		return result
+
+		return { status: 'SUCCESS', data }
 	} catch (error) {
-		throw new Error('Failed to fetch the subscriptions')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-export const subscriptions_create = async (body: any) => {
+export const subscriptions_create = async (body: any): ActionResponse<{ id: string }, string> => {
 	try {
-		const result = await knex('subscription').returning('id').insert(body)
+		const user_id = getUserId()
 
-		return { status: 'SUCCESS', data: result }
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription')
+			.insert({ ...body, user_id })
+			.returning('id')
+
+		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
-		return { status: 'ERROR', data: null }
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-export const subscriptions_delete = async (id: string) => {
+export const subscriptions_delete = async (id: string): ActionResponse<{ id: string }, string> => {
 	try {
-		const result = await knex('subscription').where('id', id).del(['id'])
+		const user_id = getUserId()
 
-		return { status: 'SUCCESS', data: result }
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription')
+			.where('id', id)
+			.andWhere('user_id', user_id)
+			.del()
+			.returning('id')
+
+		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
-		return { status: 'ERROR', data: null }
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-export const subscriptions_analytics_weekly = async (user_id: string) => {
+export const subscriptions_analytics_weekly = async (): ActionResponse<
+	Array<{ count: number; currency: string; sum: number }>,
+	string
+> => {
 	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
 		const data = await knex('subscription')
 			.select('currency')
 			.count()
@@ -110,14 +155,29 @@ export const subscriptions_analytics_weekly = async (user_id: string) => {
 			.andWhere('is_active', '=', true)
 			.andWhere('next_billing_date', '>', dayjs().weekday(0).format('YYYY-MM-DD'))
 			.andWhere('next_billing_date', '<=', dayjs().weekday(7).format('YYYY-MM-DD'))
-		return data
+
+		return {
+			status: 'SUCCESS',
+			data: data.map(datum => ({
+				currency: datum.currency,
+				count: Number(datum.count),
+				sum: Number(datum.sum),
+			})),
+		}
 	} catch (error) {
-		throw new Error('Failed to fetch weekly subscriptions data.')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-export const subscriptions_analytics_top_five_most_expensive = async (user_id: string) => {
+export const subscriptions_analytics_top_five_most_expensive = async (): ActionResponse<
+	Record<string, Array<{ title: string; currency: string; interval: string; amount: number }>>,
+	string
+> => {
 	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
 		const data = await knex
 			.with(
 				'active_subscriptions',
@@ -146,81 +206,78 @@ export const subscriptions_analytics_top_five_most_expensive = async (user_id: s
 			return acc
 		}, {})
 
-		return transformed
+		return { status: 'SUCCESS', data: transformed }
 	} catch (error) {
-		throw new Error('Failed to fetch top five most expensive subscriptions.')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-export const services = async (): ActionResponse<Record<string, Service>> => {
+export const services = async (): ActionResponse<Record<string, Service>, string> => {
 	try {
 		const data = await knex
 			.select('id', 'key', ' title', 'website')
 			.from('service')
 			.orderBy('title', 'asc')
 
-		return data.reduce((acc, curr) => {
-			acc[curr.key] = curr
-			return acc
-		}, {})
+		return {
+			status: 'SUCCESS',
+			data: data.reduce((acc, curr) => {
+				acc[curr.key] = curr
+				return acc
+			}, {}),
+		}
 	} catch (error) {
-		throw new Error('Failed to fetch services.')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-type SessionClaim = JwtPayload & { metadata: { user_id: string } }
-
-export const payment_method_list = async () => {
+export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>,string> => {
 	try {
-		const { sessionClaims } = auth()
-		const user_id = (sessionClaims as SessionClaim)?.metadata?.user_id
+		const user_id = getUserId()
 
-		if (!user_id) throw new Error('Not authorized')
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
 		const data = await knex('payment_method')
 			.select('id', 'title')
 			.where('user_id', user_id)
 			.orderBy('title', 'asc')
 
-		return data
+		return { status: 'SUCCESS', data }
 	} catch (error) {
-		const message = (error as Error).message
-		throw new Error(message)
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
 export const payment_method_create = async (formData: FormData) => {
 	try {
-		const { sessionClaims } = auth()
-		const user_id = (sessionClaims as SessionClaim)?.metadata?.user_id
+		const user_id = getUserId()
 
-		if (!user_id) throw new Error('Not authorized')
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const result = await knex('payment_method')
-			.returning('id')
+		const data = await knex('payment_method')
 			.insert({ title: formData.get('title'), user_id })
+			.returning('id')
 
-		return result
+		return { status: 'SUCCESS', data }
 	} catch (error) {
-		throw new Error('Failed to save payment method.')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
 export const payment_method_delete = async (id: string) => {
 	try {
-		const { sessionClaims } = auth()
-		const user_id = (sessionClaims as SessionClaim)?.metadata?.user_id
+		const user_id = getUserId()
 
-		if (!user_id) throw new Error('Not authorized')
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const result = await knex('payment_method')
+		const data = await knex('payment_method')
 			.where('user_id', user_id)
 			.andWhere('id', id)
-			.returning('id')
 			.del()
+			.returning('id')
 
-		return result
+		return { status: 'SUCCESS', data }
 	} catch (error) {
-		throw new Error('Failed to delete payment method.')
+		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
