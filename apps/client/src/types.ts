@@ -16,6 +16,11 @@ export interface Service {
 	website: string
 }
 
+export interface PaymentMethod {
+	id: string
+	title: string
+}
+
 export interface ISubscription {
 	id: string
 	title: string

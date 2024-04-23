@@ -22,6 +22,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 				<Tabs.Tab value="profile" leftSection={<IconUser size={18} />}>
 					Profile
 				</Tabs.Tab>
+				<Tabs.Tab value="payment-methods" leftSection={<IconCreditCard size={18} />}>
+					Payment Methods
+				</Tabs.Tab>
 			</Tabs.List>
 			<ScrollArea w="100%" h={CONTAINER_HEIGHT} px={24} type="scroll" offsetScrollbars>
 				{children}

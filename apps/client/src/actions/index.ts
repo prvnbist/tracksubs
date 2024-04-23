@@ -3,6 +3,7 @@
 import dayjs from 'dayjs'
 import { auth } from '@clerk/nextjs'
 import weekday from 'dayjs/plugin/weekday'
+import type { JwtPayload } from '@clerk/types'
 
 import knex from 'lib/db'
 import type { ActionResponse, ISubscription, Service, User } from 'types'
@@ -164,5 +165,62 @@ export const services = async (): ActionResponse<Record<string, Service>> => {
 		}, {})
 	} catch (error) {
 		throw new Error('Failed to fetch services.')
+	}
+}
+
+type SessionClaim = JwtPayload & { metadata: { user_id: string } }
+
+export const payment_method_list = async () => {
+	try {
+		const { sessionClaims } = auth()
+		const user_id = (sessionClaims as SessionClaim)?.metadata?.user_id
+
+		if (!user_id) throw new Error('Not authorized')
+
+		const data = await knex('payment_method')
+			.select('id', 'title')
+			.where('user_id', user_id)
+			.orderBy('title', 'asc')
+
+		return data
+	} catch (error) {
+		const message = (error as Error).message
+		throw new Error(message)
+	}
+}
+
+export const payment_method_create = async (formData: FormData) => {
+	try {
+		const { sessionClaims } = auth()
+		const user_id = (sessionClaims as SessionClaim)?.metadata?.user_id
+
+		if (!user_id) throw new Error('Not authorized')
+
+		const result = await knex('payment_method')
+			.returning('id')
+			.insert({ title: formData.get('title'), user_id })
+
+		return result
+	} catch (error) {
+		throw new Error('Failed to save payment method.')
+	}
+}
+
+export const payment_method_delete = async (id: string) => {
+	try {
+		const { sessionClaims } = auth()
+		const user_id = (sessionClaims as SessionClaim)?.metadata?.user_id
+
+		if (!user_id) throw new Error('Not authorized')
+
+		const result = await knex('payment_method')
+			.where('user_id', user_id)
+			.andWhere('id', id)
+			.returning('id')
+			.del()
+
+		return result
+	} catch (error) {
+		throw new Error('Failed to delete payment method.')
 	}
 }
