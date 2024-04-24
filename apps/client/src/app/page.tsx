@@ -61,6 +61,9 @@ export default function Page(): JSX.Element {
 				</Flex>
 			</Flex>
 			<Group py={16} gap={16} justify="center">
+				<Anchor c="white" component={Link} href="/changelog" underline="hover">
+					Changelog
+				</Anchor>
 				<Anchor c="white" component={Link} href="/privacy" underline="hover">
 					Privacy
 				</Anchor>

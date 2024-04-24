@@ -1,0 +1,93 @@
+import Link from 'next/link'
+import { Metadata } from 'next'
+import { IconArrowLeft } from '@tabler/icons-react'
+
+import { Container, Button, Space, Title } from '@mantine/core'
+
+export const metadata: Metadata = {
+	title: 'Changelog | TrackSubs',
+}
+
+export default function Page() {
+	return (
+		<Container py={120}>
+			<Link href="/">
+				<Button variant="outline" color="dark.2" leftSection={<IconArrowLeft size={18} />}>
+					Home
+				</Button>
+			</Link>
+			<Space h={32} />
+			<Title order={2}>Changelog</Title>
+			<Space h={24} />
+			<Title order={4}>Apr 23, 2024</Title>
+			<ul>
+				<li>Payment methods settings</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 22, 2024</Title>
+			<ul>
+				<li>Profile Settings</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 19, 2024</Title>
+			<ul>
+				<li>
+					<Link
+						target="_blank"
+						rel="noreferrer noopener"
+						href="https://marketingplatform.google.com/about/analytics"
+					>
+						Added google analytics
+					</Link>
+				</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 18, 2024</Title>
+			<ul>
+				<li>
+					<Link href="https://statsig.com" target="_blank" rel="noreferrer noopener">
+						Statsig integration
+					</Link>
+				</li>
+				<li>Added privacy policy and terms of service pages</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 17, 2024</Title>
+			<ul>
+				<li>Onboarding screen</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 16, 2024</Title>
+			<ul>
+				<li>Filter subscriptions by renew cycle</li>
+				<li>
+					Added analytics for
+					<ul>
+						<li>Subscriptions renewing in the current week</li>
+						<li>Top five most expensive subscriptions grouped by currency</li>
+					</ul>
+				</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 10, 2024</Title>
+			<ul>
+				<li>Delete subscription</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Apr 8, 2024</Title>
+			<ul>
+				<li>Added subscriptions</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Mar 29, 2024</Title>
+			<ul>
+				<li>
+					<Link href="https://clerk.com" target="_blank" rel="noreferrer noopener">
+						Clerk auth integration
+					</Link>
+				</li>
+				<li>First Commit</li>
+			</ul>
+		</Container>
+	)
+}
