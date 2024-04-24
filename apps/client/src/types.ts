@@ -29,7 +29,7 @@ export interface ISubscription {
 	currency: string
 	interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
 	user_id: string
-	next_billing_date: string | null
+	next_billing_date: string
 	payment_method_id: string
 	service: null | string
 	is_active: boolean

@@ -3,20 +3,32 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import Image from 'next/image'
-import { IconTrash } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { IconCreditCardPay, IconTrash } from '@tabler/icons-react'
 
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { ActionIcon, Badge, Card, Center, Group, Overlay, Stack, Text, Title } from '@mantine/core'
+import {
+	ActionIcon,
+	Badge,
+	Card,
+	Center,
+	Group,
+	Overlay,
+	Space,
+	Stack,
+	Text,
+	Title,
+} from '@mantine/core'
 
 import { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { subscriptions_delete } from 'actions'
 
 import classes from './index.module.css'
+import { CreateTransactionModal } from './component'
 
 dayjs.extend(relativeTime)
 
@@ -28,6 +40,8 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 
 	const dueIn = dayjs(subscription.next_billing_date).diff(dayjs(new Date()), 'week')
 	const isDueThisWeek = dueIn === 0
+
+	const isPastRenewal = dayjs().isAfter(dayjs(subscription.next_billing_date))
 
 	const deleteSubscription = () =>
 		modals.openConfirmModal({
@@ -61,6 +75,13 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 				}
 			},
 		})
+
+	const markPaid = () => {
+		modals.open({
+			title: 'Create Transaction',
+			children: <CreateTransactionModal subscription={subscription} />,
+		})
+	}
 
 	return (
 		<Card shadow="sm" padding="lg" radius="md" withBorder className={classes.card__subscription}>
@@ -110,6 +131,15 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 				className={classes.subscription__card__overlay}
 			>
 				<Center h="100%">
+					{isPastRenewal && (
+						<>
+							<ActionIcon variant="light" title="Mark Paid" onClick={markPaid}>
+								<IconCreditCardPay size={18} />
+							</ActionIcon>
+							<Space w={8} />
+						</>
+					)}
+
 					<ActionIcon
 						color="red.4"
 						variant="light"

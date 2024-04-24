@@ -281,3 +281,41 @@ export const payment_method_delete = async (id: string) => {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
+
+export const transaction_create = async (
+	subscription: ISubscription & { paidOn: Date; paymentMethodId: string }
+) => {
+	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		await knex.transaction(async trx => {
+			await trx('transaction')
+				.insert({
+					user_id,
+					amount: subscription.amount,
+					currency: subscription.currency,
+					subscription_id: subscription.id,
+					payment_method_id: subscription.paymentMethodId,
+					invoice_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
+					paid_date: dayjs(subscription.paidOn).format('YYYY-MM-DD'),
+				})
+				.returning('id')
+
+			await trx('subscription')
+				.where('id', subscription.id)
+				.andWhere('user_id', subscription.user_id)
+				.update({
+					next_billing_date: dayjs(subscription.next_billing_date)
+						.add(30, 'day')
+						.format('YYYY-MM-DD'),
+				})
+				.returning('id')
+		})
+
+		return { status: 'SUCCESS', data: null }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
