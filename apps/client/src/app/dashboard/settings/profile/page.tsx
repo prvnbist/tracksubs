@@ -61,8 +61,8 @@ export default function Page() {
 			timezone: user.timezone,
 		},
 		validate: {
-			first_name: (value: string) => (!!value.trim() ? null : 'Please enter your first name'),
-			last_name: (value: string) => (!!value.trim() ? null : 'Please enter your last name'),
+			first_name: (value: string) => (value.trim() ? null : 'Please enter your first name'),
+			last_name: (value: string) => (value.trim() ? null : 'Please enter your last name'),
 		},
 	})
 

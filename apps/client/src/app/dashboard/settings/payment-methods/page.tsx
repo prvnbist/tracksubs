@@ -19,7 +19,6 @@ import {
 	Title,
 } from '@mantine/core'
 
-import { PaymentMethod } from 'types'
 import { payment_method_create, payment_method_delete, payment_method_list } from 'actions'
 
 export default function Page() {
@@ -91,7 +90,7 @@ export default function Page() {
 					action={async (formData: FormData) => {
 						try {
 							await payment_method_create(formData)
-							query.refetch()
+							refetch()
 							formRef.current?.reset()
 							notifications.show({
 								color: 'green',

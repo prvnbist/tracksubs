@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 import { IconArrowLeft } from '@tabler/icons-react'
 
-import { Button, Container, List, Space, Text, Title } from '@mantine/core'
+import { Button, Container, Space, Text, Title } from '@mantine/core'
 
 export const metadata: Metadata = {
 	title: 'Terms of Service | TrackSubs',

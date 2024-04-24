@@ -231,7 +231,7 @@ export const services = async (): ActionResponse<Record<string, Service>, string
 	}
 }
 
-export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>,string> => {
+export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>, string> => {
 	try {
 		const user_id = getUserId()
 
