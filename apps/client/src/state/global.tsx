@@ -6,17 +6,19 @@ import { useQueries } from '@tanstack/react-query'
 
 import { Center, Loader } from '@mantine/core'
 
-import { Service, User } from 'types'
-import { services, user } from 'actions'
+import { PaymentMethod, Service, User } from 'types'
 import { Onboarding } from 'components'
+import { payment_method_list, services, user } from 'actions'
 
 interface ContextState {
 	user: User
 	services: Record<string, Service>
+	payment_methods: Array<PaymentMethod>
 }
 
 const INITITAL_STATE: ContextState = {
 	services: {},
+	payment_methods: [],
 	user: {
 		id: null,
 		is_onboarded: false,
@@ -48,12 +50,19 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 				refetchOnWindowFocus: false,
 				queryFn: () => services(),
 			},
+			{
+				retry: 2,
+				refetchOnWindowFocus: false,
+				queryKey: ['payment_methods'],
+				queryFn: () => payment_method_list(),
+			},
 		],
 		combine: results => {
 			return {
 				data: {
 					user: results[0].data?.data!,
 					services: results[1].data?.data!,
+					payment_methods: results[2].data?.data!,
 				},
 				isPending: results.some(result => result.isPending),
 			}

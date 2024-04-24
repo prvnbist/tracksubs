@@ -2,37 +2,25 @@
 
 import { useRef } from 'react'
 import { useFormStatus } from 'react-dom'
-import { useQuery } from '@tanstack/react-query'
-import { IconAlertTriangle, IconPlus, IconTrash } from '@tabler/icons-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { IconPlus, IconTrash } from '@tabler/icons-react'
 
 import { notifications } from '@mantine/notifications'
-import {
-	ActionIcon,
-	Box,
-	Center,
-	Group,
-	Input,
-	Loader,
-	Space,
-	Stack,
-	Text,
-	Title,
-} from '@mantine/core'
+import { ActionIcon, Box, Group, Input, Space, Stack, Title } from '@mantine/core'
 
-import { payment_method_create, payment_method_delete, payment_method_list } from 'actions'
+import { useGlobal } from 'state/global'
+import { payment_method_create, payment_method_delete } from 'actions'
 
 export default function Page() {
 	const formRef = useRef<HTMLFormElement | null>(null)
 
-	const { status, data, refetch } = useQuery({
-		queryKey: ['payment_methods'],
-		queryFn: () => payment_method_list(),
-	})
+	const queryClient = useQueryClient()
+	const { payment_methods } = useGlobal()
 
 	const deletePaymentMethod = async (id: string) => {
 		try {
 			await payment_method_delete(id)
-			refetch()
+			queryClient.invalidateQueries({ queryKey: ['payment_methods'] })
 			notifications.show({
 				color: 'green',
 				title: 'Success',
@@ -53,36 +41,19 @@ export default function Page() {
 			<Space h={16} />
 			<Box w={480}>
 				<Stack gap={8}>
-					{status === 'pending' && (
-						<Center py={24}>
-							<Loader />
-						</Center>
-					)}
-					{(status === 'error' || data?.status === 'ERROR') && (
-						<Center h={180}>
-							<Stack gap={8} align="center">
-								<IconAlertTriangle color="var(--mantine-color-red-4)" />
-								<Text size="sm" c="dimmed">
-									Failed to fetch
-								</Text>
-							</Stack>
-						</Center>
-					)}
-					{status === 'success' &&
-						data.status === 'SUCCESS' &&
-						data.data.map(datum => (
-							<Group gap={8}>
-								<Input flex={1} key={datum.id} defaultValue={datum.title} />
-								<ActionIcon
-									size="lg"
-									type="submit"
-									variant="subtle"
-									onClick={() => deletePaymentMethod(datum.id)}
-								>
-									<IconTrash size={18} />
-								</ActionIcon>
-							</Group>
-						))}
+					{payment_methods.map(payment_method => (
+						<Group gap={8}>
+							<Input flex={1} key={payment_method.id} defaultValue={payment_method.title} />
+							<ActionIcon
+								size="lg"
+								type="submit"
+								variant="subtle"
+								onClick={() => deletePaymentMethod(payment_method.id)}
+							>
+								<IconTrash size={18} />
+							</ActionIcon>
+						</Group>
+					))}
 				</Stack>
 				<Space h={8} />
 				<form
@@ -90,7 +61,7 @@ export default function Page() {
 					action={async (formData: FormData) => {
 						try {
 							await payment_method_create(formData)
-							refetch()
+							queryClient.invalidateQueries({ queryKey: ['payment_methods'] })
 							formRef.current?.reset()
 							notifications.show({
 								color: 'green',
