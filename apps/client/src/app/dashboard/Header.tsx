@@ -42,6 +42,15 @@ const Header = (): JSX.Element => {
 				>
 					Subscriptions
 				</Button>
+				<Button
+					size="xs"
+					radius="xl"
+					title="Transactions"
+					onClick={() => router.push('/dashboard/transactions')}
+					variant={pathname === '/dashboard/transactions' ? 'filled' : 'subtle'}
+				>
+					Transactions
+				</Button>
 			</Flex>
 			<Menu shadow="md" width={200} position="bottom-end">
 				<Menu.Target>

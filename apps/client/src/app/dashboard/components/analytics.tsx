@@ -59,7 +59,7 @@ export const WeeklySubscriptions = () => {
 				<>
 					{data.data.length > 0 ? (
 						<ScrollArea h={180} offsetScrollbars="x">
-							<Table stickyHeader striped>
+							<Table stickyHeader striped verticalSpacing="4px">
 								<Table.Thead>
 									<Table.Tr>
 										<Table.Th>Currency</Table.Th>
@@ -155,7 +155,7 @@ export const TopFiveMostExpensiveSubscriptions = () => {
 								return (
 									<Tabs.Panel key={tab} value={tab} pt={8}>
 										<ScrollArea h={180} offsetScrollbars="x">
-											<Table stickyHeader striped>
+											<Table stickyHeader striped verticalSpacing="4px">
 												<Table.Thead>
 													<Table.Tr>
 														<Table.Th>Title</Table.Th>

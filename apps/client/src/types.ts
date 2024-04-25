@@ -29,10 +29,23 @@ export interface ISubscription {
 	currency: string
 	interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
 	user_id: string
-	next_billing_date: string
+	next_billing_date: string | null
 	payment_method_id: string
 	service: null | string
 	is_active: boolean
+}
+
+export interface Transaction {
+	id: string
+	title: string
+	amount: number
+	currency: string
+	invoice_date: Date
+	paid_date: Date
+	payment_method: string
+	payment_method_id: string
+	subscription_id: string
+	service: string | null
 }
 
 export type ActionResponse<T, E> = Promise<

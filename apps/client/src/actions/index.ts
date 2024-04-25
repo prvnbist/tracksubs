@@ -6,7 +6,14 @@ import weekday from 'dayjs/plugin/weekday'
 import type { JwtPayload } from '@clerk/types'
 
 import knex from 'lib/db'
-import type { ActionResponse, ISubscription, PaymentMethod, Service, User } from 'types'
+import type {
+	ActionResponse,
+	ISubscription,
+	PaymentMethod,
+	Service,
+	Transaction,
+	User,
+} from 'types'
 
 dayjs.extend(weekday)
 
@@ -315,6 +322,34 @@ export const transaction_create = async (
 		})
 
 		return { status: 'SUCCESS', data: null }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
+export const transaction_list = async (): ActionResponse<Transaction[], string> => {
+	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('transaction')
+			.join('subscription', 'transaction.subscription_id', 'subscription.id')
+			.join('payment_method', 'transaction.payment_method_id', 'payment_method.id')
+			.select(
+				'transaction.id',
+				'transaction.amount',
+				'transaction.currency',
+				'transaction.invoice_date',
+				'transaction.paid_date',
+				'transaction.payment_method_id',
+				'transaction.subscription_id',
+				'subscription.title',
+				'subscription.service',
+				'payment_method.title as payment_method'
+			)
+
+		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}

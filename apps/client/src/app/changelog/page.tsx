@@ -19,6 +19,12 @@ export default function Page() {
 			<Space h={32} />
 			<Title order={2}>Changelog</Title>
 			<Space h={24} />
+			<Title order={4}>Apr 25, 2024</Title>
+			<ul>
+				<li>Transactions Page</li>
+				<li>Mark subscription past due date as paid via creating a transaction</li>
+			</ul>
+			<Space h={24} />
 			<Title order={4}>Apr 23, 2024</Title>
 			<ul>
 				<li>Payment methods settings</li>

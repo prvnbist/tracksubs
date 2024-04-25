@@ -22,19 +22,13 @@ const theme: MantineThemeOverride = createTheme({
 		Table: Table.extend({
 			styles: {
 				th: {
+					height: '28px',
 					paddingTop: '0px',
 					paddingBottom: '0px',
 					fontSize: '12px',
 					fontWeight: '500',
 					textTransform: 'uppercase',
 					color: 'var(--mantine-color-dark-2)',
-				},
-				td: {
-					paddingTop: '0px',
-					paddingBottom: '0px',
-				},
-				tr: {
-					height: '32px',
 				},
 			},
 		}),
