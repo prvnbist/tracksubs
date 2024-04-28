@@ -10,6 +10,7 @@ import { Center, Group, Loader, Stack, Table, Text, Title } from '@mantine/core'
 import { useGlobal } from 'state/global'
 import { currencyFormatter } from 'utils'
 import { transaction_list } from 'actions'
+import { CreateEmptyState } from 'components'
 
 const Transactions = () => {
 	const { services } = useGlobal()
@@ -37,6 +38,15 @@ const Transactions = () => {
 				</Stack>
 			</Center>
 		)
+	
+	if (query.data.data.length === 0) {
+		return (
+			<CreateEmptyState
+				title="No transactions"
+				description="Your transactions will show up here once you mark a due subscription as paid."
+			/>
+		)
+	}
 	return (
 		<Table striped withTableBorder withColumnBorders>
 			<Table.Thead>
