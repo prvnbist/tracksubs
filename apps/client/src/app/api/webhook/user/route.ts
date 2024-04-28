@@ -1,9 +1,11 @@
 import { Webhook } from 'svix'
+import { Resend } from 'resend'
 import { headers } from 'next/headers'
 import { clerkClient } from '@clerk/nextjs'
 import { WebhookEvent } from '@clerk/nextjs/server'
 
 import knex from 'lib/db'
+import UserSignUp from 'emails/UserSignUp'
 
 const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET || ``
 
@@ -46,7 +48,16 @@ export async function POST(request: Request) {
 				})
 			}
 
-			// TODO: send welcome email
+			if (process.env.NODE_ENV === 'production') {
+				const resend = new Resend(process.env.RESEND_API_KEY)
+
+				await resend.emails.send({
+					from: 'TrackSubs <onboard@tracksubs.co>',
+					to: email_address,
+					subject: 'Welcome to tracksubs.co',
+					react: UserSignUp({ firstName: data.first_name ?? '' }),
+				})
+			}
 		}
 
 		return Response.json({ message: 'Received' })

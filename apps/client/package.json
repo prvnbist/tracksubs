@@ -6,7 +6,8 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint . --max-warnings 0"
+		"lint": "eslint . --max-warnings 0",
+		"dev:email": "email dev --dir ./src/emails"
 	},
 	"dependencies": {
 		"@clerk/clerk-react": "^4.30.7",
@@ -20,6 +21,7 @@
 		"@mantine/modals": "^7.7.1",
 		"@mantine/notifications": "^7.7.1",
 		"@next/third-parties": "^14.2.2",
+		"@react-email/components": "0.0.16",
 		"@tabler/icons-react": "^3.1.0",
 		"@tanstack/react-query": "^5.29.2",
 		"dayjs": "^1.11.10",
@@ -29,7 +31,9 @@
 		"pg": "^8.11.5",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"react-email": "2.1.1",
 		"recharts": "2",
+		"resend": "^3.2.0",
 		"statsig-react": "^1.38.1",
 		"svix": "^1.21.0"
 	},

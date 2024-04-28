@@ -43,7 +43,7 @@ export interface Transaction {
 	invoice_date: Date
 	paid_date: Date
 	payment_method: string
-	payment_method_id: string
+	payment_method_id: string | null
 	subscription_id: string
 	service: string | null
 }

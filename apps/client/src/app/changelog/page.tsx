@@ -19,6 +19,16 @@ export default function Page() {
 			<Space h={32} />
 			<Title order={2}>Changelog</Title>
 			<Space h={24} />
+			<Title order={4}>Apr 28, 2024</Title>
+			<ul>
+				<li>
+					<Link href="https://resend.com" target="_blank" rel="noreferrer noopener">
+						Resend Integration
+					</Link>
+				</li>
+				<li>Welcome email on new user signup</li>
+			</ul>
+			<Space h={24} />
 			<Title order={4}>Apr 25, 2024</Title>
 			<ul>
 				<li>Transactions Page</li>
