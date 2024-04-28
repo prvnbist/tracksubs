@@ -1,14 +1,10 @@
-import * as React from 'react'
-
 import { Tailwind } from '@react-email/tailwind'
 import {
 	Body,
-	Button,
 	Column,
 	Container,
 	Font,
 	Head,
-	Heading,
 	Hr,
 	Html,
 	Img,
