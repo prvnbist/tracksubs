@@ -334,8 +334,8 @@ export const transaction_list = async (): ActionResponse<Transaction[], string> 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
 		const data = await knex('transaction')
-			.join('subscription', 'transaction.subscription_id', 'subscription.id')
-			.join('payment_method', 'transaction.payment_method_id', 'payment_method.id')
+			.leftJoin('subscription', 'transaction.subscription_id', 'subscription.id')
+			.leftJoin('payment_method', 'transaction.payment_method_id', 'payment_method.id')
 			.select(
 				'transaction.id',
 				'transaction.amount',

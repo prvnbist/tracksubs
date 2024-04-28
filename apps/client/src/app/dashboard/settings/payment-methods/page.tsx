@@ -19,7 +19,11 @@ export default function Page() {
 
 	const deletePaymentMethod = async (id: string) => {
 		try {
-			await payment_method_delete(id)
+			const result = await payment_method_delete(id)
+			if (result.status === 'ERROR') {
+				throw Error()
+			}
+
 			queryClient.invalidateQueries({ queryKey: ['payment_methods'] })
 			notifications.show({
 				color: 'green',
@@ -42,7 +46,7 @@ export default function Page() {
 			<Box w={480}>
 				<Stack gap={8}>
 					{payment_methods.map(payment_method => (
-						<Group gap={8}>
+						<Group gap={8} key={payment_method.id}>
 							<Input flex={1} key={payment_method.id} defaultValue={payment_method.title} />
 							<ActionIcon
 								size="lg"
@@ -60,6 +64,15 @@ export default function Page() {
 					ref={formRef}
 					action={async (formData: FormData) => {
 						try {
+							if (!(formData.get('title') as string)?.trim()) {
+								notifications.show({
+									color: 'orange',
+									title: 'Warning',
+									message: 'Please enter the payment method title',
+								})
+								return
+							}
+
 							await payment_method_create(formData)
 							queryClient.invalidateQueries({ queryKey: ['payment_methods'] })
 							formRef.current?.reset()
@@ -78,7 +91,7 @@ export default function Page() {
 					}}
 				>
 					<Group gap={8}>
-						<Input flex={1} placeholder="Enter payment method title" name="title" />
+						<Input required flex={1} placeholder="Enter payment method title" name="title" />
 						<SubmitButton />
 					</Group>
 				</form>
