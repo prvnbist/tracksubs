@@ -290,7 +290,7 @@ export const payment_method_delete = async (id: string) => {
 }
 
 export const transaction_create = async (
-	subscription: ISubscription & { paidOn: Date; paymentMethodId: string }
+	subscription: ISubscription & { paidOn: Date; paymentMethodId?: string }
 ) => {
 	try {
 		const user_id = getUserId()
@@ -304,7 +304,9 @@ export const transaction_create = async (
 					amount: subscription.amount,
 					currency: subscription.currency,
 					subscription_id: subscription.id,
-					payment_method_id: subscription.paymentMethodId,
+					...(subscription.payment_method_id && {
+						payment_method_id: subscription.paymentMethodId,
+					}),
 					invoice_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
 					paid_date: dayjs(subscription.paidOn).format('YYYY-MM-DD'),
 				})

@@ -21,9 +21,14 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 
 	const create = async () => {
 		try {
-			await transaction_create({ ...subscription, paidOn, paymentMethodId: paymentMethodId! })
+			await transaction_create({
+				...subscription,
+				paidOn,
+				...(paymentMethodId && { paymentMethodId }),
+			})
 
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+			queryClient.invalidateQueries({ queryKey: ['transactions'] })
 
 			modals.closeAll()
 
@@ -89,7 +94,7 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 				data={payment_methods.map(pm => ({ value: pm.id, label: pm.title }))}
 			/>
 			<Space h={16} />
-			<Button fullWidth disabled={!paidOn || !paymentMethodId} onClick={create}>
+			<Button fullWidth disabled={!paidOn} onClick={create}>
 				Create Transaction
 			</Button>
 		</div>
