@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { IconCreditCard, IconUser } from '@tabler/icons-react'
+import { IconChartPie2, IconCreditCard, IconUser } from '@tabler/icons-react'
 
 import { ScrollArea, Tabs } from '@mantine/core'
 
@@ -24,6 +24,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 				</Tabs.Tab>
 				<Tabs.Tab value="payment-methods" leftSection={<IconCreditCard size={18} />}>
 					Payment Methods
+				</Tabs.Tab>
+				<Tabs.Tab value="usage" leftSection={<IconChartPie2 size={18} />}>
+					Usage
 				</Tabs.Tab>
 			</Tabs.List>
 			<ScrollArea w="100%" h={CONTAINER_HEIGHT} px={24} type="scroll" offsetScrollbars>

@@ -61,6 +61,7 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 						message: `Successfully deleted the subscription - ${subscription.title}`,
 					})
 
+					queryClient.invalidateQueries({ queryKey: ['user'] })
 					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 					queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
 					queryClient.invalidateQueries({

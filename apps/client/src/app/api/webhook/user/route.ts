@@ -39,8 +39,17 @@ export async function POST(request: Request) {
 				})
 				.returning('id')
 
+			const { id } = user[0]
+
+			const usage = await knex('usage')
+				.insert({
+					user_id: id,
+				})
+				.returning('id')
+
+			await knex('user').where('id', id).update({ usage_id: usage[0].id })
+
 			if (Array.isArray(user) && user.length > 0) {
-				const { id } = user[0]
 				await clerkClient.users.updateUserMetadata(data.id, {
 					publicMetadata: {
 						user_id: id,

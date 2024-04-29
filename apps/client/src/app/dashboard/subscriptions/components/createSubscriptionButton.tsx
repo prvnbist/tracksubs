@@ -4,11 +4,24 @@ import { IconPlus } from '@tabler/icons-react'
 
 import { modals } from '@mantine/modals'
 import { ActionIcon } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
+
+import { useGlobal } from 'state/global'
 
 import CreateModal from './createModal'
 
 const CreateSubscriptionButton = () => {
+	const { user } = useGlobal()
 	const create = () => {
+		if (user.total_subscriptions >= 10) {
+			notifications.show({
+				color: 'red.5',
+				title: 'Usage Alert',
+				message:
+					'Selected plan allows you to create upto 10 subscriptions. Please change your plan to the one that fits your needs.',
+			})
+			return
+		}
 		modals.open({
 			title: 'Create Subscription',
 			children: <CreateModal />,

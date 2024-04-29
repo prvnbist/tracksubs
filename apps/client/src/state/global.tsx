@@ -28,6 +28,7 @@ const INITITAL_STATE: ContextState = {
 		first_name: '',
 		last_name: '',
 		email: '',
+		total_subscriptions: 0,
 	},
 }
 
@@ -88,7 +89,7 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 
 	return (
 		<Context.Provider value={data}>
-			{data.user.is_onboarded ? children : <Onboarding />}
+			{data.user?.is_onboarded ? children : <Onboarding />}
 		</Context.Provider>
 	)
 }

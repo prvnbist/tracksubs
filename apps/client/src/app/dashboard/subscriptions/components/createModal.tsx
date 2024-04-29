@@ -74,6 +74,7 @@ const CreateModal = () => {
 				message: `Successfully created the subscription - ${data.title}`,
 			})
 
+			queryClient.invalidateQueries({ queryKey: ['user'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions_analytics_weekly'] })
 			queryClient.invalidateQueries({

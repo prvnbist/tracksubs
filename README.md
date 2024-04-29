@@ -14,6 +14,8 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 |![Subscriptions: Empty](https://res.cloudinary.com/prvnbist/image/upload/v1713354168/mysubs_subscription_empty_zmv4uw.jpg)|![Subscriptions: Cards](https://res.cloudinary.com/prvnbist/image/upload/v1713354169/mysubs_subscriptions_list_gn1h0i.jpg)|
 |Settings: Profile|Settings: Payment Methods|
 |![Settings: Profile](https://res.cloudinary.com/prvnbist/image/upload/v1713937854/tracksubs_profile_settings_todmwz.jpg)|![Settings: Payment Methods](https://res.cloudinary.com/prvnbist/image/upload/v1713937854/tracksubs_payment_methods_tw6fzw.jpg)|
+|Settings: Usage||
+|![Settings: Usage](https://res.cloudinary.com/prvnbist/image/upload/v1714378623/tracksubs_usage_settings_bve12z.jpg)||
 
 ### Tech Stack
 1. [NextJs](https://nextjs.org/): Client App

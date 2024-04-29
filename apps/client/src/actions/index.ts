@@ -25,9 +25,10 @@ export const user = async (): ActionResponse<User, string> => {
 			return { status: 'ERROR', message: 'User is not authorized.' }
 		}
 
-		const data = await knex
+		const data = await knex('user')
+			.leftJoin('usage', 'user.usage_id', 'usage.id')
 			.select(
-				'id',
+				'user.id',
 				'first_name',
 				'last_name',
 				'email',
@@ -35,9 +36,10 @@ export const user = async (): ActionResponse<User, string> => {
 				'is_onboarded',
 				'timezone',
 				'currency',
-				'image_url'
+				'image_url',
+				'usage_id',
+				'usage.total_subscriptions'
 			)
-			.from('user')
 			.where('auth_id', userId)
 			.first()
 
@@ -120,6 +122,10 @@ export const subscriptions_create = async (body: any): ActionResponse<{ id: stri
 			.insert({ ...body, user_id })
 			.returning('id')
 
+		await knex('usage').where('user_id', user_id).increment({
+			total_subscriptions: 1,
+		})
+
 		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
@@ -137,6 +143,10 @@ export const subscriptions_delete = async (id: string): ActionResponse<{ id: str
 			.andWhere('user_id', user_id)
 			.del()
 			.returning('id')
+
+		await knex('usage').where('user_id', user_id).decrement({
+			total_subscriptions: 1,
+		})
 
 		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
