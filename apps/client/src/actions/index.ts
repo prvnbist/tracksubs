@@ -366,3 +366,17 @@ export const transaction_list = async (): ActionResponse<Transaction[], string> 
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
+
+export const waitlist_add = async (email: string): ActionResponse<{ email: string }, string> => {
+	try {
+		const data = await knex('waitlist').insert({ email }).returning('id')
+
+		return { status: 'SUCCESS', data: data?.[0] }
+	} catch (error) {
+		if ((error as Error).message.includes('waitlist_email_unique')) {
+			return { status: 'ERROR', message: `ALREADY_ADDED` }
+		}
+
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
