@@ -28,6 +28,8 @@ const INITITAL_STATE: ContextState = {
 		first_name: '',
 		last_name: '',
 		email: '',
+		plan: 'FREE',
+		total_alerts: 0,
 		total_subscriptions: 0,
 	},
 }

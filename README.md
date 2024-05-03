@@ -11,11 +11,11 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 |Homepage|Dashboard|
 |![Homepage](https://res.cloudinary.com/prvnbist/image/upload/v1713354167/mysubs_homepage_fr6dpe.jpg)|![Dashboard](https://res.cloudinary.com/prvnbist/image/upload/v1713354169/mysubs_dashboard_g9if1v.jpg)|
 |Subscriptions: Empty|Subscription: Cards|
-|![Subscriptions: Empty](https://res.cloudinary.com/prvnbist/image/upload/v1713354168/mysubs_subscription_empty_zmv4uw.jpg)|![Subscriptions: Cards](https://res.cloudinary.com/prvnbist/image/upload/v1713354169/mysubs_subscriptions_list_gn1h0i.jpg)|
+|![Subscriptions: Empty](https://res.cloudinary.com/prvnbist/image/upload/v1713354168/mysubs_subscription_empty_zmv4uw.jpg)|![Subscriptions: Cards](https://res.cloudinary.com/prvnbist/image/upload/v1714466492/tracksubs_subscriptions_cards_zukpqw.jpg)|
 |Settings: Profile|Settings: Payment Methods|
 |![Settings: Profile](https://res.cloudinary.com/prvnbist/image/upload/v1713937854/tracksubs_profile_settings_todmwz.jpg)|![Settings: Payment Methods](https://res.cloudinary.com/prvnbist/image/upload/v1713937854/tracksubs_payment_methods_tw6fzw.jpg)|
-|Settings: Usage||
-|![Settings: Usage](https://res.cloudinary.com/prvnbist/image/upload/v1714378623/tracksubs_usage_settings_bve12z.jpg)||
+|Settings: Usage|Settings: Plan|
+|![Settings: Usage](https://res.cloudinary.com/prvnbist/image/upload/v1714466373/tracksubs_settings_usage_wb9egm.jpg)|![Settings: Plan](https://res.cloudinary.com/prvnbist/image/upload/v1714466430/tracksubs_settings_plan_lujzmi.jpg)|
 
 ### Tech Stack
 1. [NextJs](https://nextjs.org/): Client App

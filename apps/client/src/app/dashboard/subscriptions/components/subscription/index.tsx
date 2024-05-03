@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
-import { IconCreditCardPay, IconTrash } from '@tabler/icons-react'
+import { IconBell, IconBellOff, IconCreditCardPay, IconTrash } from '@tabler/icons-react'
 
 import relativeTime from 'dayjs/plugin/relativeTime'
 
@@ -16,6 +16,7 @@ import {
 	Card,
 	Center,
 	Group,
+	Indicator,
 	Overlay,
 	Space,
 	Stack,
@@ -24,8 +25,9 @@ import {
 } from '@mantine/core'
 
 import { ISubscription } from 'types'
+import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
-import { subscriptions_delete } from 'actions'
+import { subscription_alert, subscriptions_delete } from 'actions'
 
 import classes from './index.module.css'
 import { CreateTransactionModal } from './component'
@@ -33,7 +35,7 @@ import { CreateTransactionModal } from './component'
 dayjs.extend(relativeTime)
 
 const Subscription = ({ subscription }: { subscription: ISubscription }) => {
-	const { services } = useGlobal()
+	const { user, services } = useGlobal()
 	const queryClient = useQueryClient()
 
 	const service = subscription.service ? services[subscription.service] : null
@@ -42,6 +44,8 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 	const isDueThisWeek = dueIn === 0
 
 	const isPastRenewal = dayjs().isAfter(dayjs(subscription.next_billing_date))
+
+	const plan = PLANS[user.plan]
 
 	const deleteSubscription = () =>
 		modals.openConfirmModal({
@@ -84,19 +88,73 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 		})
 	}
 
+	const setAlert = () => {
+		if (!subscription.email_alert && user.total_alerts === plan.alerts) {
+			return notifications.show({
+				color: 'red.5',
+				title: 'Usage Alert',
+				message: `Selected plan allows upto ${plan.alerts} alerts. Please change your plan to the one that fits your needs.`,
+			})
+		}
+
+		modals.openConfirmModal({
+			title: 'Email Alert',
+			children: (
+				<Text size="sm">
+					{subscription.email_alert
+						? 'Please confirm if you want disable '
+						: 'Please confirm if you want to recieve '}
+					email alerts for the subscription: {subscription.title}
+				</Text>
+			),
+			labels: { confirm: 'Confirm', cancel: 'Cancel' },
+			onConfirm: async () => {
+				try {
+					const result = await subscription_alert(subscription.id, !subscription.email_alert)
+
+					if (result.status === 'ERROR') throw Error()
+
+					queryClient.invalidateQueries({ queryKey: ['user'] })
+					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+
+					notifications.show({
+						color: 'green',
+						title: 'Success',
+						message: subscription.email_alert
+							? `Disabled the email alerts for: ${subscription.title}`
+							: `You will now recieve alerts for: ${subscription.title}`,
+					})
+				} catch (error) {
+					notifications.show({
+						color: 'red',
+						title: 'Error',
+						message: 'Something went wrong, please try again!',
+					})
+				}
+			},
+		})
+	}
+
 	return (
 		<Card shadow="sm" padding="lg" radius="md" withBorder className={classes.card__subscription}>
 			<Group justify="space-between">
 				<Group gap={16}>
 					{service && (
-						<Link href={subscription.website}>
-							<Image
-								width={40}
-								height={40}
-								alt={subscription.title}
-								src={`/services/${service.key}.svg`}
-							/>
-						</Link>
+						<Indicator
+							size={12}
+							withBorder
+							color="green"
+							disabled={!subscription.email_alert}
+						>
+							<Link href={subscription.website}>
+								<Image
+									width={40}
+									height={40}
+									alt={subscription.title}
+									src={`/services/${service.key}.svg`}
+								/>
+							</Link>
+						</Indicator>
 					)}
 					<Stack gap={0}>
 						<Title order={4}>{subscription.title}</Title>
@@ -140,7 +198,10 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 							<Space w={8} />
 						</>
 					)}
-
+					<ActionIcon variant="light" onClick={setAlert}>
+						{subscription.email_alert ? <IconBellOff size={18} /> : <IconBell size={18} />}
+					</ActionIcon>
+					<Space w={8} />
 					<ActionIcon
 						color="red.4"
 						variant="light"

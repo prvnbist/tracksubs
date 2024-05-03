@@ -6,19 +6,22 @@ import { modals } from '@mantine/modals'
 import { ActionIcon } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
+import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 
 import CreateModal from './createModal'
 
 const CreateSubscriptionButton = () => {
 	const { user } = useGlobal()
+
+	const plan = PLANS[user.plan]
+
 	const create = () => {
-		if (user.total_subscriptions >= 10) {
+		if (user.total_subscriptions === plan.subscriptions) {
 			notifications.show({
 				color: 'red.5',
 				title: 'Usage Alert',
-				message:
-					'Selected plan allows you to create upto 10 subscriptions. Please change your plan to the one that fits your needs.',
+				message: `Selected plan allows you to create upto ${plan.subscriptions} subscriptions. Please change your plan to the one that fits your needs.`,
 			})
 			return
 		}

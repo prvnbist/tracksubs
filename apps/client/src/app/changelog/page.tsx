@@ -19,6 +19,12 @@ export default function Page() {
 			<Space h={32} />
 			<Title order={2}>Changelog</Title>
 			<Space h={24} />
+			<Title order={4}>May 3, 2024</Title>
+			<ul>
+				<li>Email Alerts</li>
+				<li>User Plan</li>
+			</ul>
+			<Space h={24} />
 			<Title order={4}>Apr 29, 2024</Title>
 			<ul>
 				<li>Usage stats in settings</li>

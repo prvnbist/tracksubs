@@ -21,11 +21,13 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 
 	const create = async () => {
 		try {
-			await transaction_create({
+			const result = await transaction_create({
 				...subscription,
 				paidOn,
 				...(paymentMethodId && { paymentMethodId }),
 			})
+
+			if (result.status === 'ERROR') throw Error()
 
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			queryClient.invalidateQueries({ queryKey: ['transactions'] })

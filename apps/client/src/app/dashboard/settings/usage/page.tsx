@@ -1,58 +1,93 @@
 'use client'
 
-import { useMemo } from 'react'
+import { Card, Center, RingProgress, SimpleGrid, Space, Text, Title } from '@mantine/core'
 
-import { Box, Card, Center, RingProgress, Space, Text, Title } from '@mantine/core'
-
+import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 
-const ALLOWED_SUBSCRIPTIONS = 10
+const usageBasedColor = (usage: number) => {
+	if (usage <= 1 / 3) return 'green'
+	else if (usage > 1 / 3 && usage <= 2 / 3) return 'orange'
+	else if (usage > 2 / 3) return 'red.6'
+	return 'dark.7'
+}
 
 export default function Page() {
 	const { user } = useGlobal()
 
-	const color = useMemo(() => {
-		const count = user.total_subscriptions
-		if (count > 0 && count <= 5) return 'green'
-		else if (count > 5 && count <= 8) return 'orange'
-		else if (count > 8) return 'red.6'
-		else return 'dark.4'
-	}, [user.total_subscriptions])
+	const plan = PLANS[user.plan]
 
 	return (
 		<div>
 			<Space h={24} />
 			<Title order={2}>Usage</Title>
 			<Space h={16} />
-			<Box w={480}>
+			<SimpleGrid cols={{ base: 1, xs: 1, md: 2 }}>
 				<Card withBorder>
 					<Title order={4}>Subscriptions</Title>
 					<Text c="dimmed" size="sm">
-						Selected plan allows you to create upto {ALLOWED_SUBSCRIPTIONS} subscriptions.
+						Selected plan allows you to create upto {plan.subscriptions} subscriptions.
 					</Text>
 					<Center>
 						<RingProgress
 							label={
 								<Center>
 									<Text>
-										{user.total_subscriptions}/{ALLOWED_SUBSCRIPTIONS}
+										{user.total_subscriptions}/{plan.subscriptions}
 									</Text>
 								</Center>
 							}
 							roundCaps
 							size={160}
 							thickness={20}
-							sections={[
-								{
-									color,
-									tooltip: 'Used',
-									value: user.total_subscriptions * 10,
-								},
-							]}
+							sections={
+								user.total_subscriptions > 0
+									? [
+											{
+												tooltip: 'Used',
+												color: usageBasedColor(
+													user.total_subscriptions / plan.subscriptions
+												),
+												value: user.total_subscriptions * (100 / plan.subscriptions),
+											},
+										]
+									: []
+							}
 						/>
 					</Center>
 				</Card>
-			</Box>
+				<Card withBorder>
+					<Title order={4}>Alerts</Title>
+					<Text c="dimmed" size="sm">
+						Selected plan allows you to set upto {plan.alerts} alerts.
+					</Text>
+					<Center>
+						<RingProgress
+							label={
+								<Center>
+									<Text>
+										{user.total_alerts}/{plan.alerts}
+									</Text>
+								</Center>
+							}
+							roundCaps
+							size={160}
+							thickness={20}
+							sections={
+								user.total_alerts > 0
+									? [
+											{
+												tooltip: 'Used',
+												value: user.total_alerts * (100 / plan.alerts),
+												color: usageBasedColor(user.total_alerts / plan.alerts),
+											},
+										]
+									: []
+							}
+						/>
+					</Center>
+				</Card>
+			</SimpleGrid>
 		</div>
 	)
 }

@@ -6,11 +6,11 @@ export const CYCLES = [
 	{ value: 'YEARLY', label: 'Yearly' },
 ]
 
-let currencyNames = new Intl.DisplayNames(['en'], { type: 'currency' })
+export const CURRENCY_NAMES = new Intl.DisplayNames(['en'], { type: 'currency' })
 export const CURRENCIES = Intl.supportedValuesOf('currency')
 	.map(c => ({
 		value: c,
-		label: currencyNames.of(c) ?? '',
+		label: CURRENCY_NAMES.of(c) ?? '',
 	}))
 	.sort((a, b) => a.label.localeCompare(b.label))
 
@@ -32,3 +32,15 @@ export const TIMEZONES_DISPLAY: Array<{
 	...NEUTRAL_TIMEZONES.sort((a, b) => a.timezone.localeCompare(b.timezone)),
 	...POSITIVE_TIMEZONES.sort((a, b) => a.gmt_offset.localeCompare(b.gmt_offset)),
 ]
+
+export const PLANS = {
+	FREE: {
+		title: 'Free',
+		price: {
+			amount: 0,
+			currency: 'USD',
+		},
+		alerts: 3,
+		subscriptions: 10,
+	},
+}

@@ -38,6 +38,8 @@ export const user = async (): ActionResponse<User, string> => {
 				'currency',
 				'image_url',
 				'usage_id',
+				'plan',
+				'usage.total_alerts',
 				'usage.total_subscriptions'
 			)
 			.where('auth_id', userId)
@@ -92,6 +94,7 @@ export const subscriptions_list = async (
 				'user_id',
 				'service',
 				'is_active',
+				'email_alert',
 				'next_billing_date',
 				'payment_method_id'
 			)
@@ -147,6 +150,37 @@ export const subscriptions_delete = async (id: string): ActionResponse<{ id: str
 		await knex('usage').where('user_id', user_id).decrement({
 			total_subscriptions: 1,
 		})
+
+		return { status: 'SUCCESS', data: data?.[0] }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
+export const subscription_alert = async (
+	id: string,
+	enabled: boolean
+): ActionResponse<{ id: string }, string> => {
+	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription')
+			.where('id', id)
+			.andWhere('user_id', user_id)
+			.update({ email_alert: enabled })
+			.returning('id')
+
+		if (enabled) {
+			await knex('usage').where('user_id', user_id).increment({
+				total_alerts: 1,
+			})
+		} else {
+			await knex('usage').where('user_id', user_id).decrement({
+				total_alerts: 1,
+			})
+		}
 
 		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
@@ -301,7 +335,7 @@ export const payment_method_delete = async (id: string) => {
 
 export const transaction_create = async (
 	subscription: ISubscription & { paidOn: Date; paymentMethodId?: string }
-) => {
+): ActionResponse<null, string> => {
 	try {
 		const user_id = getUserId()
 

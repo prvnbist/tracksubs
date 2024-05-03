@@ -7,7 +7,9 @@ export interface User {
 	first_name: string
 	last_name: string
 	email: string
+	total_alerts: number
 	total_subscriptions: number
+	plan: 'FREE'
 }
 
 export interface Service {
@@ -34,6 +36,7 @@ export interface ISubscription {
 	payment_method_id: string
 	service: null | string
 	is_active: boolean
+	email_alert: boolean
 }
 
 export interface Transaction {
