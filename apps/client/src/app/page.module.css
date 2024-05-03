@@ -38,18 +38,36 @@
 .fold_1_content div:first-child > div {
 	transform: scale(1.1);
 	height: 280px;
-    width: 280px;
-    border-radius: 100%;
-    backdrop-filter: blur(15px);
-    background: var(--mantine-color-dark-7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	width: 280px;
+	border-radius: 100%;
+	backdrop-filter: blur(15px);
+	background: var(--mantine-color-dark-7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.tagline {
+	width: 380px;
+	line-height: 24px;
+}
+
+.waitlist_container {
+	display: flex;
+	gap: 16px;
 }
 
 @media screen and (max-width: 536px) {
 	.header {
 		background-size: auto;
+	}
+
+	.tagline { 
+		width: calc(100% - 32px);
+	}
+
+	.waitlist_container {
+		flex-direction: column;
 	}
 
 	.fold_1_wrapper {
@@ -69,7 +87,8 @@
 		margin-top: 40px;
 	}
 
-	.fold_1_content h2, .fold_1_content p {
+	.fold_1_content h2,
+	.fold_1_content p {
 		text-align: center;
 	}
 }

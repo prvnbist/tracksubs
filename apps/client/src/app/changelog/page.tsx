@@ -21,6 +21,11 @@ export default function Page() {
 			<Space h={24} />
 			<Title order={4}>May 3, 2024</Title>
 			<ul>
+				<li>
+					<Link href="https://trigger.dev/" target="_blank" rel="noreferrer noopener">
+						Trigger.dev Integration
+					</Link>
+				</li>
 				<li>Email Alerts</li>
 				<li>User Plan</li>
 			</ul>

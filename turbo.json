@@ -15,7 +15,9 @@
 				"NODE_ENV",
 				"NEXT_PUBLIC_STATSIG_CLIENT_KEY",
 				"NEXT_PUBLIC_STATSIG_USER_ID",
-				"RESEND_API_KEY"
+				"RESEND_API_KEY",
+				"TRIGGER_API_KEY",
+				"TRIGGER_API_URL"
 			]
 		},
 		"lint": {

@@ -36,7 +36,7 @@ client.defineJob({
 	name: 'Subscription Reminder Alert',
 	trigger: cronTrigger({ cron: '0 */3 * * *' }),
 	enabled: process.env.NODE_ENV === 'production',
-	run: async (payload, io, ctx) => {
+	run: async (payload, io) => {
 		const result = await io.runTask('get-subscriptions', async () => {
 			dayjs.extend(utc)
 			dayjs.extend(timezone)

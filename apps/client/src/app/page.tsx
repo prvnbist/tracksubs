@@ -34,7 +34,7 @@ export default function Page(): JSX.Element {
 
 	const subscribe = async () => {
 		try {
-			if (!!email.trim()) {
+			if (email.trim()) {
 				if (isEmail('ERROR')(email.trim()) === 'ERROR') {
 					return notifications.show({
 						title: 'Warning',
@@ -81,7 +81,7 @@ export default function Page(): JSX.Element {
 					<Space h={8} />
 					<Title>Track Subs</Title>
 					<Space h={8} />
-					<Text ta="center" size="18px" px={16} w={380} style={{ lineHeight: '24px' }}>
+					<Text ta="center" size="18px" className={classes.tagline}>
 						Streamline your finances and stay on top of recurring expenses effortlessly.
 					</Text>
 					<Space h={16} />
@@ -97,17 +97,15 @@ export default function Page(): JSX.Element {
 								</Link>
 							)
 						) : (
-							<Stack>
-								<Group>
-									<TextInput
-										w={280}
-										value={email}
-										placeholder="example@gmail.com"
-										onChange={e => setEmail(e.target.value)}
-									/>
-									<Button onClick={subscribe}>Join Waitlist</Button>
-								</Group>
-							</Stack>
+							<div className={classes.waitlist_container}>
+								<TextInput
+									w={280}
+									value={email}
+									placeholder="example@gmail.com"
+									onChange={e => setEmail(e.target.value)}
+								/>
+								<Button onClick={subscribe}>Join Waitlist</Button>
+							</div>
 						)}
 					</Group>
 				</Flex>
