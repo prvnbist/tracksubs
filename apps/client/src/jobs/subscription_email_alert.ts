@@ -30,7 +30,7 @@ const resend = new Resend({
 })
 
 client.defineJob({
-	version: '0.0.1',
+	version: '0.0.2',
 	integrations: { resend },
 	id: 'subscription_email_alert',
 	name: 'Subscription Reminder Alert',
@@ -104,6 +104,8 @@ client.defineJob({
 									renewal_date: datum.subscription_next_billing_date,
 									user_id: datum.user_id,
 									subscription_id: datum.subscription_id,
+									timezone: datum.user_timezone,
+									executed_at: dayjs.utc().format('YYYY-MM-DDThh:MM:ssZ'),
 								})
 							})
 						)
