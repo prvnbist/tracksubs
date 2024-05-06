@@ -1,4 +1,6 @@
 import { Metadata } from 'next'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 import { ModalsProvider } from '@mantine/modals'
 import { Container, Divider } from '@mantine/core'
 
@@ -25,6 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					</Container>
 				</ModalsProvider>
 			</GlobalProvider>
+			{process.env.NODE_ENV === 'production' && <ReactQueryDevtools />}
 		</QueryProvider>
 	)
 }

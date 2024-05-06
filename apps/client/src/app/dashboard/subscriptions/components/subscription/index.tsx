@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconBell, IconBellOff, IconCreditCardPay, IconTrash } from '@tabler/icons-react'
 
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
@@ -32,6 +34,8 @@ import { subscription_alert, subscriptions_delete } from 'actions'
 import classes from './index.module.css'
 import { CreateTransactionModal } from './component'
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
 const Subscription = ({ subscription }: { subscription: ISubscription }) => {
@@ -40,10 +44,13 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 
 	const service = subscription.service ? services[subscription.service] : null
 
-	const dueIn = dayjs(subscription.next_billing_date).diff(dayjs(new Date()), 'week')
+	const billing_date = dayjs.utc(subscription.next_billing_date).tz(user.timezone!, true)
+
+	const dueIn = billing_date.diff(dayjs.utc(new Date()), 'week')
+
 	const isDueThisWeek = dueIn === 0
 
-	const isPastRenewal = dayjs().isAfter(dayjs(subscription.next_billing_date))
+	const isPastRenewal = dayjs.utc().isAfter(billing_date)
 
 	const plan = PLANS[user.plan]
 
@@ -161,8 +168,8 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 						{subscription.is_active ? (
 							<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
 								{isDueThisWeek
-									? `Due ${dayjs(subscription.next_billing_date).tz(user.timezone!).fromNow()}`
-									: `Due: ${dayjs(subscription.next_billing_date).tz(user.timezone!).format('MMM DD, YYYY')}`}
+									? `Due ${billing_date.fromNow()}`
+									: `Due: ${billing_date.format('MMM DD, YYYY')}`}
 							</Text>
 						) : (
 							<Text size="sm" c="dimmed">
