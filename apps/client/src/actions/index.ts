@@ -15,8 +15,6 @@ import type {
 	User,
 } from 'types'
 
-dayjs.extend(weekday)
-
 export const user = async (): ActionResponse<User, string> => {
 	try {
 		const { userId } = auth()
@@ -193,6 +191,8 @@ export const subscriptions_analytics_weekly = async (): ActionResponse<
 	string
 > => {
 	try {
+		dayjs.extend(weekday)
+
 		const user_id = getUserId()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }

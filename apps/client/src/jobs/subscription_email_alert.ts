@@ -30,7 +30,7 @@ const resend = new Resend({
 })
 
 client.defineJob({
-	version: '0.0.2',
+	version: '0.0.3',
 	integrations: { resend },
 	id: 'subscription_email_alert',
 	name: 'Subscription Reminder Alert',
@@ -41,9 +41,8 @@ client.defineJob({
 			dayjs.extend(utc)
 			dayjs.extend(timezone)
 
-			const today = dayjs.utc().format('YYYY-MM-DDThh:MM:ssZ')
+			const today = dayjs.utc().format('YYYY-MM-DDTHH:MM:ssZ')
 			const tomorrow = dayjs.utc().add(1, 'day').format('YYYY-MM-DD')
-			const overmorrow = dayjs.utc().add(2, 'day').format('YYYY-MM-DD')
 
 			const timezones = TIMEZONES_DISPLAY.reduce((acc: Array<string>, curr) => {
 				const hour = dayjs.utc(today).tz(curr.timezone).hour()
@@ -71,7 +70,7 @@ client.defineJob({
 				})
 				.select(...COLUMNS)
 				.where({ 's.is_active': true, 's.email_alert': true })
-				.andWhere('s.next_billing_date', 'in', [tomorrow, overmorrow])
+				.andWhere('s.next_billing_date', tomorrow)
 		})
 
 		if (Array.isArray(result) && result.length === 0) return
@@ -95,36 +94,40 @@ client.defineJob({
 
 			await Promise.all(
 				groupedByEmail.map(async group => {
-					await io.runTask('log-email', async () => {
-						await Promise.all(
-							group.list.map(async datum => {
-								await knex('subscription_reminder_log').insert({
+					try {
+						await io.runTask('log-email', async () => {
+							await Promise.all(
+								group.list.map(async datum => {
+									await knex('subscription_reminder_log').insert({
+										amount: datum.subscription_amount,
+										currency: datum.subscription_currency,
+										renewal_date: datum.subscription_next_billing_date,
+										user_id: datum.user_id,
+										subscription_id: datum.subscription_id,
+										timezone: datum.user_timezone,
+										executed_at: dayjs.utc().format('YYYY-MM-DDTHH:MM:ssZ'),
+									})
+								})
+							)
+						})
+					} catch (error) {}
+
+					try {
+						await io.resend.emails.send('send-email', {
+							from: 'Subscription Reminder | TrackSubs <reminder@tracksubs.co>',
+							to: group.email,
+							subject: 'You have subscription/s renewing tomorrow',
+							react: RenewalAlert({
+								firstName: group.first_name,
+								subscriptions: group.list.map(datum => ({
+									id: datum.subscription_id,
+									title: datum.subscription_title,
 									amount: datum.subscription_amount,
 									currency: datum.subscription_currency,
-									renewal_date: datum.subscription_next_billing_date,
-									user_id: datum.user_id,
-									subscription_id: datum.subscription_id,
-									timezone: datum.user_timezone,
-									executed_at: dayjs.utc().format('YYYY-MM-DDThh:MM:ssZ'),
-								})
-							})
-						)
-					})
-
-					await io.resend.emails.send('send-email', {
-						from: 'Subscription Reminder | TrackSubs <reminder@tracksubs.co>',
-						to: group.email,
-						subject: 'You have subscription/s renewing tomorrow',
-						react: RenewalAlert({
-							firstName: group.first_name,
-							subscriptions: group.list.map(datum => ({
-								id: datum.subscription_id,
-								title: datum.subscription_title,
-								amount: datum.subscription_amount,
-								currency: datum.subscription_currency,
-							})),
-						}),
-					})
+								})),
+							}),
+						})
+					} catch (error) {}
 				})
 			)
 		})

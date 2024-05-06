@@ -161,8 +161,8 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 						{subscription.is_active ? (
 							<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
 								{isDueThisWeek
-									? `Due ${dayjs(subscription.next_billing_date).fromNow()}`
-									: `Due: ${dayjs(subscription.next_billing_date).format('MMM DD, YYYY')}`}
+									? `Due ${dayjs(subscription.next_billing_date).tz(user.timezone!).fromNow()}`
+									: `Due: ${dayjs(subscription.next_billing_date).tz(user.timezone!).format('MMM DD, YYYY')}`}
 							</Text>
 						) : (
 							<Text size="sm" c="dimmed">
