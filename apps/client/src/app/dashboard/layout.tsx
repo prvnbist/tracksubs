@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					</Container>
 				</ModalsProvider>
 			</GlobalProvider>
-			{process.env.NODE_ENV === 'production' && <ReactQueryDevtools />}
+			{process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
 		</QueryProvider>
 	)
 }
