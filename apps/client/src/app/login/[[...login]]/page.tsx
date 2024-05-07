@@ -10,10 +10,15 @@ export const metadata: Metadata = {
 
 export default function Page() {
 	return (
-		<Center pt="lg">
+		<Center pt={80}>
 			<SignIn
 				appearance={{
 					baseTheme: dark,
+					layout: {
+						logoPlacement: 'outside',
+						privacyPageUrl: '/privacy',
+						termsPageUrl: '/terms-of-service',
+					},
 				}}
 			/>
 		</Center>
