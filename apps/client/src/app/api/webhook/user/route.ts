@@ -4,7 +4,8 @@ import { headers } from 'next/headers'
 import { clerkClient } from '@clerk/nextjs'
 import { WebhookEvent } from '@clerk/nextjs/server'
 
-import knex from 'lib/db'
+import knex from '@tracksubs/db'
+
 import UserSignUp from 'emails/UserSignUp'
 
 const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET || ``

@@ -5,7 +5,8 @@ import { cronTrigger } from '@trigger.dev/sdk'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 
-import knex from 'lib/db'
+import knex from '@tracksubs/db'
+
 import { client } from 'trigger'
 import RenewalAlert from 'emails/RenewalAlert'
 import { TIMEZONES_DISPLAY } from 'constants/index'

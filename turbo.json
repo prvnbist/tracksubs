@@ -26,6 +26,10 @@
 		"dev": {
 			"cache": false,
 			"persistent": true
-		}
+		},
+		"migrate:make": { "cache": false },
+		"migrate:up": { "cache": false },
+		"seed:make": { "cache": false },
+		"seed:up": { "cache": false }
 	}
 }

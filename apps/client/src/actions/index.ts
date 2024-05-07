@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs'
 import weekday from 'dayjs/plugin/weekday'
 import type { JwtPayload } from '@clerk/types'
 
-import knex from 'lib/db'
+import knex from '@tracksubs/db'
 import type {
 	ActionResponse,
 	ISubscription,
