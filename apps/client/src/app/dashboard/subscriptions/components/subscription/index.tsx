@@ -2,6 +2,7 @@
 
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { lazy } from 'react'
 import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconBell, IconBellOff, IconCreditCardPay, IconTrash } from '@tabler/icons-react'
@@ -32,7 +33,8 @@ import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_delete } from 'actions'
 
 import classes from './index.module.css'
-import { CreateTransactionModal } from './component'
+
+const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

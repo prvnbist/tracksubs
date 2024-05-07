@@ -1,5 +1,6 @@
 'use client'
 
+import { lazy } from 'react'
 import { IconPlus } from '@tabler/icons-react'
 
 import { modals } from '@mantine/modals'
@@ -9,7 +10,7 @@ import { notifications } from '@mantine/notifications'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 
-import CreateModal from './createModal'
+const CreateModal = lazy(() => import('./createModal'))
 
 const CreateSubscriptionButton = () => {
 	const { user } = useGlobal()

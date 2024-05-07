@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { lazy, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 
@@ -12,8 +12,8 @@ import { CYCLES } from 'constants/index'
 import { subscriptions_list } from 'actions'
 import { CreateEmptyState, ErrorState } from 'components'
 
-import CreateModal from './createModal'
-import Subscription from './subscription'
+const CreateModal = lazy(() => import('./createModal'))
+const Subscription = lazy(() => import('./subscription'))
 
 const Subscriptions = () => {
 	const router = useRouter()
