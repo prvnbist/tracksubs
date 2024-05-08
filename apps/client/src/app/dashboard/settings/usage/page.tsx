@@ -15,7 +15,7 @@ const usageBasedColor = (usage: number) => {
 export default function Page() {
 	const { user } = useGlobal()
 
-	const plan = PLANS[user.plan]
+	const plan = PLANS[user.plan]!
 
 	return (
 		<div>

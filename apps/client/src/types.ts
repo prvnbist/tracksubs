@@ -9,7 +9,7 @@ export interface User {
 	email: string
 	total_alerts: number
 	total_subscriptions: number
-	plan: 'FREE'
+	plan: 'FREE' | 'BASIC' | 'PRO'
 }
 
 export interface Service {
@@ -55,3 +55,10 @@ export interface Transaction {
 export type ActionResponse<T, E> = Promise<
 	{ status: 'SUCCESS'; data: T; message?: never } | { status: 'ERROR'; message: E; data?: never }
 >
+
+export type Plan = {
+	title: string
+	alerts: number
+	subscriptions: number
+	price: { amount: number; currency: string }
+}

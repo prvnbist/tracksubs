@@ -54,7 +54,7 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 
 	const isPastRenewal = dayjs.utc().isAfter(billing_date)
 
-	const plan = PLANS[user.plan]
+	const plan = PLANS[user.plan]!
 
 	const deleteSubscription = () =>
 		modals.openConfirmModal({

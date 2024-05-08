@@ -1,3 +1,4 @@
+import type { Plan } from 'types'
 import timezones from './timezones.json'
 
 export const CYCLES = [
@@ -33,7 +34,7 @@ export const TIMEZONES_DISPLAY: Array<{
 	...POSITIVE_TIMEZONES.sort((a, b) => a.gmt_offset.localeCompare(b.gmt_offset)),
 ]
 
-export const PLANS = {
+export const PLANS: Record<string, Plan> = {
 	FREE: {
 		title: 'Free',
 		price: {
@@ -42,5 +43,23 @@ export const PLANS = {
 		},
 		alerts: 3,
 		subscriptions: 10,
+	},
+	BASIC: {
+		title: 'Basic',
+		price: {
+			amount: 4.99,
+			currency: 'USD',
+		},
+		alerts: 20,
+		subscriptions: 20,
+	},
+	PRO: {
+		title: 'Pro',
+		price: {
+			amount: 9.99,
+			currency: 'USD',
+		},
+		alerts: 50,
+		subscriptions: 50,
 	},
 }

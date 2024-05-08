@@ -15,7 +15,7 @@ const CreateModal = lazy(() => import('./createModal'))
 const CreateSubscriptionButton = () => {
 	const { user } = useGlobal()
 
-	const plan = PLANS[user.plan]
+	const plan = PLANS[user.plan]!
 
 	const create = () => {
 		if (user.total_subscriptions === plan.subscriptions) {
