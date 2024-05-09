@@ -10,6 +10,7 @@ import { currencyFormatter } from 'utils'
 export default function Page() {
 	const { user } = useGlobal()
 
+
 	return (
 		<div>
 			<Space h={24} />
@@ -18,7 +19,7 @@ export default function Page() {
 				<Badge variant="default">Monthly</Badge>
 			</Group>
 			<Space h={16} />
-			<SimpleGrid cols={{ base: 3, xs: 1, sm: 3 }}>
+			<SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }}>
 				{Object.keys(PLANS).map((key: keyof typeof PLANS) => (
 					<Plan
 						plan={PLANS[key]!}

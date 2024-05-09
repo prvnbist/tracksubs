@@ -3,7 +3,8 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { IconChartPie2, IconCreditCard, IconFileInvoice, IconUser } from '@tabler/icons-react'
 
-import { ScrollArea, Tabs } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
+import { Box, ScrollArea, Tabs } from '@mantine/core'
 
 const CONTAINER_HEIGHT = 'calc(100dvh - 65px)'
 
@@ -11,10 +12,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 	const router = useRouter()
 	const pathname = usePathname()
 
+	const isMobile = useMediaQuery('(max-width: 56.25em)')
+
 	return (
 		<Tabs
 			h={CONTAINER_HEIGHT}
-			orientation="vertical"
+			orientation={isMobile ? 'horizontal' : 'vertical'}
 			value={pathname.replace('/dashboard/settings/', '')}
 			onChange={value => router.push(`/dashboard/settings/${value}`)}
 		>
@@ -32,9 +35,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					Usage
 				</Tabs.Tab>
 			</Tabs.List>
-			<ScrollArea w="100%" h={CONTAINER_HEIGHT} px={24} type="scroll" offsetScrollbars>
+			<Box pl={isMobile ? 0 : 24} w="100%">
 				{children}
-			</ScrollArea>
+			</Box>
 		</Tabs>
 	)
 }
