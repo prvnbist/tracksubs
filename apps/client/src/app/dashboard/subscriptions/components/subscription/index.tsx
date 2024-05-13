@@ -5,7 +5,13 @@ import Link from 'next/link'
 import { lazy } from 'react'
 import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
-import { IconBell, IconBellOff, IconCreditCardPay, IconTrash } from '@tabler/icons-react'
+import {
+	IconBell,
+	IconBellOff,
+	IconCreditCardPay,
+	IconPencil,
+	IconTrash,
+} from '@tabler/icons-react'
 
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
@@ -40,7 +46,12 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
-const Subscription = ({ subscription }: { subscription: ISubscription }) => {
+type SubscriptionProps = {
+	subscription: ISubscription
+	onEdit: (subscription: ISubscription) => void
+}
+
+const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
 	const queryClient = useQueryClient()
 
@@ -205,6 +216,15 @@ const Subscription = ({ subscription }: { subscription: ISubscription }) => {
 					)}
 					<ActionIcon variant="light" onClick={setAlert}>
 						{subscription.email_alert ? <IconBellOff size={18} /> : <IconBell size={18} />}
+					</ActionIcon>
+					<Space w={8} />
+					<ActionIcon
+						color="green.4"
+						variant="light"
+						title="Edit Subscription"
+						onClick={() => onEdit(subscription)}
+					>
+						<IconPencil size={18} />
 					</ActionIcon>
 					<Space w={8} />
 					<ActionIcon

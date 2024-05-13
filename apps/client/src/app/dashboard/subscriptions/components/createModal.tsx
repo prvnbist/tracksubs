@@ -12,14 +12,27 @@ import { Button, Group, NumberInput, Select, Space, TextInput } from '@mantine/c
 
 import { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
-import { subscriptions_create } from 'actions'
 import { CURRENCIES, CYCLES } from 'constants/index'
+import { subscriptions_create, subscriptions_update } from 'actions'
 
-const CreateModal = () => {
+const diff = (obj1: any, obj2: any) => {
+	const result: any = {}
+
+	for (let key in obj1) {
+		let _key = key as keyof ISubscription
+		if (obj2[_key] !== undefined && obj1[_key] !== obj2[_key]) {
+			result[_key] = obj2[_key]
+		}
+	}
+
+	return result
+}
+
+const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 	const queryClient = useQueryClient()
 
 	const { user, services } = useGlobal()
-	const [service, setService] = useState<string | null>(null)
+	const [service, setService] = useState<string | null>(subscription?.service ?? null)
 
 	const memoizedCurrencies = useMemo(() => CURRENCIES, [])
 	const cachedServices = useMemo(
@@ -27,20 +40,18 @@ const CreateModal = () => {
 		[services]
 	)
 
-	const form = useForm<
-		Omit<ISubscription, 'id' | 'user_id' | 'payment_method_id' | 'is_active' | 'email_alert'>
-	>({
+	const form = useForm<Partial<ISubscription>>({
 		initialValues: {
-			title: '',
-			website: '',
-			amount: 0,
-			service: null,
-			currency: user.currency || 'INR',
-			next_billing_date: null,
-			interval: 'MONTHLY',
+			title: subscription?.title ?? '',
+			website: subscription?.website ?? '',
+			service: subscription?.service ?? null,
+			interval: subscription?.interval ?? 'MONTHLY',
+			currency: subscription?.currency ?? (user.currency || 'INR'),
+			next_billing_date: subscription?.next_billing_date ?? null,
+			amount: subscription?.amount ? subscription?.amount / 100 : 0,
 		},
 		validate: {
-			title: value => (!value.trim() ? 'Please enter the service name' : ''),
+			title: value => (!value?.trim() ? 'Please enter the service name' : ''),
 			amount: value => (value === 0 ? 'Please enter a valid amount' : ''),
 			next_billing_date: value => (!value ? 'Please select billing date' : ''),
 		},
@@ -61,10 +72,17 @@ const CreateModal = () => {
 		const data = { ...form.values }
 
 		try {
-			data.amount = data.amount * 100
+			data.amount = (data?.amount ?? 0) * 100
 			data.next_billing_date = dayjs(data.next_billing_date).format('YYYY-MM-DD')
 
-			const result = await subscriptions_create(data)
+			let result: any
+
+			if (subscription?.id) {
+				const diffResult = diff(subscription, data)
+				result = await subscriptions_update(subscription.id, diffResult)
+			} else {
+				result = await subscriptions_create(data)
+			}
 
 			if (result.status === 'ERROR') {
 				throw Error()
@@ -73,7 +91,7 @@ const CreateModal = () => {
 			notifications.show({
 				color: 'green',
 				title: 'Success',
-				message: `Successfully created the subscription - ${data.title}`,
+				message: `Successfully ${subscription?.id ? 'updated' : 'created'} the subscription - ${data.title}`,
 			})
 
 			queryClient.invalidateQueries({ queryKey: ['user'] })
@@ -85,7 +103,7 @@ const CreateModal = () => {
 			notifications.show({
 				color: 'red',
 				title: 'Failed',
-				message: `Failed to create the subscription - ${data.title}`,
+				message: `Failed to ${subscription?.id ? 'update' : 'create'} the subscription - ${data.title}`,
 			})
 		}
 	}

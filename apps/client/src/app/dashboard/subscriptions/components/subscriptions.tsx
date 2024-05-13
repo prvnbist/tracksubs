@@ -8,6 +8,7 @@ import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton } from '@mantine/core'
 
+import { ISubscription } from 'types'
 import { CYCLES } from 'constants/index'
 import { subscriptions_list } from 'actions'
 import { CreateEmptyState, ErrorState } from 'components'
@@ -44,6 +45,13 @@ const Subscriptions = () => {
 		})
 	}
 
+	const edit = (data: ISubscription) => {
+		modals.open({
+			title: 'Edit Subscription',
+			children: <CreateModal subscription={data} />,
+		})
+	}
+
 	return (
 		<>
 			<Group mb={16}>
@@ -69,7 +77,11 @@ const Subscriptions = () => {
 					{data.data.length ? (
 						<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
 							{data.data.map(subscription => (
-								<Subscription key={subscription.id} subscription={subscription} />
+								<Subscription
+									onEdit={edit}
+									key={subscription.id}
+									subscription={subscription}
+								/>
 							))}
 						</SimpleGrid>
 					) : (

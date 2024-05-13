@@ -132,6 +132,23 @@ export const subscriptions_create = async (body: any): ActionResponse<{ id: stri
 	}
 }
 
+export const subscriptions_update = async (
+	id: string,
+	body: any
+): ActionResponse<{ id: string }, string> => {
+	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription').where('id', id).update(body).returning('id')
+
+		return { status: 'SUCCESS', data: data?.[0] }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
 export const subscriptions_delete = async (id: string): ActionResponse<{ id: string }, string> => {
 	try {
 		const user_id = getUserId()
