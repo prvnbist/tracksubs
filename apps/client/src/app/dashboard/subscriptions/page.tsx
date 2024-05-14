@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
-import { Flex, Title } from '@mantine/core'
+import { Flex, Group, Title } from '@mantine/core'
 
-import { CreateSubscriptionButton, Subscriptions } from './components'
+import { CreateSubscriptionButton, ExportSubscriptionsButton, Subscriptions } from './components'
 
 export const metadata: Metadata = {
 	title: 'Subscriptions | TrackSubs',
@@ -10,10 +10,13 @@ export const metadata: Metadata = {
 export default function Page(): JSX.Element {
 	return (
 		<main>
-			<Flex component="header" mt="md" mb="md" gap="sm" align="center">
-				<Title order={2}>Subscriptions</Title>
-				<CreateSubscriptionButton />
-			</Flex>
+			<Group component="header" mt="md" mb="md" justify="space-between">
+				<Flex gap="sm" align="center">
+					<Title order={2}>Subscriptions</Title>
+					<CreateSubscriptionButton />
+				</Flex>
+				<ExportSubscriptionsButton />
+			</Group>
 			<Subscriptions />
 		</main>
 	)

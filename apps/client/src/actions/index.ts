@@ -202,6 +202,43 @@ export const subscription_alert = async (
 	}
 }
 
+export const subscription_export = async (
+	columns: Record<string, string>
+): ActionResponse<Array<Partial<ISubscription> & { payment_method: string }>, string> => {
+	try {
+		const user_id = getUserId()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription')
+			.select(
+				`title as ${columns.title}`,
+				`website as ${columns.website}`,
+				`amount as ${columns.amount}`,
+				`currency as ${columns.currency}`,
+				`frequency as ${columns.frequency}`,
+				`interval as ${columns.interval}`,
+				`is_active as ${columns.is_active}`,
+				`next_billing_date as ${columns.next_billing_date}`
+			)
+			.where('user_id', user_id)
+			.orderBy('next_billing_date', 'asc')
+
+		return {
+			status: 'SUCCESS',
+			data: data.map(datum => ({
+				...datum,
+				[columns.amount!]: datum[columns.amount!] / 100,
+				[columns.next_billing_date!]: dayjs(datum[columns.next_billing_date!]).format(
+					'YYYY-MM-DD'
+				),
+			})),
+		}
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
 export const services = async (): ActionResponse<Record<string, Service>, string> => {
 	try {
 		const data = await knex
