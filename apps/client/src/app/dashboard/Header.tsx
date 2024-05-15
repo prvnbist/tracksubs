@@ -27,6 +27,15 @@ const Header = (): JSX.Element => {
 				<Button
 					size="xs"
 					radius="xl"
+					title="Dashboard"
+					onClick={() => router.push(`/dashboard/?currency=${user.currency}`)}
+					variant={pathname === '/dashboard' ? 'filled' : 'subtle'}
+				>
+					Dashboard
+				</Button>
+				<Button
+					size="xs"
+					radius="xl"
 					title="Subscriptions"
 					onClick={() => router.push('/dashboard/subscriptions')}
 					variant={pathname === '/dashboard/subscriptions' ? 'filled' : 'subtle'}

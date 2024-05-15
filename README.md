@@ -8,6 +8,8 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 
 |||
 |--|--|
+|Dashboard: Monthly Overview||
+|![Monthy Overview](https://res.cloudinary.com/prvnbist/image/upload/v1715800149/tracksubs_dashboard_1.jpg)||
 |Subscriptions: Empty|Subscription: Cards|
 |![Subscriptions: Empty](https://res.cloudinary.com/prvnbist/image/upload/v1713354168/mysubs_subscription_empty_zmv4uw.jpg)|![Subscriptions: Cards](https://res.cloudinary.com/prvnbist/image/upload/v1714466492/tracksubs_subscriptions_cards_zukpqw.jpg)|
 |Settings: Profile|Settings: Payment Methods|
