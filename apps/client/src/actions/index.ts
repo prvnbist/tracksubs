@@ -1,8 +1,7 @@
 'use server'
 
 import dayjs from 'dayjs'
-import { auth } from '@clerk/nextjs'
-import type { JwtPayload } from '@clerk/types'
+import { auth, clerkClient } from '@clerk/nextjs'
 
 import knex from '@tracksubs/db'
 
@@ -12,9 +11,16 @@ import type {
 	ISubscription,
 	PaymentMethod,
 	Service,
+	SessionClaim,
 	Transaction,
 	User,
 } from 'types'
+
+const getUserMetadata = () => {
+	const { sessionClaims } = auth()
+
+	return (sessionClaims as SessionClaim)?.metadata
+}
 
 export const user = async (): ActionResponse<User, string> => {
 	try {
@@ -55,23 +61,28 @@ export const user = async (): ActionResponse<User, string> => {
 export const user_update = async (body: any) => {
 	try {
 		const { userId } = auth()
+		const metadata = getUserMetadata()
 
 		if (!userId) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('user').where('auth_id', userId).update(body).returning('id')
+		const data = await knex('user')
+			.where('auth_id', userId)
+			.update(body)
+			.returning<{ id: string }>('id')
+
+		if (body.currency) {
+			await clerkClient.users.updateUserMetadata(userId, {
+				publicMetadata: {
+					...metadata,
+					currency: body.currency,
+				},
+			})
+		}
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
-}
-
-type SessionClaim = JwtPayload & { metadata: { user_id: string; plan: 'FREE' | 'BASIC' | 'PRO' } }
-
-const getUserMetadata = () => {
-	const { sessionClaims } = auth()
-
-	return (sessionClaims as SessionClaim)?.metadata
 }
 
 export const subscriptions_list = async (

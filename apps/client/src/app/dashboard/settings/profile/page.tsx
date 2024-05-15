@@ -79,7 +79,12 @@ export default function Page() {
 
 	const save = async (values: Partial<User>) => {
 		try {
-			await user_update(values)
+			await user_update({
+				...(user.first_name !== values.first_name && { first_name: values.first_name }),
+				...(user.last_name !== values.last_name && { last_name: values.last_name }),
+				...(user.currency !== values.currency && { currency: values.currency }),
+				...(user.timezone !== values.timezone && { timezone: values.timezone }),
+			})
 			notifications.show({ title: 'Success', message: 'Successfully saved profile details.' })
 
 			queryClient.invalidateQueries({ queryKey: ['user'] })
@@ -117,6 +122,7 @@ export default function Page() {
 					<Select
 						searchable
 						data={timezones}
+						allowDeselect={false}
 						renderOption={renderOption}
 						placeholder="Select a timezone"
 						{...form.getInputProps('timezone')}
@@ -128,6 +134,7 @@ export default function Page() {
 					<Select
 						searchable
 						data={CURRENCIES}
+						allowDeselect={false}
 						placeholder="Select a currency"
 						{...form.getInputProps('currency')}
 					/>

@@ -1,3 +1,5 @@
+import type { JwtPayload } from '@clerk/types'
+
 export interface User {
 	id: string | null
 	currency: string | null
@@ -61,4 +63,8 @@ export type Plan = {
 	alerts: number
 	subscriptions: number
 	price: { amount: number; currency: string }
+}
+
+export type SessionClaim = JwtPayload & {
+	metadata: { user_id: string; plan: 'FREE' | 'BASIC' | 'PRO'; currency: string }
 }
