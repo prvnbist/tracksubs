@@ -1,6 +1,6 @@
 'use client'
 
-import { Space, Title, Card, Table, SimpleGrid, Badge, Group, Text } from '@mantine/core'
+import { Space, Title, Card, Table, SimpleGrid, Badge, Group } from '@mantine/core'
 
 import type { Plan } from 'types'
 import { PLANS } from 'constants/index'

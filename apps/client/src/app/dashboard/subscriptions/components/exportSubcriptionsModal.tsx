@@ -44,7 +44,13 @@ const ExportSubscriptionsModal = () => {
 
 			const result = await subscription_export(list)
 
-			if (result.status === 'ERROR') throw Error
+			if (result.status === 'ERROR') {
+				return notifications.show({
+					color: 'red.5',
+					title: 'Export Failed',
+					message: result.message,
+				})
+			}
 
 			const csv = await json2csv(result.data)
 

@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { IconChartPie2, IconCreditCard, IconFileInvoice, IconUser } from '@tabler/icons-react'
 
 import { useMediaQuery } from '@mantine/hooks'
-import { Box, ScrollArea, Tabs } from '@mantine/core'
+import { Box, Tabs } from '@mantine/core'
 
 const CONTAINER_HEIGHT = 'calc(100dvh - 65px)'
 

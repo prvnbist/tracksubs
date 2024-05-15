@@ -85,7 +85,12 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 			}
 
 			if (result.status === 'ERROR') {
-				throw Error()
+				return notifications.show({
+					color: 'red.4',
+					title: 'Error',
+					message: result.message,
+				})
+				
 			}
 
 			notifications.show({

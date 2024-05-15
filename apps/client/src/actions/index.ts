@@ -5,6 +5,8 @@ import { auth } from '@clerk/nextjs'
 import type { JwtPayload } from '@clerk/types'
 
 import knex from '@tracksubs/db'
+
+import { PLANS } from 'constants/index'
 import type {
 	ActionResponse,
 	ISubscription,
@@ -64,19 +66,19 @@ export const user_update = async (body: any) => {
 	}
 }
 
-type SessionClaim = JwtPayload & { metadata: { user_id: string } }
+type SessionClaim = JwtPayload & { metadata: { user_id: string; plan: 'FREE' | 'BASIC' | 'PRO' } }
 
-const getUserId = () => {
+const getUserMetadata = () => {
 	const { sessionClaims } = auth()
 
-	return (sessionClaims as SessionClaim)?.metadata?.user_id
+	return (sessionClaims as SessionClaim)?.metadata
 }
 
 export const subscriptions_list = async (
 	interval: string = 'ALL'
 ): ActionResponse<ISubscription[], string> => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -114,9 +116,23 @@ export const subscriptions_list = async (
 
 export const subscriptions_create = async (body: any): ActionResponse<{ id: string }, string> => {
 	try {
-		const user_id = getUserId()
+		const { plan, user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const user_plan = PLANS[plan]!
+
+		const usage = await knex('usage')
+			.where('user_id', user_id)
+			.select('total_subscriptions')
+			.first()
+
+		if (usage.total_subscriptions === user_plan?.subscriptions) {
+			return {
+				status: 'ERROR',
+				message: `Selected plan allows you to create upto ${user_plan.subscriptions} subscriptions. Please change your plan to the one that fits your needs.`,
+			}
+		}
 
 		const data = await knex('subscription')
 			.insert({ ...body, user_id })
@@ -137,7 +153,7 @@ export const subscriptions_update = async (
 	body: any
 ): ActionResponse<{ id: string }, string> => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -151,7 +167,7 @@ export const subscriptions_update = async (
 
 export const subscriptions_delete = async (id: string): ActionResponse<{ id: string }, string> => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -176,9 +192,22 @@ export const subscription_alert = async (
 	enabled: boolean
 ): ActionResponse<{ id: string }, string> => {
 	try {
-		const user_id = getUserId()
+		const { plan, user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		if (enabled) {
+			const user_plan = PLANS[plan]!
+
+			const usage = await knex('usage').where('user_id', user_id).select('total_alerts').first()
+
+			if (usage.total_alerts === user_plan?.alerts) {
+				return {
+					status: 'ERROR',
+					message: `Selected plan allows upto ${user_plan.alerts} alerts. Please change your plan to the one that fits your needs.`,
+				}
+			}
+		}
 
 		const data = await knex('subscription')
 			.where('id', id)
@@ -206,9 +235,15 @@ export const subscription_export = async (
 	columns: Record<string, string>
 ): ActionResponse<Array<Partial<ISubscription> & { payment_method: string }>, string> => {
 	try {
-		const user_id = getUserId()
+		const { plan, user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		if (plan === 'FREE')
+			return {
+				status: 'ERROR',
+				message: 'Exporting subscriptions is only available for paid plans.',
+			}
 
 		const data = await knex('subscription')
 			.select(
@@ -260,7 +295,7 @@ export const services = async (): ActionResponse<Record<string, Service>, string
 
 export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>, string> => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -277,7 +312,7 @@ export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>
 
 export const payment_method_create = async (formData: FormData) => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -293,7 +328,7 @@ export const payment_method_create = async (formData: FormData) => {
 
 export const payment_method_delete = async (id: string) => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -313,7 +348,7 @@ export const transaction_create = async (
 	subscription: ISubscription & { paidOn: Date; paymentMethodId?: string }
 ): ActionResponse<null, string> => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -351,7 +386,7 @@ export const transaction_create = async (
 
 export const transaction_list = async (): ActionResponse<Transaction[], string> => {
 	try {
-		const user_id = getUserId()
+		const { user_id } = getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 

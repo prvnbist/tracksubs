@@ -54,6 +54,7 @@ export async function POST(request: Request) {
 				await clerkClient.users.updateUserMetadata(data.id, {
 					publicMetadata: {
 						user_id: id,
+						plan: 'FREE',
 					},
 				})
 			}

@@ -128,7 +128,13 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 				try {
 					const result = await subscription_alert(subscription.id, !subscription.email_alert)
 
-					if (result.status === 'ERROR') throw Error()
+					if (result.status === 'ERROR') {
+						return notifications.show({
+							color: 'red',
+							title: 'Error',
+							message: result.message,
+						})
+					}
 
 					queryClient.invalidateQueries({ queryKey: ['user'] })
 					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
