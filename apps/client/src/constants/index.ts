@@ -63,3 +63,18 @@ export const PLANS: Record<string, Plan> = {
 		subscriptions: 50,
 	},
 }
+
+export const MONTHS = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+] as const
