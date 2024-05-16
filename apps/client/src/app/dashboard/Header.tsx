@@ -5,7 +5,8 @@ import { useClerk } from '@clerk/clerk-react'
 import { IconLogout, IconSettings } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { Avatar, Button, Flex, Menu } from '@mantine/core'
+import { useDisclosure, useMediaQuery } from '@mantine/hooks'
+import { Avatar, Burger, Button, Flex, Menu } from '@mantine/core'
 
 import Logo from 'assets/svgs/logo'
 import { useGlobal } from 'state/global'
@@ -13,8 +14,9 @@ import { useGlobal } from 'state/global'
 const Header = (): JSX.Element => {
 	const router = useRouter()
 	const { user } = useGlobal()
-	const pathname = usePathname()
 	const { signOut } = useClerk()
+
+	const isMobile = useMediaQuery('(max-width: 56.25em)')
 
 	const initials = `${user.first_name[0]}${user.last_name ? user.last_name[0] : ''}`
 
@@ -23,35 +25,7 @@ const Header = (): JSX.Element => {
 			<Link href="/" title="Home">
 				<Logo size={32} />
 			</Link>
-			<Flex gap="sm">
-				<Button
-					size="xs"
-					radius="xl"
-					title="Dashboard"
-					onClick={() => router.push(`/dashboard/?currency=${user.currency}`)}
-					variant={pathname === '/dashboard' ? 'filled' : 'subtle'}
-				>
-					Dashboard
-				</Button>
-				<Button
-					size="xs"
-					radius="xl"
-					title="Subscriptions"
-					onClick={() => router.push('/dashboard/subscriptions')}
-					variant={pathname === '/dashboard/subscriptions' ? 'filled' : 'subtle'}
-				>
-					Subscriptions
-				</Button>
-				<Button
-					size="xs"
-					radius="xl"
-					title="Transactions"
-					onClick={() => router.push('/dashboard/transactions')}
-					variant={pathname === '/dashboard/transactions' ? 'filled' : 'subtle'}
-				>
-					Transactions
-				</Button>
-			</Flex>
+			{isMobile ? <MobileMenu /> : <DesktopMenu />}
 			<Menu shadow="md" width={200} position="bottom-end">
 				<Menu.Target>
 					<Avatar
@@ -86,3 +60,86 @@ const Header = (): JSX.Element => {
 	)
 }
 export default Header
+
+const MobileMenu = () => {
+	const router = useRouter()
+	const pathname = usePathname()
+
+	const { user } = useGlobal()
+
+	const [opened, { toggle }] = useDisclosure()
+
+	const goto = (path: string) => {
+		router.push(path)
+		toggle()
+	}
+
+	return (
+		<Menu shadow="md" width={200} position="bottom">
+			<Menu.Target>
+				<Burger size="sm" opened={opened} onClick={toggle} aria-label="Toggle navigation" />
+			</Menu.Target>
+			<Menu.Dropdown>
+				<Menu.Item
+					title="Dashboard"
+					c={pathname === '/dashboard' ? 'yellow' : ''}
+					onClick={() => goto(`/dashboard/?currency=${user.currency}`)}
+				>
+					Dashboard
+				</Menu.Item>
+				<Menu.Item
+					title="Subscriptions"
+					onClick={() => goto('/dashboard/subscriptions')}
+					c={pathname === '/dashboard/subscriptions' ? 'yellow' : ''}
+				>
+					Subscriptions
+				</Menu.Item>
+				<Menu.Item
+					title="Transactions"
+					onClick={() => goto('/dashboard/transactions')}
+					c={pathname === '/dashboard/transactions' ? 'yellow' : ''}
+				>
+					Transactions
+				</Menu.Item>
+			</Menu.Dropdown>
+		</Menu>
+	)
+}
+
+const DesktopMenu = () => {
+	const router = useRouter()
+	const pathname = usePathname()
+
+	const { user } = useGlobal()
+	return (
+		<Flex gap="sm">
+			<Button
+				size="xs"
+				radius="xl"
+				title="Dashboard"
+				onClick={() => router.push(`/dashboard/?currency=${user.currency}`)}
+				variant={pathname === '/dashboard' ? 'filled' : 'subtle'}
+			>
+				Dashboard
+			</Button>
+			<Button
+				size="xs"
+				radius="xl"
+				title="Subscriptions"
+				onClick={() => router.push('/dashboard/subscriptions')}
+				variant={pathname === '/dashboard/subscriptions' ? 'filled' : 'subtle'}
+			>
+				Subscriptions
+			</Button>
+			<Button
+				size="xs"
+				radius="xl"
+				title="Transactions"
+				onClick={() => router.push('/dashboard/transactions')}
+				variant={pathname === '/dashboard/transactions' ? 'filled' : 'subtle'}
+			>
+				Transactions
+			</Button>
+		</Flex>
+	)
+}
