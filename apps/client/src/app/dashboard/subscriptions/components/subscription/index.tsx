@@ -87,6 +87,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 
 					queryClient.invalidateQueries({ queryKey: ['user'] })
 					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+					queryClient.invalidateQueries({ queryKey: ['transactions'] })
 				} catch (error) {
 					notifications.show({
 						color: 'red',

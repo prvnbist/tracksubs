@@ -1,5 +1,6 @@
 'use client'
 
+import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
 import { BarChart } from '@mantine/charts'
@@ -17,16 +18,28 @@ type MonthlyOverviewProps = {
 	}>
 }
 
+const mapChartFn = (result: Record<string, number>, month: string, year: number) => {
+	const amount = result[month] ?? 0
+	return {
+		Month: `${month} ${year.toString().replace('20', '')}`,
+		Amount: Number(amount ?? 0) / 100,
+	}
+}
+
 const MonthlyOverview = ({ currency, data }: MonthlyOverviewProps) => {
 	const chartData = useMemo(() => {
 		if (data.length === 0) return []
 
 		const result = calculateMonthlyOverview(data)
 
-		return MONTHS.map(month => {
-			const amount = result[month] ?? 0
-			return { Month: month, Amount: Number(amount ?? 0) / 100 }
-		})
+		const currentMonth = dayjs().month()
+		const currentYear = dayjs().year()
+		const nextYear = dayjs().add(1, 'year').year()
+
+		return [
+			...MONTHS.slice(currentMonth).map(month => mapChartFn(result, month, currentYear)),
+			...MONTHS.slice(0, currentMonth).map(month => mapChartFn(result, month, nextYear)),
+		]
 	}, [data])
 
 	if (data.length === 0)

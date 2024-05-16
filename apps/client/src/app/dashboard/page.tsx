@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { auth } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 
@@ -22,13 +23,24 @@ export default async function Page(props: any) {
 		.orderBy('currency', 'asc')
 		.distinct()
 
+	const startOfCurrentMonth = dayjs().startOf('month').format('YYYY-MM-DD')
+	const endOfLastMonthNextYear = dayjs(startOfCurrentMonth)
+		.add(1, 'year')
+		.subtract(1, 'month')
+		.endOf('month')
+		.format('YYYY-MM-DD')
+
 	const monthlyOverview = await knex('subscription')
 		.select('amount', 'interval', 'next_billing_date')
 		.where({
 			user_id,
 			currency: props.searchParams.currency,
 		})
-		.andWhereRaw(`EXTRACT(YEAR FROM next_billing_date) = EXTRACT(YEAR FROM now())`)
+		.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+			startOfCurrentMonth,
+			endOfLastMonthNextYear,
+		])
+		.orderBy('next_billing_date', 'asc')
 
 	return (
 		<main>
