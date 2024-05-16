@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton } from '@mantine/core'
+import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton, Space } from '@mantine/core'
 
 import { ISubscription } from 'types'
 import { CYCLES } from 'constants/index'
@@ -96,6 +96,7 @@ const Subscriptions = () => {
 					)}
 				</>
 			)}
+			<Space h={16} />
 		</>
 	)
 }

@@ -9,6 +9,7 @@ import {
 	IconBell,
 	IconBellOff,
 	IconCreditCardPay,
+	IconDotsVertical,
 	IconPencil,
 	IconTrash,
 } from '@tabler/icons-react'
@@ -18,20 +19,9 @@ import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
+import { useMediaQuery } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
-import {
-	ActionIcon,
-	Badge,
-	Card,
-	Center,
-	Group,
-	Indicator,
-	Overlay,
-	Space,
-	Stack,
-	Text,
-	Title,
-} from '@mantine/core'
+import { ActionIcon, Badge, Card, Group, Indicator, Menu, Stack, Text, Title } from '@mantine/core'
 
 import { ISubscription } from 'types'
 import { PLANS } from 'constants/index'
@@ -160,90 +150,111 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 
 	return (
 		<Card shadow="sm" padding="lg" radius="md" withBorder className={classes.card__subscription}>
-			<Group justify="space-between">
-				<Group gap={16}>
-					{service && (
-						<Indicator
-							size={12}
-							withBorder
-							color="green"
-							disabled={!subscription.email_alert}
-						>
-							<Link href={subscription.website}>
-								<Image
-									width={40}
-									height={40}
-									alt={subscription.title}
-									src={`/services/${service.key}.svg`}
-								/>
-							</Link>
-						</Indicator>
-					)}
-					<Stack gap={0}>
-						<Title order={4}>{subscription.title}</Title>
-						{subscription.is_active ? (
-							<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
-								{isDueThisWeek
-									? `Due ${billing_date.fromNow()}`
-									: `Due: ${billing_date.format('MMM DD, YYYY')}`}
-							</Text>
-						) : (
-							<Text size="sm" c="dimmed">
-								Paused
-							</Text>
+			<Card.Section p={16} bg="var(--mantine-color-dark-7)">
+				<Group justify="space-between">
+					<Group gap={16}>
+						{service && (
+							<Indicator
+								size={12}
+								withBorder
+								color="green"
+								disabled={!subscription.email_alert}
+							>
+								<Link href={subscription.website} style={{ display: 'flex' }}>
+									<Image
+										width={40}
+										height={40}
+										alt={subscription.title}
+										src={`/services/${service.key}.svg`}
+									/>
+								</Link>
+							</Indicator>
 						)}
-					</Stack>
+						<Stack gap={0}>
+							<Title order={5}>{subscription.title}</Title>
+							{subscription.is_active ? (
+								<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
+									{isDueThisWeek
+										? `Due ${billing_date.fromNow()}`
+										: `Due: ${billing_date.format('MMM DD, YYYY')}`}
+								</Text>
+							) : (
+								<Text size="sm" c="dimmed">
+									Paused
+								</Text>
+							)}
+						</Stack>
+					</Group>
+					<Menu shadow="md" width={160} position="bottom-end">
+						<Menu.Target>
+							<ActionIcon variant="subtle">
+								<IconDotsVertical size={18} />
+							</ActionIcon>
+						</Menu.Target>
+						<Menu.Dropdown>
+							{isPastRenewal && (
+								<Menu.Item
+									title="Mark Paid"
+									onClick={markPaid}
+									leftSection={<IconCreditCardPay size={18} />}
+								>
+									Mark Paid
+								</Menu.Item>
+							)}
+							<Menu.Item
+								title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+								onClick={setAlert}
+								leftSection={
+									subscription.email_alert ? (
+										<IconBellOff size={18} />
+									) : (
+										<IconBell size={18} />
+									)
+								}
+							>
+								{subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+							</Menu.Item>
+							<Menu.Item
+								title="Edit"
+								onClick={() => onEdit(subscription)}
+								leftSection={<IconPencil size={18} />}
+							>
+								Edit
+							</Menu.Item>
+							<Menu.Item
+								color="red"
+								title="Delete"
+								onClick={deleteSubscription}
+								leftSection={<IconTrash size={18} />}
+							>
+								Delete
+							</Menu.Item>
+						</Menu.Dropdown>
+					</Menu>
 				</Group>
-				<Stack gap={2} align="flex-end">
-					<Badge size="sm" radius="sm" variant="light">
-						{subscription.interval}
-					</Badge>
-					<Text size="md" ff="monospace">
+			</Card.Section>
+			<Card.Section p={16}>
+				<Group justify="space-between">
+					<Text size="xl" ff="monospace">
 						{new Intl.NumberFormat('en-IN', {
 							style: 'currency',
 							currency: subscription.currency,
 						}).format(subscription.amount / 100)}
 					</Text>
-				</Stack>
-			</Group>
-			<Overlay
-				blur={3}
-				color="#000"
-				backgroundOpacity={0.5}
-				className={classes.subscription__card__overlay}
-			>
-				<Center h="100%">
-					{isPastRenewal && (
-						<>
-							<ActionIcon variant="light" title="Mark Paid" onClick={markPaid}>
-								<IconCreditCardPay size={18} />
-							</ActionIcon>
-							<Space w={8} />
-						</>
-					)}
-					<ActionIcon variant="light" onClick={setAlert}>
-						{subscription.email_alert ? <IconBellOff size={18} /> : <IconBell size={18} />}
-					</ActionIcon>
-					<Space w={8} />
-					<ActionIcon
-						color="green.4"
+					<Badge
 						variant="light"
-						title="Edit Subscription"
-						onClick={() => onEdit(subscription)}
+						c={
+							subscription.interval === 'MONTHLY'
+								? 'teal'
+								: subscription.interval === 'QUARTERLY'
+									? 'yellow'
+									: 'red'
+						}
 					>
-						<IconPencil size={18} />
-					</ActionIcon>
-					<Space w={8} />
-					<ActionIcon
-						color="red.4"
-						variant="light"
-						title="Delete Subscription"
-						onClick={deleteSubscription}
-					>
-						<IconTrash size={18} />
-					</ActionIcon>
-				</Center>
-			</Overlay>
+						{subscription.interval}
+					</Badge>
+				</Group>
+			</Card.Section>
 		</Card>
 	)
 }
