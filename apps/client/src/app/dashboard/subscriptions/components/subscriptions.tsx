@@ -6,7 +6,16 @@ import { useQuery } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton, Space } from '@mantine/core'
+import {
+	Button,
+	Card,
+	Group,
+	SegmentedControl,
+	SimpleGrid,
+	Skeleton,
+	Space,
+	useComputedColorScheme,
+} from '@mantine/core'
 
 import { CYCLES } from 'constants/index'
 import type { ISubscription } from 'types'
@@ -20,6 +29,8 @@ type Interval = ISubscription['interval'] | 'ALL'
 
 const Subscriptions = () => {
 	const router = useRouter()
+
+	const scheme = useComputedColorScheme()
 
 	const [interval, setInterval] = useState<Interval>('ALL')
 
@@ -62,6 +73,7 @@ const Subscriptions = () => {
 					radius="sm"
 					value={interval}
 					withItemsBorders={false}
+					bg={scheme === 'light' ? 'gray.3' : 'dark.8'}
 					onChange={value => setInterval(value as Interval)}
 					data={[{ value: 'ALL', label: 'All' }, ...CYCLES]}
 				/>

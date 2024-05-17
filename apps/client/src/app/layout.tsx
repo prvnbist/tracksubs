@@ -8,6 +8,7 @@ import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
+import './layout.css'
 
 import StatsigWrapper from 'state/statsig'
 
@@ -49,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	return (
 		<html lang="en">
 			<head>
-				<ColorSchemeScript defaultColorScheme="dark" />
+				<ColorSchemeScript defaultColorScheme="auto" />
 				<link rel="apple-touch-icon" sizes="180x180" href="/logos/apple-touch-icon.png" />
 				<link rel="icon" type="image/png" sizes="32x32" href="/logos/favicon-32x32.png" />
 				<link rel="icon" type="image/png" sizes="16x16" href="/logos/favicon-16x16.png" />
@@ -59,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<body>
 				<StatsigWrapper>
 					<ClerkProvider>
-						<MantineProvider defaultColorScheme="dark" theme={theme}>
+						<MantineProvider defaultColorScheme="auto" theme={theme}>
 							<Notifications />
 							{children}
 						</MantineProvider>

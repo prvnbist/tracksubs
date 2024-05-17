@@ -1,0 +1,3 @@
+html[data-mantine-color-scheme="light"] body {
+   background-color: var(--mantine-color-gray-1);
+}

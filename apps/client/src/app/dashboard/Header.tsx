@@ -6,7 +6,7 @@ import { IconLogout, IconSettings } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
-import { Avatar, Burger, Button, Flex, Menu } from '@mantine/core'
+import { Avatar, Burger, Button, Flex, Menu, useComputedColorScheme } from '@mantine/core'
 
 import Logo from 'assets/svgs/logo'
 import { useGlobal } from 'state/global'
@@ -69,10 +69,14 @@ const MobileMenu = () => {
 
 	const [opened, { toggle }] = useDisclosure()
 
+	const scheme = useComputedColorScheme()
+
 	const goto = (path: string) => {
 		router.push(path)
 		toggle()
 	}
+
+	const color = scheme === 'light' ? 'yellow.8' : 'yellow'
 
 	return (
 		<Menu shadow="md" width={200} position="bottom">
@@ -82,7 +86,7 @@ const MobileMenu = () => {
 			<Menu.Dropdown>
 				<Menu.Item
 					title="Dashboard"
-					c={pathname === '/dashboard' ? 'yellow' : ''}
+					c={pathname === '/dashboard' ? color : ''}
 					onClick={() => goto(`/dashboard/?currency=${user.currency}`)}
 				>
 					Dashboard
@@ -90,14 +94,14 @@ const MobileMenu = () => {
 				<Menu.Item
 					title="Subscriptions"
 					onClick={() => goto('/dashboard/subscriptions')}
-					c={pathname === '/dashboard/subscriptions' ? 'yellow' : ''}
+					c={pathname === '/dashboard/subscriptions' ? color : ''}
 				>
 					Subscriptions
 				</Menu.Item>
 				<Menu.Item
 					title="Transactions"
 					onClick={() => goto('/dashboard/transactions')}
-					c={pathname === '/dashboard/transactions' ? 'yellow' : ''}
+					c={pathname === '/dashboard/transactions' ? color : ''}
 				>
 					Transactions
 				</Menu.Item>
@@ -111,6 +115,10 @@ const DesktopMenu = () => {
 	const pathname = usePathname()
 
 	const { user } = useGlobal()
+
+	const scheme = useComputedColorScheme()
+
+	const color = scheme === 'light' ? 'default' : 'subtle'
 	return (
 		<Flex gap="sm">
 			<Button
@@ -118,7 +126,7 @@ const DesktopMenu = () => {
 				radius="xl"
 				title="Dashboard"
 				onClick={() => router.push(`/dashboard/?currency=${user.currency}`)}
-				variant={pathname === '/dashboard' ? 'filled' : 'subtle'}
+				variant={pathname === '/dashboard' ? 'filled' : color}
 			>
 				Dashboard
 			</Button>
@@ -127,7 +135,7 @@ const DesktopMenu = () => {
 				radius="xl"
 				title="Subscriptions"
 				onClick={() => router.push('/dashboard/subscriptions')}
-				variant={pathname === '/dashboard/subscriptions' ? 'filled' : 'subtle'}
+				variant={pathname === '/dashboard/subscriptions' ? 'filled' : color}
 			>
 				Subscriptions
 			</Button>
@@ -136,7 +144,7 @@ const DesktopMenu = () => {
 				radius="xl"
 				title="Transactions"
 				onClick={() => router.push('/dashboard/transactions')}
-				variant={pathname === '/dashboard/transactions' ? 'filled' : 'subtle'}
+				variant={pathname === '/dashboard/transactions' ? 'filled' : color}
 			>
 				Transactions
 			</Button>

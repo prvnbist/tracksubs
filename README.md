@@ -18,9 +18,12 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 |![Settings: Usage](https://res.cloudinary.com/prvnbist/image/upload/v1714466373/tracksubs_settings_usage_wb9egm.jpg)|![Settings: Plan](https://res.cloudinary.com/prvnbist/image/upload/v1714466430/tracksubs_settings_plan_lujzmi.jpg)|
 
 ### Tech Stack
-1. [NextJs](https://nextjs.org/): Client App
-2. [Clerk](https://clerk.com/): Authentication
-3. [Xata](https://xata.io/): Database
+1. [NextJs](https://nextjs.org): Client App
+2. [Clerk](https://clerk.com): Authentication
+3. [Xata](https://xata.io): Database
 4. [Turbo Repo](https://turbo.build/repo): Monorepo
-5. [Knex](https://knexjs.org/): SQL query builder & migrations
-6. [Mantine](https://mantine.dev/): UI Library
+5. [Knex](https://knexjs.org): SQL query builder & migrations
+6. [Mantine](https://mantine.dev): UI Library
+6. [Resend](https://resend.com): Email Service
+6. [Trigger](https://trigger.dev): Jobs Scheduling
+6. [StatSig](https://statsig.com): Feature Flags

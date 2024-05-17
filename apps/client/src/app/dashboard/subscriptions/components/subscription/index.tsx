@@ -20,7 +20,18 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { ActionIcon, Badge, Card, Group, Indicator, Menu, Stack, Text, Title } from '@mantine/core'
+import {
+	ActionIcon,
+	Badge,
+	Card,
+	Group,
+	Indicator,
+	Menu,
+	Stack,
+	Text,
+	Title,
+	useComputedColorScheme,
+} from '@mantine/core'
 
 import { ISubscription } from 'types'
 import { PLANS } from 'constants/index'
@@ -41,6 +52,8 @@ type SubscriptionProps = {
 const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
 	const queryClient = useQueryClient()
+
+	const scheme = useComputedColorScheme()
 
 	const service = subscription.service ? services[subscription.service] : null
 
@@ -157,7 +170,11 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 				},
 			}}
 		>
-			<Card.Section p={16} bg="var(--mantine-color-dark-7)">
+			<Card.Section
+				p={16}
+				withBorder
+				bg={scheme === 'light' ? 'transparent' : 'var(--mantine-color-dark-7)'}
+			>
 				<Group justify="space-between">
 					<Group gap={16}>
 						{service && (
@@ -173,6 +190,13 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 										height={40}
 										alt={subscription.title}
 										src={`/services/${service.key}.svg`}
+										style={{
+											borderRadius: scheme === 'light' ? '4px' : 0,
+											border:
+												scheme === 'light'
+													? '1px solid var(--mantine-color-gray-2)'
+													: 'none',
+										}}
 									/>
 								</Link>
 							</Indicator>
@@ -180,7 +204,10 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 						<Stack gap={0}>
 							<Title order={5}>{subscription.title}</Title>
 							{subscription.is_active ? (
-								<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
+								<Text
+									size="sm"
+									c={isDueThisWeek ? (scheme === 'light' ? 'red.7' : 'red.4') : 'dark.2'}
+								>
 									{isDueThisWeek
 										? `Due ${billing_date.fromNow()}`
 										: `Due: ${billing_date.format('MMM DD, YYYY')}`}
@@ -194,7 +221,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 					</Group>
 					<Menu shadow="md" width={160} position="bottom-end">
 						<Menu.Target>
-							<ActionIcon variant="subtle">
+							<ActionIcon variant={scheme === 'light' ? 'default' : 'subtle'}>
 								<IconDotsVertical size={18} />
 							</ActionIcon>
 						</Menu.Target>
@@ -249,7 +276,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 						}).format(subscription.amount / 100)}
 					</Text>
 					<Badge
-						variant="light"
+						variant={scheme === 'light' ? 'default' : 'light'}
 						c={
 							subscription.interval === 'MONTHLY'
 								? 'teal'
