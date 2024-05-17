@@ -4,13 +4,15 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
 import { BarChart } from '@mantine/charts'
-import { Center, Title } from '@mantine/core'
+import { Center, Stack, Title } from '@mantine/core'
 
 import { MONTHS } from 'constants/index'
 import { calculateMonthlyOverview, currencyFormatter } from 'utils'
+import { IconAlertTriangle } from '@tabler/icons-react'
 
 type MonthlyOverviewProps = {
 	currency: string
+	hasError: boolean
 	data: Array<{
 		amount: number
 		next_billing_date: string
@@ -26,9 +28,9 @@ const mapChartFn = (result: Record<string, number>, month: string, year: number)
 	}
 }
 
-const MonthlyOverview = ({ currency, data }: MonthlyOverviewProps) => {
+const MonthlyOverview = ({ hasError = false, currency, data = [] }: MonthlyOverviewProps) => {
 	const chartData = useMemo(() => {
-		if (data.length === 0) return []
+		if (data.length === 0 || hasError) return []
 
 		const result = calculateMonthlyOverview(data)
 
@@ -40,8 +42,17 @@ const MonthlyOverview = ({ currency, data }: MonthlyOverviewProps) => {
 			...MONTHS.slice(currentMonth).map(month => mapChartFn(result, month, currentYear)),
 			...MONTHS.slice(0, currentMonth).map(month => mapChartFn(result, month, nextYear)),
 		]
-	}, [data])
+	}, [data, hasError])
 
+	if (hasError)
+		return (
+			<Center h={300}>
+				<Stack align="center" c="red">
+					<IconAlertTriangle size={24} />
+					<Title order={5}>Failed to load</Title>
+				</Stack>
+			</Center>
+		)
 	if (data.length === 0)
 		return (
 			<Center h={300}>

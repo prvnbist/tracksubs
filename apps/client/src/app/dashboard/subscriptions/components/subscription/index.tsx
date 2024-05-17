@@ -19,7 +19,6 @@ import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { modals } from '@mantine/modals'
-import { useMediaQuery } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { ActionIcon, Badge, Card, Group, Indicator, Menu, Stack, Text, Title } from '@mantine/core'
 

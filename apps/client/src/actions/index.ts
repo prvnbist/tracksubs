@@ -16,7 +16,7 @@ import type {
 	User,
 } from 'types'
 
-const getUserMetadata = () => {
+export const getUserMetadata = async () => {
 	const { sessionClaims } = auth()
 
 	return (sessionClaims as SessionClaim)?.metadata
@@ -61,7 +61,7 @@ export const user = async (): ActionResponse<User, string> => {
 export const user_update = async (body: any) => {
 	try {
 		const { userId } = auth()
-		const metadata = getUserMetadata()
+		const metadata = await getUserMetadata()
 
 		if (!userId) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -89,7 +89,7 @@ export const subscriptions_list = async (
 	interval: string = 'ALL'
 ): ActionResponse<ISubscription[], string> => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -127,7 +127,7 @@ export const subscriptions_list = async (
 
 export const subscriptions_create = async (body: any): ActionResponse<{ id: string }, string> => {
 	try {
-		const { plan, user_id } = getUserMetadata()
+		const { plan, user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -164,7 +164,7 @@ export const subscriptions_update = async (
 	body: any
 ): ActionResponse<{ id: string }, string> => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -178,7 +178,7 @@ export const subscriptions_update = async (
 
 export const subscriptions_delete = async (id: string): ActionResponse<{ id: string }, string> => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -203,7 +203,7 @@ export const subscription_alert = async (
 	enabled: boolean
 ): ActionResponse<{ id: string }, string> => {
 	try {
-		const { plan, user_id } = getUserMetadata()
+		const { plan, user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -246,7 +246,7 @@ export const subscription_export = async (
 	columns: Record<string, string>
 ): ActionResponse<Array<Partial<ISubscription> & { payment_method: string }>, string> => {
 	try {
-		const { plan, user_id } = getUserMetadata()
+		const { plan, user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -306,7 +306,7 @@ export const services = async (): ActionResponse<Record<string, Service>, string
 
 export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>, string> => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -323,7 +323,7 @@ export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>
 
 export const payment_method_create = async (formData: FormData) => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -339,7 +339,7 @@ export const payment_method_create = async (formData: FormData) => {
 
 export const payment_method_delete = async (id: string) => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -359,7 +359,7 @@ export const transaction_create = async (
 	subscription: ISubscription & { paidOn: Date; paymentMethodId?: string }
 ): ActionResponse<null, string> => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -397,7 +397,7 @@ export const transaction_create = async (
 
 export const transaction_list = async (): ActionResponse<Transaction[], string> => {
 	try {
-		const { user_id } = getUserMetadata()
+		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
@@ -433,6 +433,56 @@ export const waitlist_add = async (email: string): ActionResponse<{ email: strin
 			return { status: 'ERROR', message: `ALREADY_ADDED` }
 		}
 
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
+type GetCurrenciesReturn = Array<{ currency: string }>
+
+export const getCurrencies = async (): ActionResponse<GetCurrenciesReturn, string> => {
+	try {
+		const { user_id } = await getUserMetadata()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription')
+			.where('user_id', user_id)
+			.select('currency')
+			.orderBy('currency', 'asc')
+			.distinct()
+		return { status: 'SUCCESS', data }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
+type GetMonthlyOverviewReturn = Array<{
+	amount: number
+	next_billing_date: string
+	interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
+}>
+
+export const getMonthlyOverview = async (
+	currency: string
+): ActionResponse<GetMonthlyOverviewReturn, string> => {
+	try {
+		const { user_id } = await getUserMetadata()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const startOfCurrentMonth = dayjs().startOf('month')
+		const endOfLastMonthNextYear = dayjs().add(1, 'year').subtract(1, 'month').endOf('month')
+
+		const data = await knex('subscription')
+			.select('amount', 'interval', 'next_billing_date')
+			.where({ user_id, currency })
+			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+				startOfCurrentMonth.format('YYYY-MM-DD'),
+				endOfLastMonthNextYear.format('YYYY-MM-DD'),
+			])
+
+		return { status: 'SUCCESS', data }
+	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
