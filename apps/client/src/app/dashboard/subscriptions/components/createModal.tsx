@@ -90,7 +90,6 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 					title: 'Error',
 					message: result.message,
 				})
-				
 			}
 
 			notifications.show({

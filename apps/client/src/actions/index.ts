@@ -86,7 +86,7 @@ export const user_update = async (body: any) => {
 }
 
 export const subscriptions_list = async (
-	interval: string = 'ALL'
+	interval: ISubscription['interval'] | 'ALL' = 'ALL'
 ): ActionResponse<ISubscription[], string> => {
 	try {
 		const { user_id } = await getUserMetadata()
@@ -459,7 +459,7 @@ export const getCurrencies = async (): ActionResponse<GetCurrenciesReturn, strin
 type GetMonthlyOverviewReturn = Array<{
 	amount: number
 	next_billing_date: string
-	interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
+	interval: ISubscription['interval']
 }>
 
 export const getMonthlyOverview = async (

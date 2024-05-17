@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 
 import { MONTHS } from 'constants/index'
+import type { ISubscription } from 'types'
 
 export const currencyFormatter = (amount = 0, currency = 'INR') =>
 	Intl.NumberFormat('en-US', {
@@ -30,7 +31,7 @@ const updateMonthByAmount = (acc: Record<string, number>, month: string, amount:
 type CalculateMonthlyOverviewArgs = Array<{
 	amount: number
 	next_billing_date: string
-	interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
+	interval: ISubscription['interval']
 }>
 
 export const calculateMonthlyOverview = (

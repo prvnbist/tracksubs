@@ -8,18 +8,20 @@ import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 import { Button, Card, Group, SegmentedControl, SimpleGrid, Skeleton, Space } from '@mantine/core'
 
-import { ISubscription } from 'types'
 import { CYCLES } from 'constants/index'
+import type { ISubscription } from 'types'
 import { subscriptions_list } from 'actions'
 import { CreateEmptyState, ErrorState } from 'components'
 
 const CreateModal = lazy(() => import('./createModal'))
 const Subscription = lazy(() => import('./subscription'))
 
+type Interval = ISubscription['interval'] | 'ALL'
+
 const Subscriptions = () => {
 	const router = useRouter()
 
-	const [interval, setInterval] = useState('ALL')
+	const [interval, setInterval] = useState<Interval>('ALL')
 
 	const { status, data, error } = useQuery({
 		retry: 0,
@@ -59,8 +61,8 @@ const Subscriptions = () => {
 					size="sm"
 					radius="sm"
 					value={interval}
-					onChange={setInterval}
 					withItemsBorders={false}
+					onChange={value => setInterval(value as Interval)}
 					data={[{ value: 'ALL', label: 'All' }, ...CYCLES]}
 				/>
 			</Group>

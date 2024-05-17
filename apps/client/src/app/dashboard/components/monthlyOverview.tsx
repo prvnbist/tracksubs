@@ -2,13 +2,14 @@
 
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
+import { IconAlertTriangle } from '@tabler/icons-react'
 
 import { BarChart } from '@mantine/charts'
 import { Center, Stack, Title } from '@mantine/core'
 
+import { ISubscription } from 'types'
 import { MONTHS } from 'constants/index'
 import { calculateMonthlyOverview, currencyFormatter } from 'utils'
-import { IconAlertTriangle } from '@tabler/icons-react'
 
 type MonthlyOverviewProps = {
 	currency: string
@@ -16,7 +17,7 @@ type MonthlyOverviewProps = {
 	data: Array<{
 		amount: number
 		next_billing_date: string
-		interval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
+		interval: ISubscription['interval']
 	}>
 }
 
