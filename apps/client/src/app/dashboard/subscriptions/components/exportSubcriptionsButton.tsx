@@ -18,7 +18,7 @@ const ExportSubscriptionsButton = () => {
 		if (user.plan === 'FREE') {
 			notifications.show({
 				color: 'red.5',
-				title: 'Usage Alert',
+				title: 'Not available in current plan',
 				message: `Exporting subscriptions are not available in free plan, please upgrade to paid plan to export subscriptions data.`,
 			})
 			return

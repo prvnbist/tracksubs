@@ -27,8 +27,6 @@ import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_delete } from 'actions'
 
-import classes from './index.module.css'
-
 const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
 
 dayjs.extend(utc)
@@ -148,7 +146,17 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 	}
 
 	return (
-		<Card shadow="sm" padding="lg" radius="md" withBorder className={classes.card__subscription}>
+		<Card
+			shadow="sm"
+			padding="lg"
+			radius="md"
+			withBorder
+			styles={{
+				root: {
+					...(isPastRenewal && { borderWidth: 2, borderColor: 'var(--mantine-color-red-5)' }),
+				},
+			}}
+		>
 			<Card.Section p={16} bg="var(--mantine-color-dark-7)">
 				<Group justify="space-between">
 					<Group gap={16}>
