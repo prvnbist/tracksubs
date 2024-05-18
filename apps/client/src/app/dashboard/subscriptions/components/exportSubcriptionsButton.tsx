@@ -4,7 +4,7 @@ import { lazy } from 'react'
 import { IconFileExport } from '@tabler/icons-react'
 
 import { modals } from '@mantine/modals'
-import { ActionIcon, useComputedColorScheme } from '@mantine/core'
+import { Button } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
 import { useGlobal } from 'state/global'
@@ -13,8 +13,6 @@ const ExportSubcriptionsModal = lazy(() => import('./exportSubcriptionsModal'))
 
 const ExportSubscriptionsButton = () => {
 	const { user } = useGlobal()
-
-	const scheme = useComputedColorScheme()
 
 	const onExport = () => {
 		if (user.plan === 'FREE') {
@@ -31,14 +29,15 @@ const ExportSubscriptionsButton = () => {
 		})
 	}
 	return (
-		<ActionIcon
-			variant="subtle"
+		<Button
+			size="xs"
+			variant="default"
 			onClick={onExport}
 			title="Export Subscriptions"
-			color={scheme === 'light' ? 'dark' : 'gray'}
+			leftSection={<IconFileExport size={16} />}
 		>
-			<IconFileExport size={18} />
-		</ActionIcon>
+			Export
+		</Button>
 	)
 }
 

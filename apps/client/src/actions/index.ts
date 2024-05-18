@@ -475,13 +475,72 @@ export const getMonthlyOverview = async (
 
 		const data = await knex('subscription')
 			.select('amount', 'interval', 'next_billing_date')
-			.where({ user_id, currency })
+			.where({ user_id, currency, is_active: true })
 			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
 				startOfCurrentMonth.format('YYYY-MM-DD'),
 				endOfLastMonthNextYear.format('YYYY-MM-DD'),
 			])
 
 		return { status: 'SUCCESS', data }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
+export const getActiveSubscriptions = async (
+	currency: string
+): ActionResponse<{ active: number; total: number }, string> => {
+	try {
+		const { user_id } = await getUserMetadata()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const data = await knex('subscription').select('is_active').where({ user_id, currency })
+
+		const active = data.filter(datum => datum.is_active).length
+
+		return { status: 'SUCCESS', data: { active, total: data.length } }
+	} catch (error) {
+		return { status: 'ERROR', message: 'Something went wrong!' }
+	}
+}
+
+export const getThisWeekMonthSubscriptions = async (
+	currency: string
+): ActionResponse<{ this_week: number; this_month: number }, string> => {
+	try {
+		const { user_id } = await getUserMetadata()
+
+		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const startOfWeek = dayjs().startOf('week')
+		const endOfWeek = dayjs().endOf('week')
+
+		const this_week = await knex('subscription')
+			.count()
+			.where({ user_id, currency, is_active: true })
+			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+				startOfWeek.format('YYYY-MM-DD'),
+				endOfWeek.format('YYYY-MM-DD'),
+			])
+			.first<{ count: number }>()
+
+		const startOfMonth = dayjs().startOf('month')
+		const endOfMonth = dayjs().endOf('month')
+
+		const this_month = await knex('subscription')
+			.count()
+			.where({ user_id, currency, is_active: true })
+			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+				startOfMonth.format('YYYY-MM-DD'),
+				endOfMonth.format('YYYY-MM-DD'),
+			])
+			.first<{ count: number }>()
+
+		return {
+			status: 'SUCCESS',
+			data: { this_week: this_week.count, this_month: this_month.count },
+		}
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}

@@ -8,10 +8,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
 	IconBell,
 	IconBellOff,
+	IconCheck,
 	IconCreditCardPay,
 	IconDotsVertical,
 	IconPencil,
 	IconTrash,
+	IconX,
 } from '@tabler/icons-react'
 
 import utc from 'dayjs/plugin/utc'
@@ -36,7 +38,7 @@ import {
 import { ISubscription } from 'types'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
-import { subscription_alert, subscriptions_delete } from 'actions'
+import { subscription_alert, subscriptions_delete, subscriptions_update } from 'actions'
 
 const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
 
@@ -158,6 +160,52 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 		})
 	}
 
+	const toggleActive = () => {
+		modals.openConfirmModal({
+			title: subscription.is_active ? 'Mark Inactive' : 'Mark Active',
+			children: (
+				<Text size="sm">
+					{subscription.is_active
+						? 'Please confirm if you want to disable '
+						: 'Please confirm if you want to enable '}
+					the subscription: {subscription.title}
+				</Text>
+			),
+			labels: { confirm: 'Confirm', cancel: 'Cancel' },
+			onConfirm: async () => {
+				try {
+					const result = await subscriptions_update(subscription.id, {
+						is_active: !subscription.is_active,
+					})
+
+					if (result.status === 'ERROR') {
+						return notifications.show({
+							color: 'red',
+							title: 'Error',
+							message: result.message,
+						})
+					}
+
+					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+
+					notifications.show({
+						color: 'green',
+						title: 'Success',
+						message: subscription.is_active
+							? `Disabled the subscription: ${subscription.title}`
+							: `Enabled the subscription: ${subscription.title}`,
+					})
+				} catch (error) {
+					notifications.show({
+						color: 'red',
+						title: 'Error',
+						message: 'Something went wrong, please try again!',
+					})
+				}
+			},
+		})
+	}
+
 	return (
 		<Card
 			shadow="sm"
@@ -166,6 +214,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 			withBorder
 			styles={{
 				root: {
+					...(!subscription.is_active && { filter: 'grayscale(1)' }),
 					...(isPastRenewal && { borderWidth: 2, borderColor: 'var(--mantine-color-red-5)' }),
 				},
 			}}
@@ -214,7 +263,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 								</Text>
 							) : (
 								<Text size="sm" c="dimmed">
-									Paused
+									Inactive
 								</Text>
 							)}
 						</Stack>
@@ -236,18 +285,33 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 								</Menu.Item>
 							)}
 							<Menu.Item
-								title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
-								onClick={setAlert}
+								onClick={toggleActive}
 								leftSection={
-									subscription.email_alert ? (
-										<IconBellOff size={18} />
+									subscription.is_active ? (
+										<IconCheck size={18} color="var(--mantine-color-green-5)" />
 									) : (
-										<IconBell size={18} />
+										<IconX size={18} color="var(--mantine-color-gray-5)" />
 									)
 								}
+								title={`Mark ${subscription.is_active ? 'Inactive' : 'Active'}`}
 							>
-								{subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+								Mark {subscription.is_active ? 'Inactive' : 'Active'}
 							</Menu.Item>
+							{subscription.is_active && (
+								<Menu.Item
+									title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+									onClick={setAlert}
+									leftSection={
+										subscription.email_alert ? (
+											<IconBellOff size={18} />
+										) : (
+											<IconBell size={18} />
+										)
+									}
+								>
+									{subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+								</Menu.Item>
+							)}
 							<Menu.Item
 								title="Edit"
 								onClick={() => onEdit(subscription)}
