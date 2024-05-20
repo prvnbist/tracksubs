@@ -7,6 +7,7 @@ import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
 import { Button, Group, Select, Space, TextInput } from '@mantine/core'
 
+import { track } from 'utils'
 import { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { transaction_create } from 'actions'
@@ -21,6 +22,7 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 
 	const create = async () => {
 		try {
+			track('btn-create-transaction')
 			const result = await transaction_create({
 				...subscription,
 				paidOn,

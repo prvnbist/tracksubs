@@ -10,6 +10,7 @@ import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
 import { Button, Group, NumberInput, Select, Space, TextInput } from '@mantine/core'
 
+import { track } from 'utils'
 import { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { CURRENCIES, CYCLES } from 'constants/index'
@@ -81,6 +82,7 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 				const diffResult = diff(subscription, data)
 				result = await subscriptions_update(subscription.id, diffResult)
 			} else {
+				track('btn-create-subscription')
 				result = await subscriptions_create(data)
 			}
 

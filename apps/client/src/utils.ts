@@ -75,3 +75,10 @@ export const calculateMonthlyOverview = (
 		return acc
 	}, {})
 }
+
+export const track = async (name: string, payload?: Record<string, any>) => {
+	try {
+		await window.umami.track(name, payload ?? {})
+		return
+	} catch (e) {}
+}

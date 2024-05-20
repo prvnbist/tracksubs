@@ -18,6 +18,7 @@ import {
 	useComputedColorScheme,
 } from '@mantine/core'
 
+import { track } from 'utils'
 import { useGlobal } from 'state/global'
 import { payment_method_create, payment_method_delete } from 'actions'
 
@@ -32,6 +33,7 @@ export default function Page() {
 
 	const deletePaymentMethod = async (id: string) => {
 		try {
+			track('btn-delete-payment-method')
 			const result = await payment_method_delete(id)
 			if (result.status === 'ERROR') {
 				throw Error()
@@ -77,6 +79,7 @@ export default function Page() {
 				ref={formRef}
 				action={async (formData: FormData) => {
 					try {
+						track('btn-create-payment-method')
 						if (!(formData.get('title') as string)?.trim()) {
 							notifications.show({
 								color: 'orange',

@@ -5,7 +5,7 @@ import { useMap } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { Button, Group, Space, Stack, TextInput } from '@mantine/core'
 
-import { downloadCSV } from 'utils'
+import { downloadCSV, track } from 'utils'
 import { subscription_export } from 'actions'
 
 const ExportSubscriptionsModal = () => {
@@ -25,6 +25,7 @@ const ExportSubscriptionsModal = () => {
 
 	const onExport = async () => {
 		try {
+			track('btn-export-subscription')
 			setStatus(true)
 
 			const notification_id = notifications.show({

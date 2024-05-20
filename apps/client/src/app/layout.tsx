@@ -13,6 +13,7 @@ import './layout.css'
 import StatsigWrapper from 'state/statsig'
 
 import theme from './theme'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
 	title: 'TrackSubs',
@@ -56,6 +57,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<link rel="icon" type="image/png" sizes="16x16" href="/logos/favicon-16x16.png" />
 				<link rel="manifest" href="/site.webmanifest" />
 				{process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-9HQWT4K0XG" />}
+				<Script
+					src="script"
+					data-host-url="https://analytics.prvnbist.com"
+					data-website-id="b64a95e5-2fa2-45ca-9ef7-348516e65f59"
+				/>
 			</head>
 			<body>
 				<StatsigWrapper>

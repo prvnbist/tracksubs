@@ -21,6 +21,7 @@ import {
 import { isEmail } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
 
+import { track } from 'utils'
 import Logo from 'assets/svgs/logo'
 import { waitlist_add } from 'actions'
 
@@ -53,6 +54,8 @@ export default function Page(): JSX.Element {
 						throw Error()
 					}
 				}
+
+				track('btn-waitlist')
 
 				notifications.show({
 					title: 'Added',
@@ -88,11 +91,11 @@ export default function Page(): JSX.Element {
 					<Group gap={16}>
 						{is_signup_allowed && isLoaded ? (
 							isSignedIn ? (
-								<Link href="/dashboard">
+								<Link href="/dashboard" onClick={() => track('btn-dashboard')}>
 									<Button>Go to dashboard</Button>
 								</Link>
 							) : (
-								<Link href="/login">
+								<Link href="/login" onClick={() => track('btn-login')}>
 									<Button>Get Started</Button>
 								</Link>
 							)
@@ -160,6 +163,7 @@ export default function Page(): JSX.Element {
 					component={Link}
 					underline="hover"
 					rel="noreferrer noopener"
+					onClick={() => track('btn-github')}
 					href="https://github.com/prvnbist/tracksubs"
 				>
 					Github

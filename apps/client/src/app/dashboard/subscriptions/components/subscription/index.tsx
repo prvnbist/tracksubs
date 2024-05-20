@@ -35,6 +35,7 @@ import {
 	useComputedColorScheme,
 } from '@mantine/core'
 
+import { track } from 'utils'
 import { ISubscription } from 'types'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
@@ -76,6 +77,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 			labels: { confirm: 'Yes, Delete', cancel: 'Cancel' },
 			onConfirm: async () => {
 				try {
+					track('btn-delete-subscription')
 					const result = await subscriptions_delete(subscription.id)
 
 					if (result.status === 'ERROR') {
@@ -129,6 +131,11 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			onConfirm: async () => {
 				try {
+					if (subscription.email_alert) {
+						track('btn-set-alert')
+					} else {
+						track('btn-unset-alert')
+					}
 					const result = await subscription_alert(subscription.id, !subscription.email_alert)
 
 					if (result.status === 'ERROR') {
@@ -174,6 +181,11 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			onConfirm: async () => {
 				try {
+					if (subscription.is_active) {
+						track('btn-set-inactive')
+					} else {
+						track('btn-set-active')
+					}
 					const result = await subscriptions_update(subscription.id, {
 						is_active: !subscription.is_active,
 					})
