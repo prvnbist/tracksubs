@@ -17,6 +17,7 @@ import {
 	Text,
 	TextInput,
 	Title,
+	useComputedColorScheme,
 } from '@mantine/core'
 import { isEmail } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
@@ -30,6 +31,8 @@ import classes from './page.module.css'
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()
 	const { value: is_signup_allowed } = useGate('is_signup_allowed')
+
+	const scheme = useComputedColorScheme()
 
 	const [email, setEmail] = useState('')
 
@@ -116,12 +119,19 @@ export default function Page(): JSX.Element {
 			<Flex
 				align="center"
 				component="section"
-				bg="var(--mantine-color-dark-6)"
 				className={classes.fold_1_wrapper}
+				bg={scheme === 'light' ? 'var(--mantine-color-gray-2)' : 'var(--mantine-color-dark-6)'}
 			>
 				<Container w="100%" className={classes.fold_1_content}>
 					<div>
-						<div>
+						<div
+							style={{
+								backgroundColor:
+									scheme === 'light'
+										? 'var(--mantine-color-gray-4)'
+										: 'var(--mantine-color-dark-7)',
+							}}
+						>
 							<Stack gap={4}>
 								<Image
 									src="/images/hulu_card.svg"
@@ -158,7 +168,7 @@ export default function Page(): JSX.Element {
 			</Flex>
 			<Group py={16} gap={16} justify="center">
 				<Anchor
-					c="white"
+					c={scheme === 'light' ? 'gray.8' : 'white'}
 					target="_blank"
 					component={Link}
 					underline="hover"
@@ -168,13 +178,28 @@ export default function Page(): JSX.Element {
 				>
 					Github
 				</Anchor>
-				<Anchor c="white" component={Link} href="/changelog" underline="hover">
+				<Anchor
+					c={scheme === 'light' ? 'gray.8' : 'white'}
+					component={Link}
+					href="/changelog"
+					underline="hover"
+				>
 					Changelog
 				</Anchor>
-				<Anchor c="white" component={Link} href="/privacy" underline="hover">
+				<Anchor
+					c={scheme === 'light' ? 'gray.8' : 'white'}
+					component={Link}
+					href="/privacy"
+					underline="hover"
+				>
 					Privacy
 				</Anchor>
-				<Anchor c="white" component={Link} href="/terms-of-service" underline="hover">
+				<Anchor
+					c={scheme === 'light' ? 'gray.8' : 'white'}
+					component={Link}
+					href="/terms-of-service"
+					underline="hover"
+				>
 					Terms of Service
 				</Anchor>
 			</Group>
