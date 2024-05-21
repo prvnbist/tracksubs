@@ -84,7 +84,6 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 				required
 				label="Paid on"
 				value={paidOn}
-				minDate={new Date()}
 				placeholder="Select billing date"
 				onChange={value => setPaidOn(value!)}
 			/>
