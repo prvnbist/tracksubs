@@ -126,7 +126,8 @@ export default function Page() {
 			<Space h={16} />
 			<Text c="dimmed">
 				If you have any questions or suggestions regarding my terms of services, please feel
-				free to contact me at <Link href="mailto:prvnbist@gmail.com">prvnbist@gmail.com</Link>.
+				free to contact me at{' '}
+				<Link href="mailto:tracksubs.co@gmail.com">tracksubs.co@gmail.com</Link>.
 			</Text>
 		</Container>
 	)
