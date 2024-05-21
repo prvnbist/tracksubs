@@ -67,21 +67,34 @@ const MobileMenu = () => {
 
 	const { user } = useGlobal()
 
-	const [opened, { toggle }] = useDisclosure()
+	const [opened, { open, close }] = useDisclosure()
 
 	const scheme = useComputedColorScheme()
 
 	const goto = (path: string) => {
 		router.push(path)
-		toggle()
+		close()
 	}
 
 	const color = scheme === 'light' ? 'yellow.8' : 'yellow'
 
 	return (
-		<Menu shadow="md" width={200} position="bottom">
+		<Menu
+			shadow="md"
+			width={200}
+			position="bottom"
+			closeOnEscape
+			closeOnClickOutside
+			closeOnItemClick
+			onClose={() => close()}
+		>
 			<Menu.Target>
-				<Burger size="sm" opened={opened} onClick={toggle} aria-label="Toggle navigation" />
+				<Burger
+					size="sm"
+					opened={opened}
+					aria-label="Toggle navigation"
+					onClick={() => (opened ? close() : open())}
+				/>
 			</Menu.Target>
 			<Menu.Dropdown>
 				<Menu.Item
