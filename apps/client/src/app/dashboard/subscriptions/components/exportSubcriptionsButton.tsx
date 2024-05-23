@@ -19,7 +19,8 @@ const ExportSubscriptionsButton = () => {
 			notifications.show({
 				color: 'red.5',
 				title: 'Not available in current plan',
-				message: `Exporting subscriptions are not available in free plan, please upgrade to paid plan to export subscriptions data.`,
+				message:
+					'Exporting subscriptions are not available in free plan, please upgrade to paid plan to export subscriptions data.',
 			})
 			return
 		}

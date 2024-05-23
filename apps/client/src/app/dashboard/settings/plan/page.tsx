@@ -19,13 +19,19 @@ export default function Page() {
 			</Group>
 			<Space h={16} />
 			<SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }}>
-				{Object.keys(PLANS).map((key: keyof typeof PLANS) => (
-					<Plan
-						plan={PLANS[key]!}
-						isActive={key === user.plan}
-						usage={{ alerts: user.total_alerts, subscriptions: user.total_subscriptions }}
-					/>
-				))}
+				{Object.keys(PLANS).map((key: keyof typeof PLANS) => {
+					const plan = PLANS[key]
+
+					if (!plan) return null
+					return (
+						<Plan
+							key={key}
+							plan={plan}
+							isActive={key === user.plan}
+							usage={{ alerts: user.total_alerts, subscriptions: user.total_subscriptions }}
+						/>
+					)
+				})}
 			</SimpleGrid>
 		</div>
 	)
@@ -63,14 +69,14 @@ const Plan = ({ plan, isActive, usage = { alerts: 0, subscriptions: 0 } }: PlanP
 					<Table.Tr>
 						<Table.Td>Subscriptions</Table.Td>
 						<Table.Td ta="right" ff="monospace">
-							{isActive ? `${usage.subscriptions}/` : ``}
+							{isActive ? `${usage.subscriptions}/` : ''}
 							{plan.subscriptions}
 						</Table.Td>
 					</Table.Tr>
 					<Table.Tr>
 						<Table.Td>Alerts</Table.Td>
 						<Table.Td ta="right" ff="monospace">
-							{isActive ? `${usage.alerts}/` : ``}
+							{isActive ? `${usage.alerts}/` : ''}
 							{plan.alerts}
 						</Table.Td>
 					</Table.Tr>

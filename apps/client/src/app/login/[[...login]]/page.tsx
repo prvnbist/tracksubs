@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { dark } from '@clerk/themes'
 import { SignIn } from '@clerk/nextjs'
 

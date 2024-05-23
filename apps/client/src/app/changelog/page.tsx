@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { IconArrowLeft } from '@tabler/icons-react'
 
 import { Container, Button, Space, Title } from '@mantine/core'

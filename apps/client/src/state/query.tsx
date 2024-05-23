@@ -1,6 +1,6 @@
 'use client'
 
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 function makeQueryClient() {
@@ -18,10 +18,10 @@ let browserQueryClient: QueryClient | undefined = undefined
 function getQueryClient() {
 	if (typeof window === 'undefined') {
 		return makeQueryClient()
-	} else {
-		if (!browserQueryClient) browserQueryClient = makeQueryClient()
-		return browserQueryClient
 	}
+
+	if (!browserQueryClient) browserQueryClient = makeQueryClient()
+	return browserQueryClient
 }
 
 export default function QueryProvider(props: PropsWithChildren) {

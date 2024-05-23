@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.withSchema('public').createTable('payment_method', function (table) {
+exports.up = knex => {
+	return knex.schema.withSchema('public').createTable('payment_method', table => {
 		table.uuid('id').primary().defaultTo(knex.fn.uuid())
 		table.string('title').notNullable()
 		table.uuid('user_id').notNullable()
@@ -15,6 +15,6 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
+exports.down = knex => {
 	return knex.schema.withSchema('public').dropTableIfExists('payment_method')
 }

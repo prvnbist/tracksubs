@@ -2,7 +2,8 @@
 
 import { IBM_Plex_Mono, Inter, Unbounded } from 'next/font/google'
 
-import { MantineThemeOverride, Table, createTheme } from '@mantine/core'
+import type { MantineThemeOverride } from '@mantine/core'
+import { Table, createTheme } from '@mantine/core'
 
 const inter = Inter({ subsets: ['latin'] })
 const unbounded = Unbounded({ subsets: ['latin'] })

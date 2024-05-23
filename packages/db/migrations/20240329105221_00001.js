@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.withSchema('public').createTable('user', function (table) {
+exports.up = knex => {
+	return knex.schema.withSchema('public').createTable('user', table => {
 		table.uuid('id').primary().defaultTo(knex.fn.uuid())
 		table.string('auth_id').notNullable().unique()
 		table.string('first_name')
@@ -16,6 +16,6 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
+exports.down = knex => {
 	return knex.schema.withSchema('public').dropTableIfExists('user')
 }

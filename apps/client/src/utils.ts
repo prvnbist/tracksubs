@@ -10,7 +10,7 @@ export const currencyFormatter = (amount = 0, currency = 'INR') =>
 		maximumFractionDigits: 2,
 	}).format(amount)
 
-export const downloadCSV = (csv: string, name: string = 'data') => {
+export const downloadCSV = (csv: string, name = 'data') => {
 	const blob = new Blob([csv], { type: 'text/plain' })
 	const a = document.createElement('a')
 	a.download = `${name}.csv`
@@ -43,9 +43,9 @@ export const calculateMonthlyOverview = (
 
 		switch (interval) {
 			case 'MONTHLY': {
-				MONTHS.forEach(month => {
+				for (const month of MONTHS) {
 					updateMonthByAmount(acc, month, amount)
-				})
+				}
 				break
 			}
 			case 'YEARLY': {
@@ -64,10 +64,11 @@ export const calculateMonthlyOverview = (
 
 				const quarterlyMonths = [...pastMonths, monthIndex, ...futureMonths]
 
-				quarterlyMonths.forEach(quarterlyMonthIndex => {
+				for (const quarterlyMonthIndex of quarterlyMonths) {
 					const month = MONTHS[quarterlyMonthIndex]!
 					updateMonthByAmount(acc, month, amount)
-				})
+				}
+
 				break
 			}
 		}
@@ -76,7 +77,7 @@ export const calculateMonthlyOverview = (
 	}, {})
 }
 
-export const track = async (name: string, payload?: Record<string, any>) => {
+export const track = async (name: string, payload?: Record<string, string | number | boolean>) => {
 	try {
 		await window.umami.track(name, payload ?? {})
 		return

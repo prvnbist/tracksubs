@@ -53,9 +53,8 @@ export default function Page(): JSX.Element {
 						return notifications.show({
 							message: `You're already added to the waitlist👋🏽`,
 						})
-					} else {
-						throw Error()
 					}
+					throw Error()
 				}
 
 				track('btn-waitlist')

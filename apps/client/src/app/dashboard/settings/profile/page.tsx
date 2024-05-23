@@ -22,7 +22,7 @@ import {
 	Title,
 } from '@mantine/core'
 
-import { User } from 'types'
+import type { User } from 'types'
 import { user_update } from 'actions'
 import { useGlobal } from 'state/global'
 import { CURRENCIES, TIMEZONES_DISPLAY } from 'constants/index'

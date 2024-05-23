@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.withSchema('public').alterTable('subscription', function (table) {
+exports.up = knex => {
+	return knex.schema.withSchema('public').alterTable('subscription', table => {
 		table.boolean('is_active').defaultTo(true)
 	})
 }
@@ -12,4 +12,4 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {}
+exports.down = knex => {}

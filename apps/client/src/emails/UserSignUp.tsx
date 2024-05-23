@@ -41,7 +41,7 @@ export default function UserSignUp({ firstName }: { firstName: string }) {
 						<Section className="">
 							<Text>Hey{firstName ? ` ${firstName}` : ''},</Text>
 							<Text>
-								Thanks for signing up and welcome to{` `}
+								Thanks for signing up and welcome to{' '}
 								<Link href="https://www.tracksubs.co">TrackSubs</Link>!
 							</Text>
 						</Section>

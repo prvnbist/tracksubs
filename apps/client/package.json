@@ -42,14 +42,10 @@
 		"svix": "^1.21.0"
 	},
 	"devDependencies": {
-		"@next/eslint-plugin-next": "^14.1.1",
-		"@tracksubs/eslint-config": "*",
 		"@tracksubs/typescript-config": "*",
-		"@types/eslint": "^8.56.5",
 		"@types/node": "^20.11.24",
 		"@types/react": "^18.3.1",
 		"@types/react-dom": "^18.3.0",
-		"eslint": "^8.57.0",
 		"postcss": "^8.4.38",
 		"postcss-preset-mantine": "^1.13.0",
 		"postcss-simple-vars": "^7.0.1",

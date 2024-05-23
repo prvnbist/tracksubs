@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = async function (knex) {
+exports.up = async knex => {
 	await knex.raw(`ALTER TABLE "user" ALTER COLUMN auth_id TYPE text;`)
 	await knex.raw(`ALTER TABLE "user" ALTER COLUMN first_name TYPE text;`)
 	await knex.raw(`ALTER TABLE "user" ALTER COLUMN last_name TYPE text;`)
@@ -13,4 +13,4 @@ exports.up = async function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {}
+exports.down = knex => {}

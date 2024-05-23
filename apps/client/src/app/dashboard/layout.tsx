@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { ModalsProvider } from '@mantine/modals'

@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.withSchema('public').alterTable('transaction', function (table) {
+exports.up = knex => {
+	return knex.schema.withSchema('public').alterTable('transaction', table => {
 		table.uuid('subscription_id').notNullable()
 		table.foreign('subscription_id').references('id').inTable('subscription')
 	})
@@ -13,4 +13,4 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {}
+exports.down = knex => {}

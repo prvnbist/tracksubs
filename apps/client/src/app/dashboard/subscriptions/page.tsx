@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { Flex, Group, Title } from '@mantine/core'
 
 import { CreateSubscriptionButton, ExportSubscriptionsButton, Subscriptions } from './components'

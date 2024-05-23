@@ -6,7 +6,7 @@ import { useQueries } from '@tanstack/react-query'
 
 import { Center, Loader } from '@mantine/core'
 
-import { PaymentMethod, Service, User } from 'types'
+import type { PaymentMethod, Service, User } from 'types'
 import { Onboarding } from 'components'
 import { payment_method_list, services, user } from 'actions'
 

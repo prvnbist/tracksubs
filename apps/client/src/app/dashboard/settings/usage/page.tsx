@@ -6,10 +6,16 @@ import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 
 const usageBasedColor = (usage: number) => {
-	if (usage <= 1 / 3) return 'green'
-	else if (usage > 1 / 3 && usage <= 2 / 3) return 'orange'
-	else if (usage > 2 / 3) return 'red.6'
-	return 'dark.7'
+	switch (true) {
+		case usage <= 1 / 3:
+			return 'green'
+		case usage > 1 / 3 && usage <= 2 / 3:
+			return 'orange'
+		case usage > 2 / 3:
+			return 'red.6'
+		default:
+			return 'dark.7'
+	}
 }
 
 export default function Page() {

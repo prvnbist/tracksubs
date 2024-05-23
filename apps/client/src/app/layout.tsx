@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { GoogleAnalytics } from '@next/third-parties/google'
 

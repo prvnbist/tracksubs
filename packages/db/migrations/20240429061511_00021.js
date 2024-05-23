@@ -2,12 +2,12 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = async function (knex) {
-	await knex.schema.withSchema('public').alterTable('payment_method', function (table) {
+exports.up = async knex => {
+	await knex.schema.withSchema('public').alterTable('payment_method', table => {
 		table.dropForeign('user_id')
 		table.foreign('user_id').references('id').inTable('user').onDelete('CASCADE')
 	})
-	await knex.schema.withSchema('public').alterTable('transaction', function (table) {
+	await knex.schema.withSchema('public').alterTable('transaction', table => {
 		table.dropForeign('user_id')
 		table.foreign('user_id').references('id').inTable('user').onDelete('CASCADE')
 
@@ -15,7 +15,7 @@ exports.up = async function (knex) {
 		table.foreign('subscription_id').references('id').inTable('subscription').onDelete('CASCADE')
 	})
 
-	return knex.schema.withSchema('public').alterTable('subscription', function (table) {
+	return knex.schema.withSchema('public').alterTable('subscription', table => {
 		table.dropForeign('user_id')
 		table.foreign('user_id').references('id').inTable('user').onDelete('CASCADE')
 	})
@@ -25,12 +25,12 @@ exports.up = async function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = async function (knex) {
-	await knex.schema.withSchema('public').alterTable('payment_method', function (table) {
+exports.down = async knex => {
+	await knex.schema.withSchema('public').alterTable('payment_method', table => {
 		table.dropForeign('user_id')
 		table.foreign('user_id').references('id').inTable('user').onDelete('NO ACTION')
 	})
-	await knex.schema.withSchema('public').alterTable('transaction', function (table) {
+	await knex.schema.withSchema('public').alterTable('transaction', table => {
 		table.dropForeign('user_id')
 		table.foreign('user_id').references('id').inTable('user').onDelete('NO ACTION')
 
@@ -42,7 +42,7 @@ exports.down = async function (knex) {
 			.onDelete('NO ACTION')
 	})
 
-	return knex.schema.withSchema('public').alterTable('subscription', function (table) {
+	return knex.schema.withSchema('public').alterTable('subscription', table => {
 		table.dropForeign('user_id')
 		table.foreign('user_id').references('id').inTable('user').onDelete('NO ACTION')
 	})

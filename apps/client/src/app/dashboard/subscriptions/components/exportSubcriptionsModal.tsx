@@ -62,7 +62,7 @@ const ExportSubscriptionsModal = () => {
 			notifications.show({
 				color: 'red.5',
 				title: 'Export Failed',
-				message: `Failed to export the susbcriptions data, please try again!`,
+				message: 'Failed to export the susbcriptions data, please try again!',
 			})
 		} finally {
 			setStatus(false)

@@ -430,7 +430,7 @@ export const waitlist_add = async (email: string): ActionResponse<{ email: strin
 		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
 		if ((error as Error).message.includes('waitlist_email_unique')) {
-			return { status: 'ERROR', message: `ALREADY_ADDED` }
+			return { status: 'ERROR', message: 'ALREADY_ADDED' }
 		}
 
 		return { status: 'ERROR', message: 'Something went wrong!' }
@@ -476,7 +476,7 @@ export const getMonthlyOverview = async (
 		const data = await knex('subscription')
 			.select('amount', 'interval', 'next_billing_date')
 			.where({ user_id, currency, is_active: true })
-			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+			.andWhereRaw('next_billing_date >= ? and next_billing_date <= ?', [
 				startOfCurrentMonth.format('YYYY-MM-DD'),
 				endOfLastMonthNextYear.format('YYYY-MM-DD'),
 			])
@@ -519,7 +519,7 @@ export const getThisWeekMonthSubscriptions = async (
 		const this_week = await knex('subscription')
 			.count()
 			.where({ user_id, currency, is_active: true })
-			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+			.andWhereRaw('next_billing_date >= ? and next_billing_date <= ?', [
 				startOfWeek.format('YYYY-MM-DD'),
 				endOfWeek.format('YYYY-MM-DD'),
 			])
@@ -531,7 +531,7 @@ export const getThisWeekMonthSubscriptions = async (
 		const this_month = await knex('subscription')
 			.count()
 			.where({ user_id, currency, is_active: true })
-			.andWhereRaw(`next_billing_date >= ? and next_billing_date <= ?`, [
+			.andWhereRaw('next_billing_date >= ? and next_billing_date <= ?', [
 				startOfMonth.format('YYYY-MM-DD'),
 				endOfMonth.format('YYYY-MM-DD'),
 			])

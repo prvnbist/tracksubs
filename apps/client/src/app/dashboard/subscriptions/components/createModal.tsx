@@ -11,7 +11,7 @@ import { notifications } from '@mantine/notifications'
 import { Button, Group, NumberInput, Select, Space, TextInput } from '@mantine/core'
 
 import { track } from 'utils'
-import { ISubscription } from 'types'
+import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { CURRENCIES, CYCLES } from 'constants/index'
 import { subscriptions_create, subscriptions_update } from 'actions'
@@ -19,8 +19,8 @@ import { subscriptions_create, subscriptions_update } from 'actions'
 const diff = (obj1: any, obj2: any) => {
 	const result: any = {}
 
-	for (let key in obj1) {
-		let _key = key as keyof ISubscription
+	for (const key in obj1) {
+		const _key = key as keyof ISubscription
 		if (obj2[_key] !== undefined && obj1[_key] !== obj2[_key]) {
 			result[_key] = obj2[_key]
 		}
@@ -67,7 +67,7 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 				form.setFieldValue('service', service)
 			}
 		}
-	}, [service])
+	}, [service, services, form.setFieldValue])
 
 	const handleSubmit = async () => {
 		const data = { ...form.values }
@@ -97,7 +97,9 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 			notifications.show({
 				color: 'green',
 				title: 'Success',
-				message: `Successfully ${subscription?.id ? 'updated' : 'created'} the subscription - ${data.title}`,
+				message: `Successfully ${subscription?.id ? 'updated' : 'created'} the subscription - ${
+					data.title
+				}`,
 			})
 
 			queryClient.invalidateQueries({ queryKey: ['user'] })
@@ -109,7 +111,9 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 			notifications.show({
 				color: 'red',
 				title: 'Failed',
-				message: `Failed to ${subscription?.id ? 'update' : 'create'} the subscription - ${data.title}`,
+				message: `Failed to ${subscription?.id ? 'update' : 'create'} the subscription - ${
+					data.title
+				}`,
 			})
 		}
 	}

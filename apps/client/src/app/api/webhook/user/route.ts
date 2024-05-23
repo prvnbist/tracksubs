@@ -2,13 +2,13 @@ import { Webhook } from 'svix'
 import { Resend } from 'resend'
 import { headers } from 'next/headers'
 import { clerkClient } from '@clerk/nextjs'
-import { WebhookEvent } from '@clerk/nextjs/server'
+import type { WebhookEvent } from '@clerk/nextjs/server'
 
 import knex from '@tracksubs/db'
 
 import UserSignUp from 'emails/UserSignUp'
 
-const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET || ``
+const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET || ''
 
 async function validateRequest(request: Request) {
 	const payloadString = await request.text()

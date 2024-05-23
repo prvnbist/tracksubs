@@ -1,6 +1,6 @@
 'use client'
 
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 import { StatsigProvider } from 'statsig-react'
 
 const StatsigWrapper = ({ children }: PropsWithChildren) => {

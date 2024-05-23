@@ -36,7 +36,7 @@ import {
 } from '@mantine/core'
 
 import { track } from 'utils'
-import { ISubscription } from 'types'
+import type { ISubscription } from 'types'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_delete, subscriptions_update } from 'actions'

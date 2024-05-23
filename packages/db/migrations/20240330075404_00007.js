@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.alterTable('transaction', function (t) {
+exports.up = knex => {
+	return knex.schema.alterTable('transaction', t => {
 		t.setNullable('payment_method_id')
 	})
 }
@@ -12,8 +12,8 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
-	return knex.schema.alterTable('transaction', function (t) {
+exports.down = knex => {
+	return knex.schema.alterTable('transaction', t => {
 		t.dropNullable('payment_method_id')
 	})
 }

@@ -58,7 +58,7 @@ const Onboarding = () => {
 		} catch (error) {
 			notifications.show({
 				title: 'Error',
-				message: `Failed to save user preferences, please try again.`,
+				message: 'Failed to save user preferences, please try again.',
 			})
 		}
 	}

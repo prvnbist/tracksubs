@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.withSchema('public').createTable('transaction', function (table) {
+exports.up = knex => {
+	return knex.schema.withSchema('public').createTable('transaction', table => {
 		table.uuid('id').primary().defaultTo(knex.fn.uuid())
 		table.date('paid_date').notNullable()
 		table.date('invoice_date').notNullable()
@@ -20,6 +20,6 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
+exports.down = knex => {
 	return knex.schema.withSchema('public').dropTableIfExists('transaction')
 }

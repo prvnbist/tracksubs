@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
-	return knex.schema.withSchema('public').alterTable('subscription', function (table) {
+exports.up = knex => {
+	return knex.schema.withSchema('public').alterTable('subscription', table => {
 		table.renameColumn('next_payment_date', 'next_billing_date')
 	})
 }
@@ -12,8 +12,8 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
-	return knex.schema.withSchema('public').alterTable('subscription', function (table) {
+exports.down = knex => {
+	return knex.schema.withSchema('public').alterTable('subscription', table => {
 		table.renameColumn('next_billing_date', 'next_payment_date')
 	})
 }

@@ -14,7 +14,9 @@ import {
 import { CurrencySelector, MonthlyOverview } from './components'
 
 interface IPageProps {
-	params: {}
+	params: {
+		[key in string]: any
+	}
 	searchParams: { currency?: string }
 }
 
