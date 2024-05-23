@@ -2,6 +2,7 @@
 module.exports = {
 	experimental: {
 		serverComponentsExternalPackages: ['knex'],
+		optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
 	},
 	async rewrites() {
 		return [
