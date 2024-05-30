@@ -37,6 +37,7 @@ export const TIMEZONES_DISPLAY: Array<{
 export const PLANS: Record<string, Plan> = {
 	FREE: {
 		title: 'Free',
+		type: 'FREE',
 		price: {
 			amount: 0,
 			currency: 'USD',
@@ -46,6 +47,7 @@ export const PLANS: Record<string, Plan> = {
 	},
 	BASIC: {
 		title: 'Basic',
+		type: 'PAID',
 		price: {
 			amount: 4.99,
 			currency: 'USD',
@@ -55,6 +57,7 @@ export const PLANS: Record<string, Plan> = {
 	},
 	PRO: {
 		title: 'Pro',
+		type: 'PAID',
 		price: {
 			amount: 9.99,
 			currency: 'USD',

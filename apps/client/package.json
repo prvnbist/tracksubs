@@ -6,7 +6,6 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint . --max-warnings 0",
 		"dev:email": "email dev --dir ./src/emails"
 	},
 	"dependencies": {

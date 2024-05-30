@@ -59,11 +59,12 @@ export type ActionResponse<T, E> = Promise<
 >
 
 export type Plan = {
-	title: string
-	alerts: number
-	subscriptions: number
-	price: { amount: number; currency: string }
-}
+		title: string
+		alerts: number
+		type: 'FREE' | 'PAID'
+		subscriptions: number
+		price: { amount: number; currency: string }
+	}
 
 export type SessionClaim = JwtPayload & {
 	metadata: { user_id: string; plan: 'FREE' | 'BASIC' | 'PRO'; currency: string }

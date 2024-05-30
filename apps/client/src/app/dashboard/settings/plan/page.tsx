@@ -1,6 +1,8 @@
 'use client'
 
-import { Space, Title, Card, Table, SimpleGrid, Badge, Group } from '@mantine/core'
+import { useGate } from 'statsig-react'
+
+import { Space, Title, Card, Table, SimpleGrid, Badge, Group, Blockquote } from '@mantine/core'
 
 import type { Plan as TPlan } from 'types'
 import { PLANS } from 'constants/index'
@@ -9,6 +11,7 @@ import { currencyFormatter } from 'utils'
 
 export default function Page() {
 	const { user } = useGlobal()
+	const { value: is_paid_plans_available } = useGate('is_paid_plans_available')
 
 	return (
 		<div>
@@ -18,17 +21,31 @@ export default function Page() {
 				<Badge variant="default">Monthly</Badge>
 			</Group>
 			<Space h={16} />
+			{!is_paid_plans_available && (
+				<>
+					<Blockquote color="blue" radius="md">
+						More plans with higher limits will be available once we're out of beta!
+					</Blockquote>
+					<Space h={16} />
+				</>
+			)}
 			<SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }}>
 				{Object.keys(PLANS).map((key: keyof typeof PLANS) => {
 					const plan = PLANS[key]
 
 					if (!plan) return null
+
+					if (!is_paid_plans_available && plan.type === 'PAID') return null
+
 					return (
 						<Plan
 							key={key}
 							plan={plan}
 							isActive={key === user.plan}
-							usage={{ alerts: user.total_alerts, subscriptions: user.total_subscriptions }}
+							usage={{
+								alerts: user.total_alerts,
+								subscriptions: user.total_subscriptions,
+							}}
 						/>
 					)
 				})}
