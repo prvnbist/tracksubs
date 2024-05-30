@@ -186,11 +186,17 @@ export const subscriptions_delete = async (id: string): ActionResponse<{ id: str
 			.where('id', id)
 			.andWhere('user_id', user_id)
 			.del()
-			.returning('id')
+			.returning(['id', 'email_alert'])
 
 		await knex('usage').where('user_id', user_id).decrement({
 			total_subscriptions: 1,
 		})
+
+		if (data?.[0]?.email_alert) {
+			await knex('usage').where('user_id', user_id).decrement({
+				total_alerts: 1,
+			})
+		}
 
 		return { status: 'SUCCESS', data: data?.[0] }
 	} catch (error) {
