@@ -1,10 +1,11 @@
 'use client'
 
 import type { PropsWithChildren } from 'react'
+import { IconBug } from '@tabler/icons-react'
 import { createContext, useContext } from 'react'
 import { useQueries } from '@tanstack/react-query'
 
-import { Center, Loader } from '@mantine/core'
+import { Center, Loader, Stack, Text, Title } from '@mantine/core'
 
 import type { PaymentMethod, Service, User } from 'types'
 import { Onboarding } from 'components'
@@ -20,17 +21,18 @@ const INITITAL_STATE: ContextState = {
 	services: {},
 	payment_methods: [],
 	user: {
-		id: null,
-		is_onboarded: false,
-		currency: null,
-		timezone: null,
-		image_url: null,
+		id: '',
+		auth_id: '',
+		email: '',
 		first_name: '',
 		last_name: '',
-		email: '',
+		image_url: null,
+		currency: null,
+		is_onboarded: false,
 		plan: 'FREE',
-		total_alerts: 0,
-		total_subscriptions: 0,
+		timezone: null,
+		usage_id: '',
+		usage: { id: '', user_id: '', total_alerts: 0, total_subscriptions: 0 },
 	},
 }
 
@@ -78,17 +80,16 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 				<Loader />
 			</Center>
 		)
-	// if (status === 'ERROR')
-	// 	return (
-	// 		<Center pt={80}>
-	// 			<Stack align="center" gap={16}>
-	// 				<IconBug size={40} color="var(--mantine-color-dark-3)" />
-	// 				<Title order={2}>404</Title>
-	// 				<Text c="dimmed">Something went wrong, please refresh the page.</Text>
-	// 			</Stack>
-	// 		</Center>
-	// 	)
-
+	if (!data.user)
+		return (
+			<Center pt={80}>
+				<Stack align="center" gap={16}>
+					<IconBug size={40} color="var(--mantine-color-dark-3)" />
+					<Title order={2}>404</Title>
+					<Text c="dimmed">Something went wrong, please refresh the page.</Text>
+				</Stack>
+			</Center>
+		)
 	return (
 		<Context.Provider value={data}>
 			{data.user?.is_onboarded ? children : <Onboarding />}

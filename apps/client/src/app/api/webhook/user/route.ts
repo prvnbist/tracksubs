@@ -1,10 +1,11 @@
 import { Webhook } from 'svix'
 import { Resend } from 'resend'
+import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { clerkClient } from '@clerk/nextjs'
 import type { WebhookEvent } from '@clerk/nextjs/server'
 
-import knex from '@tracksubs/db'
+import db, { insertUserSchema, schema } from '@tracksubs/drizzle'
 
 import UserSignUp from 'emails/UserSignUp'
 
@@ -30,30 +31,40 @@ export async function POST(request: Request) {
 		if (payload.type === 'user.created') {
 			const { data } = payload
 			const email_address = data.email_addresses?.[0]?.email_address ?? ''
-			const user = await knex('user')
-				.insert({
-					auth_id: data.id,
-					email: email_address,
-					first_name: data.first_name,
-					last_name: data.last_name,
-					...(data.has_image && { image_url: data.image_url }),
+
+			const values = insertUserSchema.parse({
+				auth_id: data.id,
+				email: email_address,
+				first_name: data.first_name,
+				last_name: data.last_name,
+				...(data.has_image && { image_url: data.image_url }),
+			})
+
+			const [user] = await db
+				.insert(schema.user)
+				.values(values)
+				.returning({ id: schema.user.id })
+
+			if (!user) {
+				throw Error()
+			}
+
+			const [usage] = await db
+				.insert(schema.usage)
+				.values({
+					user_id: user.id,
 				})
-				.returning('id')
+				.returning({ id: schema.usage.id })
 
-			const { id } = user[0]
-
-			const usage = await knex('usage')
-				.insert({
-					user_id: id,
-				})
-				.returning('id')
-
-			await knex('user').where('id', id).update({ usage_id: usage[0].id })
+			await db
+				.update(schema.user)
+				.set({ usage_id: usage?.id })
+				.where(eq(schema.user.id, user.id))
 
 			if (Array.isArray(user) && user.length > 0) {
 				await clerkClient.users.updateUserMetadata(data.id, {
 					publicMetadata: {
-						user_id: id,
+						user_id: user.id,
 						plan: 'FREE',
 					},
 				})

@@ -48,7 +48,7 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 			service: subscription?.service ?? null,
 			interval: subscription?.interval ?? 'MONTHLY',
 			currency: subscription?.currency ?? (user.currency || 'INR'),
-			next_billing_date: subscription?.next_billing_date ?? null,
+			next_billing_date: subscription?.next_billing_date,
 			amount: subscription?.amount ? subscription?.amount / 100 : 0,
 		},
 		validate: {

@@ -18,7 +18,7 @@ const CreateSubscriptionButton = () => {
 	const plan = PLANS[user.plan]!
 
 	const create = () => {
-		if (user.total_subscriptions === plan.subscriptions) {
+		if (user.usage.total_subscriptions === plan.subscriptions) {
 			notifications.show({
 				color: 'red.5',
 				title: 'Usage Alert',

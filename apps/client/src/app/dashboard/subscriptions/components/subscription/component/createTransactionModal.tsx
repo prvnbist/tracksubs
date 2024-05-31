@@ -22,10 +22,12 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 
 	const create = async () => {
 		try {
-			track('btn-create-transaction')
+			await track('btn-create-transaction')
+
 			const result = await transaction_create({
 				...subscription,
-				paidOn,
+				paidOn: dayjs(paidOn).format('YYYY-MM-DD'),
+				next_billing_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
 				...(paymentMethodId && { paymentMethodId }),
 			})
 
@@ -54,7 +56,7 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 		<div>
 			<TextInput readOnly disabled label="Title" defaultValue={subscription.title} />
 			<Space h={16} />
-			<TextInput readOnly disabled label="Website" defaultValue={subscription.website} />
+			<TextInput readOnly disabled label="Website" defaultValue={subscription.website ?? ''} />
 			<Space h={16} />
 			<Group gap={16}>
 				<TextInput

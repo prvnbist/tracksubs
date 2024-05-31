@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
 import { Resend } from '@trigger.dev/resend'
 import { cronTrigger } from '@trigger.dev/sdk'
+import { and, eq, inArray } from 'drizzle-orm'
 
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 
-import knex from '@tracksubs/db'
+import db, { insertSubscriptionReminderLogSchema, schema } from '@tracksubs/drizzle'
 
 import { client } from 'trigger'
 import RenewalAlert from 'emails/RenewalAlert'
@@ -16,11 +17,11 @@ type Subscription = {
 	subscription_title: string
 	subscription_amount: number
 	subscription_currency: string
-	subscription_next_billing_date: Date
+	subscription_next_billing_date: string
 	user_id: string
 	user_email: string
-	user_timezone: string
-	user_first_name: string
+	user_timezone: string | null
+	user_first_name: string | null
 }
 
 type GroupByEmail = Record<string, { first_name: string; email: string; list: Array<Subscription> }>
@@ -53,25 +54,33 @@ client.defineJob({
 				return acc
 			}, [])
 
-			const COLUMNS = [
-				's.id as subscription_id',
-				's.title as subscription_title',
-				's.amount as subscription_amount',
-				's.currency as subscription_currency',
-				's.next_billing_date as subscription_next_billing_date',
-				'u.id as user_id',
-				'u.email as user_email',
-				'u.timezone as user_timezone',
-				'u.first_name as user_first_name',
-			]
-
-			return await knex('subscription as s')
-				.innerJoin('user as u', function () {
-					this.on('s.user_id', '=', 'u.id').andOnIn('u.timezone', timezones)
+			return db
+				.select({
+					subscription_id: schema.subscription.id,
+					subscription_title: schema.subscription.title,
+					subscription_amount: schema.subscription.amount,
+					subscription_currency: schema.subscription.currency,
+					subscription_next_billing_date: schema.subscription.next_billing_date,
+					user_id: schema.user.id,
+					user_email: schema.user.email,
+					user_timezone: schema.user.timezone,
+					user_first_name: schema.user.first_name,
 				})
-				.select(...COLUMNS)
-				.where({ 's.is_active': true, 's.email_alert': true })
-				.andWhere('s.next_billing_date', tomorrow)
+				.from(schema.subscription)
+				.innerJoin(
+					schema.user,
+					and(
+						eq(schema.subscription.user_id, schema.user.id),
+						inArray(schema.user.timezone, timezones)
+					)
+				)
+				.where(
+					and(
+						eq(schema.subscription.is_active, true),
+						eq(schema.subscription.email_alert, true),
+						eq(schema.subscription.next_billing_date, tomorrow)
+					)
+				)
 		})
 
 		if (Array.isArray(result) && result.length === 0) return
@@ -86,7 +95,7 @@ client.defineJob({
 					if (item) {
 						item.list.push(curr)
 					} else {
-						acc[email] = { email, first_name, list: [curr] }
+						acc[email] = { email, first_name: first_name ?? '', list: [curr] }
 					}
 
 					return acc
@@ -99,15 +108,20 @@ client.defineJob({
 						await io.runTask('log-email', async () => {
 							await Promise.all(
 								group.list.map(async datum => {
-									await knex('subscription_reminder_log').insert({
+									const data = insertSubscriptionReminderLogSchema.parse({
 										amount: datum.subscription_amount,
 										currency: datum.subscription_currency,
+										executed_at: dayjs.utc().format('YYYY-MM-DDTHH:MM:ssZ'),
 										renewal_date: datum.subscription_next_billing_date,
-										user_id: datum.user_id,
 										subscription_id: datum.subscription_id,
 										timezone: datum.user_timezone,
-										executed_at: dayjs.utc().format('YYYY-MM-DDTHH:MM:ssZ'),
+										user_id: datum.user_id,
 									})
+
+									await db
+										.insert(schema.subscription_reminder_log)
+										.values(data)
+										.returning({ id: schema.subscription_reminder_log.id })
 								})
 							)
 						})

@@ -24,6 +24,7 @@ import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 import {
 	ActionIcon,
+	Avatar,
 	Badge,
 	Card,
 	Group,
@@ -35,8 +36,8 @@ import {
 	useComputedColorScheme,
 } from '@mantine/core'
 
-import { track } from 'utils'
-import type { ISubscription } from 'types'
+import { getInitials, track } from 'utils'
+import type { ISubscription, Service } from 'types'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_delete, subscriptions_update } from 'actions'
@@ -56,9 +57,11 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
 	const queryClient = useQueryClient()
 
+	const usage = user.usage!
+
 	const scheme = useComputedColorScheme()
 
-	const service = subscription.service ? services[subscription.service] : null
+	const service = subscription.service ? services[subscription.service] ?? null : null
 
 	const billing_date = dayjs.utc(subscription.next_billing_date).tz(user.timezone!, true)
 
@@ -110,7 +113,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 	}
 
 	const setAlert = () => {
-		if (!subscription.email_alert && user.total_alerts === plan.alerts) {
+		if (!subscription.email_alert && usage.total_alerts === plan.alerts) {
 			return notifications.show({
 				color: 'red.5',
 				title: 'Usage Alert',
@@ -238,30 +241,24 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 			>
 				<Group justify="space-between">
 					<Group gap={16}>
-						{service && (
-							<Indicator
-								size={12}
-								withBorder
-								color="green"
-								disabled={!subscription.email_alert}
-							>
-								<Link href={subscription.website} style={{ display: 'flex' }}>
-									<Image
-										width={40}
-										height={40}
-										alt={subscription.title}
-										src={`/services/${service.key}.svg`}
-										style={{
-											borderRadius: scheme === 'light' ? '4px' : 0,
-											border:
-												scheme === 'light'
-													? '1px solid var(--mantine-color-gray-2)'
-													: 'none',
-										}}
-									/>
+						<Indicator
+							size={12}
+							withBorder
+							color="green"
+							disabled={!subscription.email_alert}
+						>
+							{subscription.website ? (
+								<Link
+									target="_blank"
+									href={subscription.website}
+									style={{ display: 'flex', textDecoration: 'none' }}
+								>
+									<SubscriptionAvatar subscription={subscription} service={service} />
 								</Link>
-							</Indicator>
-						)}
+							) : (
+								<SubscriptionAvatar subscription={subscription} service={service} />
+							)}
+						</Indicator>
 						<Stack gap={0}>
 							<Title order={5}>{subscription.title}</Title>
 							{subscription.is_active ? (
@@ -370,3 +367,30 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 }
 
 export default Subscription
+
+const SubscriptionAvatar = ({
+	subscription,
+	service,
+}: { subscription: ISubscription; service: Service | null }) => {
+	const scheme = useComputedColorScheme()
+
+	if (!service) {
+		return (
+			<Avatar color="blue" radius="sm" fw={300}>
+				{getInitials(subscription.title)}
+			</Avatar>
+		)
+	}
+	return (
+		<Image
+			width={40}
+			height={40}
+			alt={subscription.title}
+			src={`/services/${service.key}.svg`}
+			style={{
+				borderRadius: scheme === 'light' ? '4px' : 0,
+				border: scheme === 'light' ? '1px solid var(--mantine-color-gray-2)' : 'none',
+			}}
+		/>
+	)
+}

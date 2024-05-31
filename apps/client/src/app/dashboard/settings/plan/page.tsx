@@ -43,8 +43,8 @@ export default function Page() {
 							plan={plan}
 							isActive={key === user.plan}
 							usage={{
-								alerts: user.total_alerts,
-								subscriptions: user.total_subscriptions,
+								alerts: user.usage.total_alerts,
+								subscriptions: user.usage.total_subscriptions,
 							}}
 						/>
 					)
