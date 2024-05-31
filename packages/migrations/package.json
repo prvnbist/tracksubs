@@ -1,5 +1,5 @@
 {
-	"name": "@tracksubs/db",
+	"name": "@tracksubs/migrations",
 	"version": "0.0.0",
 	"scripts": {
 		"migrate:make": "knex migrate:make",
