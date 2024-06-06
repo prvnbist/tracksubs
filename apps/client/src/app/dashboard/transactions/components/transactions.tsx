@@ -80,7 +80,7 @@ const Transactions = () => {
 											<Image
 												width={24}
 												height={24}
-												alt={datum.title}
+												alt={datum.title ?? ''}
 												src={`/services/${service.key}.svg`}
 											/>
 										)}

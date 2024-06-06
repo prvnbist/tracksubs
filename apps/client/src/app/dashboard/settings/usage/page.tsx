@@ -39,7 +39,7 @@ export default function Page() {
 							label={
 								<Center>
 									<Text>
-										{user.total_subscriptions}/{plan.subscriptions}
+										{user.usage.total_subscriptions}/{plan.subscriptions}
 									</Text>
 								</Center>
 							}
@@ -47,14 +47,15 @@ export default function Page() {
 							size={160}
 							thickness={20}
 							sections={
-								user.total_subscriptions > 0
+								user.usage.total_subscriptions > 0
 									? [
 											{
 												tooltip: 'Used',
 												color: usageBasedColor(
-													user.total_subscriptions / plan.subscriptions
+													user.usage.total_subscriptions / plan.subscriptions
 												),
-												value: user.total_subscriptions * (100 / plan.subscriptions),
+												value:
+													user.usage.total_subscriptions * (100 / plan.subscriptions),
 											},
 										]
 									: []
@@ -72,7 +73,7 @@ export default function Page() {
 							label={
 								<Center>
 									<Text>
-										{user.total_alerts}/{plan.alerts}
+										{user.usage.total_alerts}/{plan.alerts}
 									</Text>
 								</Center>
 							}
@@ -80,12 +81,12 @@ export default function Page() {
 							size={160}
 							thickness={20}
 							sections={
-								user.total_alerts > 0
+								user.usage.total_alerts > 0
 									? [
 											{
 												tooltip: 'Used',
-												value: user.total_alerts * (100 / plan.alerts),
-												color: usageBasedColor(user.total_alerts / plan.alerts),
+												value: user.usage.total_alerts * (100 / plan.alerts),
+												color: usageBasedColor(user.usage.total_alerts / plan.alerts),
 											},
 										]
 									: []

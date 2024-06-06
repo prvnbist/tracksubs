@@ -58,8 +58,8 @@ export default function Page() {
 
 	const form = useForm<FormState>({
 		initialValues: {
-			first_name: user.first_name,
-			last_name: user.last_name,
+			first_name: user.first_name ?? '',
+			last_name: user.last_name ?? '',
 			currency: user.currency,
 			timezone: user.timezone,
 		},

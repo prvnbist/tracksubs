@@ -14,8 +14,7 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"postcss.config.ts",
-		"knexfile.js"
+		"postcss.config.ts"
 	],
 	"exclude": ["node_modules"]
 }

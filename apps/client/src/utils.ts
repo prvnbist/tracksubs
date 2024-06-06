@@ -83,3 +83,19 @@ export const track = async (name: string, payload?: Record<string, string | numb
 		return
 	} catch (e) {}
 }
+
+export const getInitials = (phrase: string) => {
+	if (!phrase.trim()) return ''
+
+	const words = phrase.split(' ').filter(Boolean)
+
+	if (words.length === 0) return ''
+
+	let initials = ''
+
+	for (let i = 0; i < Math.min(2, words.length); i++) {
+		initials += words?.[i]?.charAt(0) ?? ''
+	}
+
+	return initials.toUpperCase()
+}

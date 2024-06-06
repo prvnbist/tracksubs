@@ -2,8 +2,9 @@
 
 import dayjs from 'dayjs'
 import { auth, clerkClient } from '@clerk/nextjs'
+import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm'
 
-import knex from '@tracksubs/db'
+import db, { schema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'constants/index'
 import type {
@@ -30,25 +31,12 @@ export const user = async (): ActionResponse<User, string> => {
 			return { status: 'ERROR', message: 'User is not authorized.' }
 		}
 
-		const data = await knex('user')
-			.leftJoin('usage', 'user.usage_id', 'usage.id')
-			.select(
-				'user.id',
-				'first_name',
-				'last_name',
-				'email',
-				'auth_id',
-				'is_onboarded',
-				'timezone',
-				'currency',
-				'image_url',
-				'usage_id',
-				'plan',
-				'usage.total_alerts',
-				'usage.total_subscriptions'
-			)
-			.where('auth_id', userId)
-			.first()
+		const data = await db.query.user.findFirst({
+			where: (user, { eq }) => eq(user.auth_id, userId),
+			with: {
+				usage: true,
+			},
+		})
 
 		if (!data) return { status: 'ERROR', message: 'No such user found.' }
 
@@ -65,10 +53,11 @@ export const user_update = async (body: any) => {
 
 		if (!userId) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('user')
-			.where('auth_id', userId)
-			.update(body)
-			.returning<{ id: string }>('id')
+		const data = await db
+			.update(schema.user)
+			.set(body)
+			.where(eq(schema.user.auth_id, userId))
+			.returning({ id: schema.user.id })
 
 		if (body.currency) {
 			await clerkClient.users.updateUserMetadata(userId, {
@@ -93,31 +82,20 @@ export const subscriptions_list = async (
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex
-			.select(
-				'id',
-				'title',
-				'website',
-				'amount',
-				'currency',
-				'interval',
-				'user_id',
-				'service',
-				'is_active',
-				'email_alert',
-				'next_billing_date',
-				'payment_method_id'
-			)
-			.from('subscription')
-			.where('user_id', user_id)
-			.andWhere(builder =>
-				builder.whereIn(
-					'interval',
-					interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval]
-				)
-			)
-			.orderBy('is_active', 'desc')
-			.orderBy('next_billing_date', 'asc')
+		const data = await db.query.subscription.findMany({
+			where: (subscription, { eq }) =>
+				and(
+					eq(subscription.user_id, user_id),
+					inArray(
+						subscription.interval,
+						interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval]
+					)
+				),
+			orderBy: (subscription, { asc, desc }) => [
+				desc(subscription.is_active),
+				asc(subscription.next_billing_date),
+			],
+		})
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
@@ -125,7 +103,9 @@ export const subscriptions_list = async (
 	}
 }
 
-export const subscriptions_create = async (body: any): ActionResponse<{ id: string }, string> => {
+export const subscriptions_create = async (
+	body: any
+): ActionResponse<Array<{ id: string }>, string> => {
 	try {
 		const { plan, user_id } = await getUserMetadata()
 
@@ -133,10 +113,11 @@ export const subscriptions_create = async (body: any): ActionResponse<{ id: stri
 
 		const user_plan = PLANS[plan]!
 
-		const usage = await knex('usage')
-			.where('user_id', user_id)
-			.select('total_subscriptions')
-			.first()
+		const usage = await db.query.usage.findFirst({
+			where: (usage, { eq }) => eq(usage.user_id, user_id),
+		})
+
+		if (!usage) throw Error()
 
 		if (usage.total_subscriptions === user_plan?.subscriptions) {
 			return {
@@ -145,15 +126,19 @@ export const subscriptions_create = async (body: any): ActionResponse<{ id: stri
 			}
 		}
 
-		const data = await knex('subscription')
-			.insert({ ...body, user_id })
-			.returning('id')
+		const data = await db
+			.insert(schema.subscription)
+			.values({ ...body, user_id })
+			.returning({ id: schema.subscription.id })
 
-		await knex('usage').where('user_id', user_id).increment({
-			total_subscriptions: 1,
-		})
+		await db
+			.update(schema.usage)
+			.set({
+				total_subscriptions: sql`${schema.usage.total_subscriptions} + 1`,
+			})
+			.where(eq(schema.usage.user_id, user_id))
 
-		return { status: 'SUCCESS', data: data?.[0] }
+		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
@@ -162,43 +147,54 @@ export const subscriptions_create = async (body: any): ActionResponse<{ id: stri
 export const subscriptions_update = async (
 	id: string,
 	body: any
-): ActionResponse<{ id: string }, string> => {
+): ActionResponse<Array<{ id: string }>, string> => {
 	try {
 		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('subscription').where('id', id).update(body).returning('id')
+		const data = await db
+			.update(schema.subscription)
+			.set(body)
+			.where(eq(schema.subscription.id, id))
+			.returning({ id: schema.subscription.id })
 
-		return { status: 'SUCCESS', data: data?.[0] }
+		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
 
-export const subscriptions_delete = async (id: string): ActionResponse<{ id: string }, string> => {
+export const subscriptions_delete = async (
+	id: string
+): ActionResponse<Array<{ id: string }>, string> => {
 	try {
 		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('subscription')
-			.where('id', id)
-			.andWhere('user_id', user_id)
-			.del()
-			.returning(['id', 'email_alert'])
+		const data = await db
+			.delete(schema.subscription)
+			.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
+			.returning({ id: schema.subscription.id, email_alert: schema.subscription.email_alert })
 
-		await knex('usage').where('user_id', user_id).decrement({
-			total_subscriptions: 1,
-		})
+		await db
+			.update(schema.usage)
+			.set({
+				total_subscriptions: sql`${schema.usage.total_subscriptions} - 1`,
+			})
+			.where(eq(schema.usage.user_id, user_id))
 
 		if (data?.[0]?.email_alert) {
-			await knex('usage').where('user_id', user_id).decrement({
-				total_alerts: 1,
-			})
+			await db
+				.update(schema.usage)
+				.set({
+					total_alerts: sql`${schema.usage.total_alerts} - 1`,
+				})
+				.where(eq(schema.usage.user_id, user_id))
 		}
 
-		return { status: 'SUCCESS', data: data?.[0] }
+		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
@@ -207,7 +203,7 @@ export const subscriptions_delete = async (id: string): ActionResponse<{ id: str
 export const subscription_alert = async (
 	id: string,
 	enabled: boolean
-): ActionResponse<{ id: string }, string> => {
+): ActionResponse<Array<{ id: string }>, string> => {
 	try {
 		const { plan, user_id } = await getUserMetadata()
 
@@ -216,7 +212,11 @@ export const subscription_alert = async (
 		if (enabled) {
 			const user_plan = PLANS[plan]!
 
-			const usage = await knex('usage').where('user_id', user_id).select('total_alerts').first()
+			const usage = await db.query.usage.findFirst({
+				where: eq(schema.user.id, user_id),
+			})
+
+			if (!usage) throw Error()
 
 			if (usage.total_alerts === user_plan?.alerts) {
 				return {
@@ -226,23 +226,29 @@ export const subscription_alert = async (
 			}
 		}
 
-		const data = await knex('subscription')
-			.where('id', id)
-			.andWhere('user_id', user_id)
-			.update({ email_alert: enabled })
-			.returning('id')
+		const data = await db
+			.update(schema.subscription)
+			.set({ email_alert: enabled })
+			.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
+			.returning({ id: schema.subscription.id })
 
 		if (enabled) {
-			await knex('usage').where('user_id', user_id).increment({
-				total_alerts: 1,
-			})
+			await db
+				.update(schema.usage)
+				.set({
+					total_alerts: sql`${schema.usage.total_alerts} + 1`,
+				})
+				.where(eq(schema.usage.user_id, user_id))
 		} else {
-			await knex('usage').where('user_id', user_id).decrement({
-				total_alerts: 1,
-			})
+			await db
+				.update(schema.usage)
+				.set({
+					total_alerts: sql`${schema.usage.total_alerts} - 1`,
+				})
+				.where(eq(schema.usage.user_id, user_id))
 		}
 
-		return { status: 'SUCCESS', data: data?.[0] }
+		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
@@ -250,7 +256,7 @@ export const subscription_alert = async (
 
 export const subscription_export = async (
 	columns: Record<string, string>
-): ActionResponse<Array<Partial<ISubscription> & { payment_method: string }>, string> => {
+): ActionResponse<Array<Record<string, any>>, string> => {
 	try {
 		const { plan, user_id } = await getUserMetadata()
 
@@ -262,30 +268,21 @@ export const subscription_export = async (
 				message: 'Exporting subscriptions is only available for paid plans.',
 			}
 
-		const data = await knex('subscription')
-			.select(
-				`title as ${columns.title}`,
-				`website as ${columns.website}`,
-				`amount as ${columns.amount}`,
-				`currency as ${columns.currency}`,
-				`frequency as ${columns.frequency}`,
-				`interval as ${columns.interval}`,
-				`is_active as ${columns.is_active}`,
-				`next_billing_date as ${columns.next_billing_date}`
-			)
-			.where('user_id', user_id)
-			.orderBy('next_billing_date', 'asc')
+		const data = await db
+			.select({
+				[`${columns.title}`]: schema.subscription.title,
+				[`${columns.website}`]: schema.subscription.website,
+				[`${columns.amount}`]: sql`${schema.subscription.amount} / 100`,
+				[`${columns.currency}`]: schema.subscription.currency,
+				[`${columns.next_billing_date}`]: sql`to_char(${schema.subscription.next_billing_date}, 'YYYY-MM-DD')`,
+				[`${columns.interval}`]: schema.subscription.interval,
+				[`${columns.is_active}`]: schema.subscription.is_active,
+			})
+			.from(schema.subscription)
+			.where(eq(schema.subscription.user_id, user_id))
+			.orderBy(desc(schema.subscription.is_active), asc(schema.subscription.next_billing_date))
 
-		return {
-			status: 'SUCCESS',
-			data: data.map(datum => ({
-				...datum,
-				[columns.amount!]: datum[columns.amount!] / 100,
-				[columns.next_billing_date!]: dayjs(datum[columns.next_billing_date!]).format(
-					'YYYY-MM-DD'
-				),
-			})),
-		}
+		return { data, status: 'SUCCESS' }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
@@ -293,14 +290,13 @@ export const subscription_export = async (
 
 export const services = async (): ActionResponse<Record<string, Service>, string> => {
 	try {
-		const data = await knex
-			.select('id', 'key', ' title', 'website')
-			.from('service')
-			.orderBy('title', 'asc')
+		const data = await db.query.service.findMany({
+			orderBy: asc(schema.service.title),
+		})
 
 		return {
 			status: 'SUCCESS',
-			data: data.reduce((acc, curr) => {
+			data: data.reduce((acc: Record<string, Service>, curr) => {
 				acc[curr.key] = curr
 				return acc
 			}, {}),
@@ -316,10 +312,10 @@ export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('payment_method')
-			.select('id', 'title')
-			.where('user_id', user_id)
-			.orderBy('title', 'asc')
+		const data = await db.query.payment_method.findMany({
+			where: eq(schema.payment_method.user_id, user_id),
+			orderBy: asc(schema.payment_method.title),
+		})
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
@@ -333,9 +329,12 @@ export const payment_method_create = async (formData: FormData) => {
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('payment_method')
-			.insert({ title: formData.get('title'), user_id })
-			.returning('id')
+		const title = formData.get('title') as string
+
+		const data = await db
+			.insert(schema.payment_method)
+			.values({ title, user_id })
+			.returning({ id: schema.payment_method.id })
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
@@ -349,11 +348,10 @@ export const payment_method_delete = async (id: string) => {
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('payment_method')
-			.where('user_id', user_id)
-			.andWhere('id', id)
-			.del()
-			.returning('id')
+		const data = await db
+			.delete(schema.payment_method)
+			.where(and(eq(schema.payment_method.user_id, user_id), eq(schema.payment_method.id, id)))
+			.returning({ id: schema.payment_method.id })
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
@@ -362,38 +360,44 @@ export const payment_method_delete = async (id: string) => {
 }
 
 export const transaction_create = async (
-	subscription: ISubscription & { paidOn: Date; paymentMethodId?: string }
+	subscription: ISubscription & { paidOn: string; paymentMethodId?: string }
 ): ActionResponse<null, string> => {
 	try {
 		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		await knex.transaction(async trx => {
-			await trx('transaction')
-				.insert({
-					user_id,
-					amount: subscription.amount,
-					currency: subscription.currency,
-					subscription_id: subscription.id,
-					...(subscription.payment_method_id && {
-						payment_method_id: subscription.paymentMethodId,
-					}),
-					invoice_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
-					paid_date: dayjs(subscription.paidOn).format('YYYY-MM-DD'),
-				})
-				.returning('id')
+		const transaction = await db
+			.insert(schema.transaction)
+			.values({
+				amount: subscription.amount,
+				currency: subscription.currency,
+				invoice_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
+				paid_date: dayjs(subscription.paidOn).format('YYYY-MM-DD'),
+				subscription_id: subscription.id,
+				user_id,
+				...(subscription.paymentMethodId && {
+					payment_method_id: subscription.paymentMethodId,
+				}),
+			})
+			.returning({ id: schema.transaction.id })
 
-			await trx('subscription')
-				.where('id', subscription.id)
-				.andWhere('user_id', subscription.user_id)
-				.update({
-					next_billing_date: dayjs(subscription.next_billing_date)
-						.add(30, 'day')
-						.format('YYYY-MM-DD'),
-				})
-				.returning('id')
-		})
+		if (transaction.length > 0) {
+			const next_billing_date = dayjs(subscription.next_billing_date)
+				.add(30, 'day')
+				.format('YYYY-MM-DD')
+
+			await db
+				.update(schema.subscription)
+				.set({ next_billing_date })
+				.where(
+					and(
+						eq(schema.subscription.id, subscription.id),
+						eq(schema.subscription.user_id, user_id)
+					)
+				)
+				.returning({ id: schema.subscription.id })
+		}
 
 		return { status: 'SUCCESS', data: null }
 	} catch (error) {
@@ -401,26 +405,35 @@ export const transaction_create = async (
 	}
 }
 
-export const transaction_list = async (): ActionResponse<Transaction[], string> => {
+type ReturnTransction = Omit<
+	Transaction,
+	'user_id' | 'payment_method_id' | 'invoice_date' | 'subscription_id'
+> & { payment_method: string | null; service: string | null; title: string | null }
+
+export const transaction_list = async (): ActionResponse<ReturnTransction[], string> => {
 	try {
 		const { user_id } = await getUserMetadata()
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('transaction')
-			.leftJoin('subscription', 'transaction.subscription_id', 'subscription.id')
-			.leftJoin('payment_method', 'transaction.payment_method_id', 'payment_method.id')
-			.select(
-				'transaction.id',
-				'transaction.amount',
-				'transaction.currency',
-				'transaction.invoice_date',
-				'transaction.paid_date',
-				'transaction.payment_method_id',
-				'transaction.subscription_id',
-				'subscription.title',
-				'subscription.service',
-				'payment_method.title as payment_method'
+		const data = await db
+			.select({
+				id: schema.transaction.id,
+				amount: schema.transaction.amount,
+				currency: schema.transaction.currency,
+				paid_date: schema.transaction.paid_date,
+				title: schema.subscription.title,
+				service: schema.subscription.service,
+				payment_method: schema.payment_method.title,
+			})
+			.from(schema.transaction)
+			.leftJoin(
+				schema.subscription,
+				eq(schema.transaction.subscription_id, schema.subscription.id)
+			)
+			.leftJoin(
+				schema.payment_method,
+				eq(schema.transaction.payment_method_id, schema.payment_method.id)
 			)
 
 		return { status: 'SUCCESS', data }
@@ -429,11 +442,16 @@ export const transaction_list = async (): ActionResponse<Transaction[], string> 
 	}
 }
 
-export const waitlist_add = async (email: string): ActionResponse<{ email: string }, string> => {
+export const waitlist_add = async (
+	email: string
+): ActionResponse<Array<{ email: string }>, string> => {
 	try {
-		const data = await knex('waitlist').insert({ email }).returning('id')
+		const data = await db
+			.insert(schema.waitlist)
+			.values({ email })
+			.returning({ email: schema.waitlist.email })
 
-		return { status: 'SUCCESS', data: data?.[0] }
+		return { status: 'SUCCESS', data }
 	} catch (error) {
 		if ((error as Error).message.includes('waitlist_email_unique')) {
 			return { status: 'ERROR', message: 'ALREADY_ADDED' }
@@ -451,11 +469,12 @@ export const getCurrencies = async (): ActionResponse<GetCurrenciesReturn, strin
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('subscription')
-			.where('user_id', user_id)
-			.select('currency')
-			.orderBy('currency', 'asc')
-			.distinct()
+		const data = await db
+			.selectDistinct({ currency: schema.subscription.currency })
+			.from(schema.subscription)
+			.where(eq(schema.subscription.user_id, user_id))
+			.orderBy(asc(schema.subscription.currency))
+
 		return { status: 'SUCCESS', data }
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
@@ -479,13 +498,21 @@ export const getMonthlyOverview = async (
 		const startOfCurrentMonth = dayjs().startOf('month')
 		const endOfLastMonthNextYear = dayjs().add(1, 'year').subtract(1, 'month').endOf('month')
 
-		const data = await knex('subscription')
-			.select('amount', 'interval', 'next_billing_date')
-			.where({ user_id, currency, is_active: true })
-			.andWhereRaw('next_billing_date >= ? and next_billing_date <= ?', [
-				startOfCurrentMonth.format('YYYY-MM-DD'),
-				endOfLastMonthNextYear.format('YYYY-MM-DD'),
-			])
+		const data = await db.query.subscription.findMany({
+			columns: {
+				amount: true,
+				interval: true,
+				next_billing_date: true,
+			},
+			where: and(
+				eq(schema.subscription.user_id, user_id),
+				eq(schema.subscription.currency, currency),
+				eq(schema.subscription.is_active, true),
+				sql`next_billing_date >= ${startOfCurrentMonth.format(
+					'YYYY-MM-DD'
+				)} and next_billing_date <= ${endOfLastMonthNextYear.format('YYYY-MM-DD')}`
+			),
+		})
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
@@ -501,7 +528,13 @@ export const getActiveSubscriptions = async (
 
 		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
 
-		const data = await knex('subscription').select('is_active').where({ user_id, currency })
+		const data = await db.query.subscription.findMany({
+			columns: { is_active: true },
+			where: and(
+				eq(schema.subscription.user_id, user_id),
+				eq(schema.subscription.currency, currency)
+			),
+		})
 
 		const active = data.filter(datum => datum.is_active).length
 
@@ -522,30 +555,40 @@ export const getThisWeekMonthSubscriptions = async (
 		const startOfWeek = dayjs().startOf('week')
 		const endOfWeek = dayjs().endOf('week')
 
-		const this_week = await knex('subscription')
-			.count()
-			.where({ user_id, currency, is_active: true })
-			.andWhereRaw('next_billing_date >= ? and next_billing_date <= ?', [
-				startOfWeek.format('YYYY-MM-DD'),
-				endOfWeek.format('YYYY-MM-DD'),
-			])
-			.first<{ count: number }>()
+		const [this_week] = await db
+			.select({ count: count() })
+			.from(schema.subscription)
+			.where(
+				and(
+					eq(schema.subscription.user_id, user_id),
+					eq(schema.subscription.currency, currency),
+					eq(schema.subscription.is_active, true),
+					sql`next_billing_date >= ${startOfWeek.format(
+						'YYYY-MM-DD'
+					)} and next_billing_date <= ${endOfWeek.format('YYYY-MM-DD')}`
+				)
+			)
 
 		const startOfMonth = dayjs().startOf('month')
 		const endOfMonth = dayjs().endOf('month')
 
-		const this_month = await knex('subscription')
-			.count()
-			.where({ user_id, currency, is_active: true })
-			.andWhereRaw('next_billing_date >= ? and next_billing_date <= ?', [
-				startOfMonth.format('YYYY-MM-DD'),
-				endOfMonth.format('YYYY-MM-DD'),
-			])
-			.first<{ count: number }>()
+		const [this_month] = await db
+			.select({ count: count() })
+			.from(schema.subscription)
+			.where(
+				and(
+					eq(schema.subscription.user_id, user_id),
+					eq(schema.subscription.currency, currency),
+					eq(schema.subscription.is_active, true),
+					sql`next_billing_date >= ${startOfMonth.format(
+						'YYYY-MM-DD'
+					)} and next_billing_date <= ${endOfMonth.format('YYYY-MM-DD')}`
+				)
+			)
 
 		return {
 			status: 'SUCCESS',
-			data: { this_week: this_week.count, this_month: this_month.count },
+			data: { this_week: this_week?.count ?? 0, this_month: this_month?.count ?? 0 },
 		}
 	} catch (error) {
 		return { status: 'ERROR', message: 'Something went wrong!' }
