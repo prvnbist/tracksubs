@@ -10,7 +10,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.7.3",
-		"@tracksubs/typescript-config": "*",
+		"@tracksubs/typescript": "*",
 		"turbo": "latest"
 	},
 	"engines": {

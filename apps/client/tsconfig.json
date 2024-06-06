@@ -1,5 +1,5 @@
 {
-	"extends": "@tracksubs/typescript-config/nextjs.json",
+	"extends": "@tracksubs/typescript/nextjs.json",
 	"compilerOptions": {
 		"baseUrl": "./src",
 		"plugins": [

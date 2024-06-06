@@ -1,5 +1,5 @@
 {
-	"extends": "@tracksubs/typescript-config/base.json",
+	"extends": "@tracksubs/typescript/base.json",
 	"include": ["src", "."],
 	"exclude": ["node_modules"]
 }
