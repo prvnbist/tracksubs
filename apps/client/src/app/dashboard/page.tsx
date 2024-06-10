@@ -29,7 +29,8 @@ export default async function Page(props: IPageProps) {
 
 	const selectedCurrency = props.searchParams.currency
 
-	if (!selectedCurrency) return redirect(`/dashboard/?currency=${currency}`)
+	if (!selectedCurrency || selectedCurrency === 'undefined')
+		return redirect(`/dashboard/?currency=${currency}`)
 
 	const first = await getCurrencies()
 	const second = await getMonthlyOverview(selectedCurrency)
