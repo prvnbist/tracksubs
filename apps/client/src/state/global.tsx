@@ -1,8 +1,9 @@
 'use client'
 
+import { useAuth } from '@clerk/clerk-react'
 import type { PropsWithChildren } from 'react'
 import { IconBug } from '@tabler/icons-react'
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { useQueries } from '@tanstack/react-query'
 
 import { Center, Loader, Stack, Text, Title } from '@mantine/core'
@@ -41,25 +42,30 @@ const Context = createContext(INITITAL_STATE)
 export const useGlobal = () => useContext(Context)
 
 export const GlobalProvider = ({ children }: PropsWithChildren) => {
-	const { data, isPending } = useQueries({
+	const { isSignedIn } = useAuth()
+
+	const { data, isPending, retry } = useQueries({
 		queries: [
 			{
 				retry: 2,
 				queryKey: ['user'],
 				refetchOnWindowFocus: false,
 				queryFn: () => user(),
+				enabled: isSignedIn,
 			},
 			{
 				retry: 2,
 				queryKey: ['services'],
 				refetchOnWindowFocus: false,
 				queryFn: () => services(),
+				enabled: isSignedIn,
 			},
 			{
 				retry: 2,
 				refetchOnWindowFocus: false,
 				queryKey: ['payment_methods'],
 				queryFn: () => payment_method_list(),
+				enabled: isSignedIn,
 			},
 		],
 		combine: results => {
@@ -69,10 +75,17 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 					services: results[1].data?.data!,
 					payment_methods: results[2].data?.data!,
 				},
+				retry: results[0].refetch,
 				isPending: results.some(result => result.isPending),
 			}
 		},
 	})
+
+	useEffect(() => {
+		if (!data.user) {
+			retry()
+		}
+	}, [data.user, retry])
 
 	if (isPending)
 		return (
@@ -80,7 +93,7 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 				<Loader />
 			</Center>
 		)
-	if (!data.user)
+	if (!data.user) {
 		return (
 			<Center pt={80}>
 				<Stack align="center" gap={16}>
@@ -90,6 +103,7 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 				</Stack>
 			</Center>
 		)
+	}
 	return (
 		<Context.Provider value={data}>
 			{data.user?.is_onboarded ? children : <Onboarding />}

@@ -13,6 +13,8 @@ export default function Page() {
 	const { user } = useGlobal()
 	const { value: is_paid_plans_available } = useGate('is_paid_plans_available')
 
+	const usage = user.usage
+
 	return (
 		<div>
 			<Space h={24} />
@@ -43,8 +45,8 @@ export default function Page() {
 							plan={plan}
 							isActive={key === user.plan}
 							usage={{
-								alerts: user.usage.total_alerts,
-								subscriptions: user.usage.total_subscriptions,
+								alerts: usage?.total_alerts,
+								subscriptions: usage?.total_subscriptions,
 							}}
 						/>
 					)
@@ -62,7 +64,7 @@ const activePlanStyles = {
 type PlanProps = {
 	plan: TPlan
 	isActive: boolean
-	usage: { alerts: number; subscriptions: number }
+	usage: { alerts?: number; subscriptions?: number }
 }
 
 const Plan = ({ plan, isActive, usage = { alerts: 0, subscriptions: 0 } }: PlanProps) => {

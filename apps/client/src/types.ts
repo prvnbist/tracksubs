@@ -11,7 +11,7 @@ import type {
 
 export type Usage = z.infer<typeof selectUsageSchema>
 
-export type User = z.infer<typeof selectUserSchema> & { usage: Usage }
+export type User = z.infer<typeof selectUserSchema> & { usage: Usage | null }
 
 export type Service = z.infer<typeof selectServiceSchema>
 

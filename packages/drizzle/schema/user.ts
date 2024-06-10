@@ -14,7 +14,7 @@ const user = pgTable('user', {
 	last_name: text('last_name'),
 	plan: varchar('plan', { length: 225 }).default('FREE').notNull(),
 	timezone: varchar('timezone', { length: 225 }),
-	usage_id: uuid('usage_id').notNull(),
+	usage_id: uuid('usage_id'),
 })
 
 export const userRelations = relations(user, ({ one }) => ({

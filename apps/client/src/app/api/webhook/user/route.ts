@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 				.set({ usage_id: usage?.id })
 				.where(eq(schema.user.id, user.id))
 
-			if (Array.isArray(user) && user.length > 0) {
+			if (user) {
 				await clerkClient.users.updateUserMetadata(data.id, {
 					publicMetadata: {
 						user_id: user.id,
