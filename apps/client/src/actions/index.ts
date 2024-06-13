@@ -12,7 +12,6 @@ import type {
 	ISubscription,
 	PaymentMethod,
 	Service,
-	SessionClaim,
 	Transaction,
 	User,
 } from 'types'
@@ -20,7 +19,7 @@ import type {
 export const getUserMetadata = async () => {
 	const { sessionClaims } = auth()
 
-	return (sessionClaims as SessionClaim)?.metadata
+	return sessionClaims?.metadata!
 }
 
 export const user = async (): ActionResponse<User, string> => {
@@ -49,9 +48,10 @@ export const user = async (): ActionResponse<User, string> => {
 export const user_update = async (body: any) => {
 	try {
 		const { userId } = auth()
-		const metadata = await getUserMetadata()
 
 		if (!userId) return { status: 'ERROR', message: 'User is not authorized.' }
+
+		const metadata = await getUserMetadata()
 
 		const data = await db
 			.update(schema.user)

@@ -1,5 +1,4 @@
 import type z from 'zod'
-import type { JwtPayload } from '@clerk/types'
 import type {
 	selectPaymentMethodSchema,
 	selectServiceSchema,
@@ -31,8 +30,4 @@ export type Plan = {
 	type: 'FREE' | 'PAID'
 	subscriptions: number
 	price: { amount: number; currency: string }
-}
-
-export type SessionClaim = JwtPayload & {
-	metadata: { user_id: string; plan: 'FREE' | 'BASIC' | 'PRO'; currency: string }
 }
