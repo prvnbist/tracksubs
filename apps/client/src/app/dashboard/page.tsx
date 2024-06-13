@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-
 import { Group, Paper, SimpleGrid, Space, Title } from '@mantine/core'
 
 import {
@@ -18,19 +16,13 @@ import {
 } from './components'
 
 interface IPageProps {
-	params: {
-		[key in string]: any
-	}
 	searchParams: { currency?: string }
 }
 
 export default async function Page(props: IPageProps) {
 	const { currency } = await getUserMetadata()
 
-	const selectedCurrency = props.searchParams.currency
-
-	if (!selectedCurrency || selectedCurrency === 'undefined')
-		return redirect(`/dashboard/?currency=${currency}`)
+	const selectedCurrency = props.searchParams.currency ?? currency
 
 	const first = await getCurrencies()
 	const second = await getMonthlyOverview(selectedCurrency)
@@ -42,13 +34,15 @@ export default async function Page(props: IPageProps) {
 			<Group component="header" mt="md" mb="md" justify="space-between">
 				<Title order={2}>Dashboard</Title>
 				{first.status === 'SUCCESS' && first.data.length > 0 && (
-					<CurrencySelector currencies={first.data} />
+					<CurrencySelector currencies={first.data} selected={selectedCurrency} />
 				)}
 			</Group>
-			<SimpleGrid mb={16} cols={{ base: 1, sm: 2 }}>
-				{third.data && <ActiveSubscriptions data={third.data} />}
-				{four.data && <RenewingSubscriptions data={four.data} />}
-			</SimpleGrid>
+			{(third.data || four.data) && (
+				<SimpleGrid mb={16} cols={{ base: 1, sm: 2 }}>
+					{third.data && <ActiveSubscriptions data={third.data} />}
+					{four.data && <RenewingSubscriptions data={four.data} />}
+				</SimpleGrid>
+			)}
 			<Paper p="xl" withBorder shadow="md">
 				<Title order={4}>Monthly Overview</Title>
 				<Space h={24} />
