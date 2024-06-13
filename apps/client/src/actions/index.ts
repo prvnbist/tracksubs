@@ -1,7 +1,7 @@
 'use server'
 
 import dayjs from 'dayjs'
-import { auth, clerkClient } from '@clerk/nextjs'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { and, asc, count, desc, eq, inArray, sql } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
@@ -64,6 +64,7 @@ export const user_update = async (body: any) => {
 				publicMetadata: {
 					...metadata,
 					currency: body.currency,
+					...('is_onboarded' in body && { is_onboarded: body.is_onboarded }),
 				},
 			})
 		}
@@ -78,9 +79,13 @@ export const subscriptions_list = async (
 	interval: ISubscription['interval'] | 'ALL' = 'ALL'
 ): ActionResponse<ISubscription[], string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db.query.subscription.findMany({
 			where: (subscription, { eq }) =>
@@ -107,9 +112,13 @@ export const subscriptions_create = async (
 	body: any
 ): ActionResponse<Array<{ id: string }>, string> => {
 	try {
-		const { plan, user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { plan, user_id } = await getUserMetadata()
 
 		const user_plan = PLANS[plan]!
 
@@ -149,14 +158,18 @@ export const subscriptions_update = async (
 	body: any
 ): ActionResponse<Array<{ id: string }>, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db
 			.update(schema.subscription)
 			.set(body)
-			.where(eq(schema.subscription.id, id))
+			.where(and(eq(schema.subscription.user_id, user_id), eq(schema.subscription.id, id)))
 			.returning({ id: schema.subscription.id })
 
 		return { status: 'SUCCESS', data }
@@ -169,9 +182,13 @@ export const subscriptions_delete = async (
 	id: string
 ): ActionResponse<Array<{ id: string }>, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db
 			.delete(schema.subscription)
@@ -205,9 +222,13 @@ export const subscription_alert = async (
 	enabled: boolean
 ): ActionResponse<Array<{ id: string }>, string> => {
 	try {
-		const { plan, user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { plan, user_id } = await getUserMetadata()
 
 		if (enabled) {
 			const user_plan = PLANS[plan]!
@@ -251,9 +272,13 @@ export const subscription_export = async (
 	columns: Record<string, string>
 ): ActionResponse<Array<Record<string, any>>, string> => {
 	try {
-		const { plan, user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { plan, user_id } = await getUserMetadata()
 
 		if (plan === 'FREE')
 			return {
@@ -301,9 +326,13 @@ export const services = async (): ActionResponse<Record<string, Service>, string
 
 export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db.query.payment_method.findMany({
 			where: eq(schema.payment_method.user_id, user_id),
@@ -318,9 +347,13 @@ export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>
 
 export const payment_method_create = async (formData: FormData) => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const title = formData.get('title') as string
 
@@ -337,9 +370,13 @@ export const payment_method_create = async (formData: FormData) => {
 
 export const payment_method_delete = async (id: string) => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db
 			.delete(schema.payment_method)
@@ -356,9 +393,13 @@ export const transaction_create = async (
 	subscription: ISubscription & { paidOn: string; paymentMethodId?: string }
 ): ActionResponse<null, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const transaction = await db
 			.insert(schema.transaction)
@@ -405,9 +446,13 @@ type ReturnTransction = Omit<
 
 export const transaction_list = async (): ActionResponse<ReturnTransction[], string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db
 			.select({
@@ -428,6 +473,7 @@ export const transaction_list = async (): ActionResponse<ReturnTransction[], str
 				schema.payment_method,
 				eq(schema.transaction.payment_method_id, schema.payment_method.id)
 			)
+			.where(eq(schema.transaction.user_id, user_id))
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
@@ -458,9 +504,13 @@ type GetCurrenciesReturn = Array<{ currency: string }>
 
 export const getCurrencies = async (): ActionResponse<GetCurrenciesReturn, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db
 			.selectDistinct({ currency: schema.subscription.currency })
@@ -484,9 +534,13 @@ export const getMonthlyOverview = async (
 	currency: string
 ): ActionResponse<GetMonthlyOverviewReturn, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const startOfCurrentMonth = dayjs().startOf('month')
 		const endOfLastMonthNextYear = dayjs().add(1, 'year').subtract(1, 'month').endOf('month')
@@ -517,9 +571,13 @@ export const getActiveSubscriptions = async (
 	currency: string
 ): ActionResponse<{ active: number; total: number }, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const data = await db.query.subscription.findMany({
 			columns: { is_active: true },
@@ -541,9 +599,13 @@ export const getThisWeekMonthSubscriptions = async (
 	currency: string
 ): ActionResponse<{ this_week: number; this_month: number }, string> => {
 	try {
-		const { user_id } = await getUserMetadata()
+		const { userId: authId } = auth()
 
-		if (!user_id) return { status: 'ERROR', message: 'User is not authorized.' }
+		if (!authId) {
+			return { status: 'ERROR', message: 'User is not authorized.' }
+		}
+
+		const { user_id } = await getUserMetadata()
 
 		const startOfWeek = dayjs().startOf('week')
 		const endOfWeek = dayjs().endOf('week')
