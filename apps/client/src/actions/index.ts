@@ -213,7 +213,7 @@ export const subscription_alert = async (
 			const user_plan = PLANS[plan]!
 
 			const usage = await db.query.usage.findFirst({
-				where: eq(schema.user.id, user_id),
+				where: eq(schema.usage.user_id, user_id),
 			})
 
 			if (!usage) throw Error()
@@ -232,21 +232,14 @@ export const subscription_alert = async (
 			.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
 			.returning({ id: schema.subscription.id })
 
-		if (enabled) {
-			await db
-				.update(schema.usage)
-				.set({
-					total_alerts: sql`${schema.usage.total_alerts} + 1`,
-				})
-				.where(eq(schema.usage.user_id, user_id))
-		} else {
-			await db
-				.update(schema.usage)
-				.set({
-					total_alerts: sql`${schema.usage.total_alerts} - 1`,
-				})
-				.where(eq(schema.usage.user_id, user_id))
-		}
+		await db
+			.update(schema.usage)
+			.set({
+				total_alerts: enabled
+					? sql`${schema.usage.total_alerts} + 1`
+					: sql`${schema.usage.total_alerts} - 1`,
+			})
+			.where(eq(schema.usage.user_id, user_id))
 
 		return { status: 'SUCCESS', data }
 	} catch (error) {
