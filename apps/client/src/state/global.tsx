@@ -2,14 +2,12 @@
 
 import { useAuth } from '@clerk/clerk-react'
 import type { PropsWithChildren } from 'react'
-import { IconBug } from '@tabler/icons-react'
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext } from 'react'
 import { useQueries } from '@tanstack/react-query'
 
-import { Center, Loader, Stack, Text, Title } from '@mantine/core'
+import { Center, Loader } from '@mantine/core'
 
 import type { PaymentMethod, Service, User } from 'types'
-import { Onboarding } from 'components'
 import { payment_method_list, services, user } from 'actions'
 
 interface ContextState {
@@ -44,7 +42,7 @@ export const useGlobal = () => useContext(Context)
 export const GlobalProvider = ({ children }: PropsWithChildren) => {
 	const { isSignedIn } = useAuth()
 
-	const { data, isPending, retry } = useQueries({
+	const { data, isPending } = useQueries({
 		queries: [
 			{
 				retry: 2,
@@ -75,17 +73,10 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 					services: results[1].data?.data!,
 					payment_methods: results[2].data?.data!,
 				},
-				retry: results[0].refetch,
 				isPending: results.some(result => result.isPending),
 			}
 		},
 	})
-
-	useEffect(() => {
-		if (!data.user) {
-			retry()
-		}
-	}, [data.user, retry])
 
 	if (isPending)
 		return (
@@ -93,20 +84,5 @@ export const GlobalProvider = ({ children }: PropsWithChildren) => {
 				<Loader />
 			</Center>
 		)
-	if (!data.user) {
-		return (
-			<Center pt={80}>
-				<Stack align="center" gap={16}>
-					<IconBug size={40} color="var(--mantine-color-dark-3)" />
-					<Title order={2}>404</Title>
-					<Text c="dimmed">Something went wrong, please refresh the page.</Text>
-				</Stack>
-			</Center>
-		)
-	}
-	return (
-		<Context.Provider value={data}>
-			{data.user?.is_onboarded ? children : <Onboarding />}
-		</Context.Provider>
-	)
+	return <Context.Provider value={data}>{children}</Context.Provider>
 }
