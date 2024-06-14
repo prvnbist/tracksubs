@@ -9,10 +9,9 @@
 		"dev:email": "email dev --dir ./src/emails"
 	},
 	"dependencies": {
-		"@clerk/clerk-react": "^4.30.7",
-		"@clerk/nextjs": "^4.29.9",
-		"@clerk/themes": "^1.7.10",
-		"@tracksubs/drizzle": "*",
+		"@clerk/elements": "^0.7.0",
+		"@clerk/nextjs": "^5.1.5",
+		"@clerk/themes": "^2.1.9",
 		"@mantine/charts": "^7.9.1",
 		"@mantine/core": "^7.9.1",
 		"@mantine/dates": "^7.9.1",
@@ -25,6 +24,7 @@
 		"@tabler/icons-react": "^3.1.0",
 		"@tanstack/react-query": "^5.29.2",
 		"@tanstack/react-query-devtools": "^5.35.1",
+		"@tracksubs/drizzle": "*",
 		"@trigger.dev/nextjs": "^2.3.18",
 		"@trigger.dev/react": "^2.3.18",
 		"@trigger.dev/resend": "^2.3.18",

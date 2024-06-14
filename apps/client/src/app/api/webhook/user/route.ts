@@ -2,7 +2,7 @@ import { Webhook } from 'svix'
 import { Resend } from 'resend'
 import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
-import { clerkClient } from '@clerk/nextjs'
+import { clerkClient } from '@clerk/nextjs/server'
 import type { WebhookEvent } from '@clerk/nextjs/server'
 
 import db, { insertUserSchema, schema } from '@tracksubs/drizzle'
@@ -49,23 +49,12 @@ export async function POST(request: Request) {
 				throw Error()
 			}
 
-			const [usage] = await db
-				.insert(schema.usage)
-				.values({
-					user_id: user.id,
-				})
-				.returning({ id: schema.usage.id })
-
-			await db
-				.update(schema.user)
-				.set({ usage_id: usage?.id })
-				.where(eq(schema.user.id, user.id))
-
 			if (user) {
 				await clerkClient.users.updateUserMetadata(data.id, {
 					publicMetadata: {
 						user_id: user.id,
 						plan: 'FREE',
+						is_onboarded: false,
 					},
 				})
 			}
@@ -79,6 +68,12 @@ export async function POST(request: Request) {
 					subject: 'Welcome to tracksubs.co',
 					react: UserSignUp({ firstName: data.first_name ?? '' }),
 				})
+			}
+		} else if (payload.type === 'user.deleted') {
+			const id = payload.data.id
+
+			if (id) {
+				await db.delete(schema.user).where(eq(schema.user.auth_id, id))
 			}
 		}
 

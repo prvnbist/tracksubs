@@ -29,6 +29,8 @@ const diff = (obj1: any, obj2: any) => {
 	return result
 }
 
+type FormValues = Partial<Omit<ISubscription, 'next_billing_date'>>
+
 const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 	const queryClient = useQueryClient()
 
@@ -41,14 +43,16 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 		[services]
 	)
 
-	const form = useForm<Partial<ISubscription>>({
+	const form = useForm<FormValues & { next_billing_date: Date | undefined }>({
 		initialValues: {
 			title: subscription?.title ?? '',
 			website: subscription?.website ?? '',
 			service: subscription?.service ?? null,
 			interval: subscription?.interval ?? 'MONTHLY',
 			currency: subscription?.currency ?? (user.currency || 'INR'),
-			next_billing_date: subscription?.next_billing_date,
+			next_billing_date: subscription?.next_billing_date
+				? new Date(subscription?.next_billing_date)
+				: undefined,
 			amount: subscription?.amount ? subscription?.amount / 100 : 0,
 		},
 		validate: {
@@ -70,7 +74,7 @@ const CreateModal = ({ subscription }: { subscription?: ISubscription }) => {
 	}, [service, services, form.setFieldValue])
 
 	const handleSubmit = async () => {
-		const data = { ...form.values }
+		const data = { ...form.values } as FormValues & { next_billing_date: string | undefined }
 
 		try {
 			data.amount = (data?.amount ?? 0) * 100

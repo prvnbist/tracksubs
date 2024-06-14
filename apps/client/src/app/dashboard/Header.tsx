@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useClerk } from '@clerk/clerk-react'
+import { useClerk } from '@clerk/nextjs'
 import { IconLogout, IconSettings } from '@tabler/icons-react'
 import { usePathname, useRouter } from 'next/navigation'
 
@@ -51,7 +51,7 @@ const Header = (): JSX.Element => {
 						color="red"
 						title="Logout"
 						leftSection={<IconLogout size={18} />}
-						onClick={() => signOut(() => router.push('/'))}
+						onClick={() => signOut({ redirectUrl: '/' })}
 					>
 						Logout
 					</Menu.Item>
@@ -65,8 +65,6 @@ export default Header
 const MobileMenu = () => {
 	const router = useRouter()
 	const pathname = usePathname()
-
-	const { user } = useGlobal()
 
 	const [opened, { open, close }] = useDisclosure()
 
@@ -100,8 +98,8 @@ const MobileMenu = () => {
 			<Menu.Dropdown>
 				<Menu.Item
 					title="Dashboard"
+					onClick={() => goto('/dashboard')}
 					c={pathname === '/dashboard' ? color : ''}
-					onClick={() => goto(`/dashboard/?currency=${user.currency}`)}
 				>
 					Dashboard
 				</Menu.Item>
@@ -128,8 +126,6 @@ const DesktopMenu = () => {
 	const router = useRouter()
 	const pathname = usePathname()
 
-	const { user } = useGlobal()
-
 	const scheme = useComputedColorScheme()
 
 	const color = scheme === 'light' ? 'default' : 'subtle'
@@ -139,7 +135,7 @@ const DesktopMenu = () => {
 				size="xs"
 				radius="xl"
 				title="Dashboard"
-				onClick={() => router.push(`/dashboard/?currency=${user.currency}`)}
+				onClick={() => router.push('/dashboard')}
 				variant={pathname === '/dashboard' ? 'filled' : color}
 			>
 				Dashboard

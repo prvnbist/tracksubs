@@ -7,11 +7,13 @@ import { Select } from '@mantine/core'
 
 import { CURRENCY_NAMES } from 'constants/index'
 
-const CurrencySelector = ({ currencies }: { currencies: Array<{ currency: string }> }) => {
-	const router = useRouter()
-	const searchParams = useSearchParams()
+type CurrencySelectorProps = {
+	selected: string | undefined
+	currencies: Array<{ currency: string }>
+}
 
-	const currency = searchParams.get('currency')
+const CurrencySelector = ({ currencies, selected }: CurrencySelectorProps) => {
+	const router = useRouter()
 
 	const list = useMemo(() => {
 		return currencies.map(({ currency }) => ({
@@ -25,7 +27,7 @@ const CurrencySelector = ({ currencies }: { currencies: Array<{ currency: string
 			<Select
 				searchable
 				data={list}
-				value={currency}
+				value={selected}
 				clearable={false}
 				allowDeselect={false}
 				onChange={value => router.push(`/dashboard/?currency=${value}`)}
