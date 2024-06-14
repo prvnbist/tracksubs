@@ -20,7 +20,7 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 ### Tech Stack
 1. [NextJs](https://nextjs.org): Client App
 2. [Clerk](https://clerk.com): Authentication
-3. [Xata](https://xata.io): Database
+3. [Supabase](https://supabase.com/): Database
 4. [Turbo Repo](https://turbo.build/repo): Monorepo
 5. [Knex](https://knexjs.org): SQL Migrations
 6. [Mantine](https://mantine.dev): UI Library
