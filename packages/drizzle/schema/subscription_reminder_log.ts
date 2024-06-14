@@ -7,7 +7,7 @@ const subscription_reminder_log = pgTable('subscription_reminder_log', {
 	renewal_date: date('renewal_date').notNull(),
 	subscription_id: uuid('subscription_id').notNull(),
 	user_id: uuid('user_id').notNull(),
-	timezone: varchar('timezone', { length: 255 }).notNull(),
+	timezone: text('timezone').notNull(),
 	executed_at: timestamp('executed_at').notNull(),
 })
 
