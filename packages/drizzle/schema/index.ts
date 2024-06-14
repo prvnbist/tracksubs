@@ -12,5 +12,3 @@ export { default as usage } from './usage'
 
 export { userRelations } from './user'
 export { default as user } from './user'
-
-export { default as waitlist } from './waitlist'

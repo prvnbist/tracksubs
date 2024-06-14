@@ -50,11 +50,6 @@
 	line-height: 24px;
 }
 
-.waitlist_container {
-	display: flex;
-	gap: 16px;
-}
-
 @media screen and (max-width: 536px) {
 	.header {
 		background-size: auto;
@@ -62,10 +57,6 @@
 
 	.tagline {
 		width: calc(100% - 32px);
-	}
-
-	.waitlist_container {
-		flex-direction: column;
 	}
 
 	.fold_1_wrapper {
