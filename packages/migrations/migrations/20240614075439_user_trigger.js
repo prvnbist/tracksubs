@@ -13,14 +13,15 @@ exports.up = async knex => {
          UPDATE "user" SET usage_id = (SELECT id FROM usage WHERE user_id = NEW.id) WHERE id = NEW.id;
          RETURN NEW;
       END;
-      $$
+      $$;
    `)
+
 	return knex.raw(`
-      CREATE TRIGGER user_on_insert_trigger
+		CREATE TRIGGER user_on_insert_trigger
       AFTER INSERT ON "user"
       FOR EACH ROW
       EXECUTE FUNCTION user_on_insert_trigger();
-   `)
+	`)
 }
 
 /**
@@ -28,6 +29,6 @@ exports.up = async knex => {
  * @returns { Promise<void> }
  */
 exports.down = async knex => {
-	await knex.raw('DROP TRIGGER IF EXISTS user_on_insert_trigger ON "user";')
-	return knex.raw('DROP FUNCTION IF EXISTS user_on_insert_trigger;')
+	await knex.raw('DROP TRIGGER IF EXISTS public.user_on_insert_trigger on "user";')
+	return knex.raw('DROP FUNCTION IF EXISTS public.user_on_insert_trigger();')
 }

@@ -481,25 +481,6 @@ export const transaction_list = async (): ActionResponse<ReturnTransction[], str
 	}
 }
 
-export const waitlist_add = async (
-	email: string
-): ActionResponse<Array<{ email: string }>, string> => {
-	try {
-		const data = await db
-			.insert(schema.waitlist)
-			.values({ email })
-			.returning({ email: schema.waitlist.email })
-
-		return { status: 'SUCCESS', data }
-	} catch (error) {
-		if ((error as Error).message.includes('waitlist_email_unique')) {
-			return { status: 'ERROR', message: 'ALREADY_ADDED' }
-		}
-
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
-
 type GetCurrenciesReturn = Array<{ currency: string }>
 
 export const getCurrencies = async (): ActionResponse<GetCurrenciesReturn, string> => {

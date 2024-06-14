@@ -59,7 +59,6 @@ export default function Page() {
 			<Title order={4}>Apr 29, 2024</Title>
 			<ul>
 				<li>Usage stats in settings</li>
-				<li>Added waitlist</li>
 			</ul>
 			<Space h={24} />
 			<Title order={4}>Apr 28, 2024</Title>

@@ -2,7 +2,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
-import { useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useGate } from 'statsig-react'
 import {
@@ -15,16 +14,12 @@ import {
 	Space,
 	Stack,
 	Text,
-	TextInput,
 	Title,
 	useComputedColorScheme,
 } from '@mantine/core'
-import { isEmail } from '@mantine/form'
-import { notifications } from '@mantine/notifications'
 
 import { track } from 'utils'
 import Logo from 'assets/svgs/logo'
-import { waitlist_add } from 'actions'
 
 import classes from './page.module.css'
 
@@ -34,45 +29,6 @@ export default function Page(): JSX.Element {
 
 	const scheme = useComputedColorScheme()
 
-	const [email, setEmail] = useState('')
-
-	const subscribe = async () => {
-		try {
-			if (email.trim()) {
-				if (isEmail('ERROR')(email.trim()) === 'ERROR') {
-					return notifications.show({
-						title: 'Warning',
-						message: 'Please enter a valid email.',
-					})
-				}
-
-				const result = await waitlist_add(email.trim())
-
-				if (result.status === 'ERROR') {
-					if (result.message === 'ALREADY_ADDED') {
-						return notifications.show({
-							message: `You're already added to the waitlist👋🏽`,
-						})
-					}
-					throw Error()
-				}
-
-				track('btn-waitlist')
-
-				notifications.show({
-					title: 'Added',
-					message: 'Successfully added you to the waitlist, cheers🍾',
-				})
-
-				setEmail('')
-			}
-		} catch (error) {
-			notifications.show({
-				title: 'Error',
-				message: 'Unable to join the waitlist, please try again!',
-			})
-		}
-	}
 	return (
 		<main>
 			<Flex component="header" align="center" h="90dvh" className={classes.header}>
@@ -101,17 +57,7 @@ export default function Page(): JSX.Element {
 									<Button>Get Started</Button>
 								</Link>
 							)
-						) : (
-							<div className={classes.waitlist_container}>
-								<TextInput
-									w={280}
-									value={email}
-									placeholder="example@gmail.com"
-									onChange={e => setEmail(e.target.value)}
-								/>
-								<Button onClick={subscribe}>Join Waitlist</Button>
-							</div>
-						)}
+						) : null}
 					</Group>
 				</Flex>
 			</Flex>
