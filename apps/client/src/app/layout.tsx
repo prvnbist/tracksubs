@@ -10,8 +10,6 @@ import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 import './layout.css'
 
-import StatsigWrapper from 'state/statsig'
-
 import theme from './theme'
 import Script from 'next/script'
 
@@ -66,14 +64,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				)}
 			</head>
 			<body>
-				<StatsigWrapper>
-					<ClerkProvider>
-						<MantineProvider defaultColorScheme="auto" theme={theme}>
-							<Notifications />
-							{children}
-						</MantineProvider>
-					</ClerkProvider>
-				</StatsigWrapper>
+				<ClerkProvider>
+					<MantineProvider defaultColorScheme="auto" theme={theme}>
+						<Notifications />
+						{children}
+					</MantineProvider>
+				</ClerkProvider>
 			</body>
 		</html>
 	)

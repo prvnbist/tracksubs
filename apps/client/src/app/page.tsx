@@ -3,10 +3,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { useUser } from '@clerk/nextjs'
-import { useGate } from 'statsig-react'
 import {
 	Anchor,
-	Badge,
 	Button,
 	Container,
 	Flex,
@@ -25,18 +23,12 @@ import classes from './page.module.css'
 
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()
-	const { value: is_signup_allowed } = useGate('is_signup_allowed')
 
 	const scheme = useComputedColorScheme()
 
 	return (
 		<main>
 			<Flex component="header" align="center" h="90dvh" className={classes.header}>
-				{!is_signup_allowed && (
-					<Badge variant="light" color="pink" className={classes.coming_soon}>
-						Coming Soon
-					</Badge>
-				)}
 				<Flex direction="column" align="center" justify="center" w="100%">
 					<Logo size={120} />
 					<Space h={8} />
@@ -46,9 +38,9 @@ export default function Page(): JSX.Element {
 						Streamline your finances and stay on top of recurring expenses effortlessly.
 					</Text>
 					<Space h={16} />
-					<Group gap={16}>
-						{is_signup_allowed && isLoaded ? (
-							isSignedIn ? (
+					{isLoaded ? (
+						<Group gap={16}>
+							{isSignedIn ? (
 								<Link href="/dashboard" onClick={() => track('btn-dashboard')}>
 									<Button>Go to dashboard</Button>
 								</Link>
@@ -56,9 +48,9 @@ export default function Page(): JSX.Element {
 								<Link href="/login" onClick={() => track('btn-login')}>
 									<Button>Get Started</Button>
 								</Link>
-							)
-						) : null}
-					</Group>
+							)}
+						</Group>
+					) : null}
 				</Flex>
 			</Flex>
 			<Flex

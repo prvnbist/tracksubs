@@ -37,7 +37,6 @@
 		"react-email": "2.1.1",
 		"recharts": "2",
 		"resend": "^3.2.0",
-		"statsig-react": "^1.38.1",
 		"svix": "^1.21.0"
 	},
 	"devDependencies": {

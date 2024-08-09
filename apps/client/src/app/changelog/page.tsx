@@ -102,11 +102,6 @@ export default function Page() {
 			<Space h={24} />
 			<Title order={4}>Apr 18, 2024</Title>
 			<ul>
-				<li>
-					<Link href="https://statsig.com" target="_blank" rel="noreferrer noopener">
-						Statsig integration
-					</Link>
-				</li>
 				<li>Added privacy policy and terms of service pages</li>
 			</ul>
 			<Space h={24} />
