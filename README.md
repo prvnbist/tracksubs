@@ -2,6 +2,8 @@
 
 Streamline your finances and stay on top of recurring expenses effortlessly.
 
+![Architecture](https://res.cloudinary.com/prvnbist/image/upload/v1724309486/tracksubs/architecture.svg)
+
 ### Changelog
 [> Go to changelog](https://www.tracksubs.co/changelog)
 
