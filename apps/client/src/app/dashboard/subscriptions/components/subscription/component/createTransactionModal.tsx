@@ -10,7 +10,8 @@ import { Button, Group, Select, Space, TextInput } from '@mantine/core'
 import { track } from 'utils'
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
-import { transaction_create } from 'actions'
+
+import { transaction_create } from '../../../action'
 
 const CreateTransactionModal = ({ subscription }: { subscription: ISubscription }) => {
 	const queryClient = useQueryClient()

@@ -40,7 +40,7 @@ import { getInitials, track } from 'utils'
 import type { ISubscription, Service } from 'types'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
-import { subscription_alert, subscriptions_delete, subscriptions_update } from 'actions'
+import { subscription_alert, subscriptions_delete, subscriptions_update } from '../../action'
 
 const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
 

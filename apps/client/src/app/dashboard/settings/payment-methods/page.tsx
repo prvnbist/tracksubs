@@ -20,7 +20,7 @@ import {
 
 import { track } from 'utils'
 import { useGlobal } from 'state/global'
-import { payment_method_create, payment_method_delete } from 'actions'
+import { payment_method_create, payment_method_delete } from './action'
 
 export default function Page() {
 	const formRef = useRef<HTMLFormElement | null>(null)

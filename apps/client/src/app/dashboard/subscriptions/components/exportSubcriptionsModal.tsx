@@ -6,7 +6,8 @@ import { notifications } from '@mantine/notifications'
 import { Button, Group, Space, Stack, TextInput } from '@mantine/core'
 
 import { downloadCSV, track } from 'utils'
-import { subscription_export } from 'actions'
+
+import { subscription_export } from '../action'
 
 const ExportSubscriptionsModal = () => {
 	const [loading, setStatus] = useState(false)

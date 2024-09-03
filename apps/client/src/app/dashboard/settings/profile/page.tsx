@@ -23,9 +23,10 @@ import {
 } from '@mantine/core'
 
 import type { User } from 'types'
-import { user_update } from 'actions'
 import { useGlobal } from 'state/global'
 import { CURRENCIES, TIMEZONES_DISPLAY } from 'constants/index'
+
+import { user_update } from './action'
 
 const renderOption = ({
 	option,

@@ -9,8 +9,9 @@ import { Center, Group, Loader, ScrollArea, Stack, Table, Text, Title } from '@m
 
 import { useGlobal } from 'state/global'
 import { currencyFormatter } from 'utils'
-import { transaction_list } from 'actions'
 import { CreateEmptyState } from 'components'
+
+import { transaction_list } from '../action'
 
 const noWrapStyles = {
 	whiteSpace: 'nowrap',

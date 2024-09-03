@@ -19,8 +19,9 @@ import {
 
 import { CYCLES } from 'constants/index'
 import type { ISubscription } from 'types'
-import { subscriptions_list } from 'actions'
 import { CreateEmptyState, ErrorState } from 'components'
+
+import { subscriptions_list } from '../action'
 
 const CreateModal = lazy(() => import('./createModal'))
 const Subscription = lazy(() => import('./subscription'))

@@ -14,7 +14,8 @@ import { track } from 'utils'
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { CURRENCIES, CYCLES } from 'constants/index'
-import { subscriptions_create, subscriptions_update } from 'actions'
+
+import { subscriptions_create, subscriptions_update } from '../action'
 
 const diff = (obj1: any, obj2: any) => {
 	const result: any = {}

@@ -1,3 +1,5 @@
+'use server'
+
 import dayjs from 'dayjs'
 import { auth } from '@clerk/nextjs/server'
 import { and, asc, count, eq, sql } from 'drizzle-orm'

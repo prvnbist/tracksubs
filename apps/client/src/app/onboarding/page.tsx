@@ -23,7 +23,7 @@ import type { ComboboxItem, ComboboxLikeRenderOptionInput } from '@mantine/core'
 import Logo from 'assets/svgs/logo'
 import { CURRENCIES, TIMEZONES_DISPLAY } from 'constants/index'
 
-import { onboard } from './actions'
+import { onboard } from './action'
 
 const renderOption = ({
 	option,
