@@ -59,6 +59,7 @@ const Transactions = () => {
 					<Table.Tr>
 						<Table.Th>Title</Table.Th>
 						<Table.Th ta="right">Amount</Table.Th>
+						<Table.Th ta="right">Invoice Date</Table.Th>
 						<Table.Th ta="right">Paid On</Table.Th>
 						<Table.Th styles={{ th: noWrapStyles }}>Payment Method</Table.Th>
 					</Table.Tr>
@@ -90,6 +91,9 @@ const Transactions = () => {
 								</Table.Td>
 								<Table.Td ta="right" ff="monospace">
 									{currencyFormatter(datum.amount / 100, datum.currency)}
+								</Table.Td>
+								<Table.Td ta="right" styles={{ td: noWrapStyles }}>
+									{dayjs(datum.invoice_date).format('MMM DD, YYYY')}
 								</Table.Td>
 								<Table.Td ta="right" styles={{ td: noWrapStyles }}>
 									{dayjs(datum.paid_date).format('MMM DD, YYYY')}

@@ -8,10 +8,11 @@ import db, { schema } from '@tracksubs/drizzle'
 import { getUserMetadata } from 'actions'
 import type { ActionResponse, Transaction } from 'types'
 
-type ReturnTransction = Omit<
-	Transaction,
-	'user_id' | 'payment_method_id' | 'invoice_date' | 'subscription_id'
-> & { payment_method: string | null; service: string | null; title: string | null }
+type ReturnTransction = Omit<Transaction, 'user_id' | 'payment_method_id' | 'subscription_id'> & {
+	payment_method: string | null
+	service: string | null
+	title: string | null
+}
 
 export const transaction_list = async (): ActionResponse<ReturnTransction[], string> => {
 	try {
@@ -28,6 +29,7 @@ export const transaction_list = async (): ActionResponse<ReturnTransction[], str
 				id: schema.transaction.id,
 				amount: schema.transaction.amount,
 				currency: schema.transaction.currency,
+				invoice_date: schema.transaction.invoice_date,
 				paid_date: schema.transaction.paid_date,
 				title: schema.subscription.title,
 				service: schema.subscription.service,
