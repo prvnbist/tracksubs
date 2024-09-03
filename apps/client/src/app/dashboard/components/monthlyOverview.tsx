@@ -1,24 +1,21 @@
 'use client'
 
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import { use, useMemo } from 'react'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
 import { BarChart } from '@mantine/charts'
 import { Center, Stack, Title } from '@mantine/core'
 
-import type { ISubscription } from 'types'
 import { MONTHS } from 'constants/index'
+import type { ActionResponse, ISubscription } from 'types'
 import { calculateMonthlyOverview, currencyFormatter } from 'utils'
+
+import type { GetMonthlyOverviewReturn } from '../action'
 
 type MonthlyOverviewProps = {
 	currency: string
-	hasError: boolean
-	data: Array<{
-		amount: number
-		next_billing_date: string
-		interval: ISubscription['interval']
-	}>
+	data: ActionResponse<GetMonthlyOverviewReturn, string>
 }
 
 const mapChartFn = (result: Record<string, number>, month: string, year: number) => {
@@ -29,11 +26,13 @@ const mapChartFn = (result: Record<string, number>, month: string, year: number)
 	}
 }
 
-const MonthlyOverview = ({ hasError = false, currency, data = [] }: MonthlyOverviewProps) => {
-	const chartData = useMemo(() => {
-		if (data.length === 0 || hasError) return []
+const MonthlyOverview = ({ currency, data }: MonthlyOverviewProps) => {
+	const subscriptions = use(data)
 
-		const result = calculateMonthlyOverview(data)
+	const chartData = useMemo(() => {
+		if (!subscriptions.data || subscriptions.data.length === 0) return []
+
+		const result = calculateMonthlyOverview(subscriptions.data)
 
 		const currentMonth = dayjs().month()
 		const currentYear = dayjs().year()
@@ -43,9 +42,9 @@ const MonthlyOverview = ({ hasError = false, currency, data = [] }: MonthlyOverv
 			...MONTHS.slice(currentMonth).map(month => mapChartFn(result, month, currentYear)),
 			...MONTHS.slice(0, currentMonth).map(month => mapChartFn(result, month, nextYear)),
 		]
-	}, [data, hasError])
+	}, [subscriptions.data])
 
-	if (hasError)
+	if (subscriptions.status === 'ERROR')
 		return (
 			<Center h={300}>
 				<Stack align="center" c="red">
@@ -54,7 +53,7 @@ const MonthlyOverview = ({ hasError = false, currency, data = [] }: MonthlyOverv
 				</Stack>
 			</Center>
 		)
-	if (data.length === 0)
+	if (subscriptions.data?.length === 0)
 		return (
 			<Center h={300}>
 				<Title order={5}>No Data</Title>

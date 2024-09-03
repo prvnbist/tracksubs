@@ -1,12 +1,19 @@
-import { Group, Paper, SimpleGrid, Space, Title } from '@mantine/core'
-
+import { Suspense } from 'react'
+import { IconInfoCircle } from '@tabler/icons-react'
 import {
-	getActiveSubscriptions,
-	getCurrencies,
-	getMonthlyOverview,
-	getThisWeekMonthSubscriptions,
-	getUserMetadata,
-} from 'actions'
+	Center,
+	Group,
+	Loader,
+	Paper,
+	SimpleGrid,
+	Space,
+	Stack,
+	Text,
+	Title,
+	Tooltip,
+} from '@mantine/core'
+
+import { getUserMetadata } from 'actions'
 
 import {
 	ActiveSubscriptions,
@@ -14,6 +21,12 @@ import {
 	MonthlyOverview,
 	RenewingSubscriptions,
 } from './components'
+import {
+	getActiveSubscriptions,
+	getCurrencies,
+	getMonthlyOverview,
+	getThisWeekMonthSubscriptions,
+} from './action'
 
 interface IPageProps {
 	searchParams: { currency?: string }
@@ -24,33 +37,88 @@ export default async function Page(props: IPageProps) {
 
 	const selectedCurrency = props.searchParams.currency ?? currency
 
-	const first = await getCurrencies()
-	const second = await getMonthlyOverview(selectedCurrency)
-	const third = await getActiveSubscriptions(selectedCurrency)
-	const four = await getThisWeekMonthSubscriptions(selectedCurrency)
+	const first = getCurrencies()
+	const second = getMonthlyOverview(selectedCurrency)
+	const third = getActiveSubscriptions(selectedCurrency)
+	const four = getThisWeekMonthSubscriptions(selectedCurrency)
 
 	return (
 		<main>
 			<Group component="header" mt="md" mb="md" justify="space-between">
 				<Title order={2}>Dashboard</Title>
-				{first.status === 'SUCCESS' && first.data.length > 0 && (
-					<CurrencySelector currencies={first.data} selected={selectedCurrency} />
-				)}
+				<CurrencySelector data={first} selected={selectedCurrency} />
 			</Group>
-			{(third.data || four.data) && (
-				<SimpleGrid mb={16} cols={{ base: 1, sm: 2 }}>
-					{third.data && <ActiveSubscriptions data={third.data} />}
-					{four.data && <RenewingSubscriptions data={four.data} />}
-				</SimpleGrid>
-			)}
+			<SimpleGrid mb={16} cols={{ base: 1, sm: 2 }}>
+				<Paper p="xl" withBorder shadow="md">
+					<Group gap={8}>
+						<Title order={4}>Subscriptions</Title>
+						<Tooltip
+							multiline
+							offset={8}
+							position="top"
+							color="dark.6"
+							label={
+								<Stack gap={4} p={4}>
+									<Text>Active/Total</Text>
+									<Text c="dimmed" size="sm">
+										*Filtered by selected currency
+									</Text>
+								</Stack>
+							}
+							transitionProps={{ transition: 'fade-up', duration: 300 }}
+						>
+							<IconInfoCircle size={16} />
+						</Tooltip>
+					</Group>
+					<Space h={24} />
+					<Suspense
+						fallback={
+							<Center h="100%">
+								<Loader />
+							</Center>
+						}
+					>
+						<ActiveSubscriptions data={third} />
+					</Suspense>
+				</Paper>
+				<Paper p="xl" withBorder shadow="md">
+					<Group gap={8}>
+						<Title order={4}>Renewal</Title>
+						<Tooltip
+							multiline
+							offset={8}
+							position="top"
+							color="dark.6"
+							label="*Filtered by selected currency"
+							transitionProps={{ transition: 'fade-up', duration: 300 }}
+						>
+							<IconInfoCircle size={16} />
+						</Tooltip>
+					</Group>
+					<Space h={24} />
+					<Suspense
+						fallback={
+							<Center h="100%">
+								<Loader />
+							</Center>
+						}
+					>
+						<RenewingSubscriptions data={four} />
+					</Suspense>
+				</Paper>
+			</SimpleGrid>
 			<Paper p="xl" withBorder shadow="md">
 				<Title order={4}>Monthly Overview</Title>
 				<Space h={24} />
-				<MonthlyOverview
-					data={second.data ?? []}
-					currency={selectedCurrency}
-					hasError={second.status === 'ERROR'}
-				/>
+				<Suspense
+					fallback={
+						<Center h="100%">
+							<Loader />
+						</Center>
+					}
+				>
+					<MonthlyOverview data={second} currency={selectedCurrency} />
+				</Suspense>
 			</Paper>
 		</main>
 	)

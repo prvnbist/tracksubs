@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { ModalsProvider } from '@mantine/modals'
@@ -15,7 +17,10 @@ export const metadata: Metadata = {
 	title: 'Dashboard | TrackSubs',
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+	const { userId } = auth()
+
+	if (!userId) return redirect('/login')
 	return (
 		<QueryProvider>
 			<GlobalProvider>

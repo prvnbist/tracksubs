@@ -1,22 +1,27 @@
 'use client'
 
-import { useMemo } from 'react'
+import { use, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Select } from '@mantine/core'
 
+import type { ActionResponse } from 'types'
 import { CURRENCY_NAMES } from 'constants/index'
 
 type CurrencySelectorProps = {
 	selected: string | undefined
-	currencies: Array<{ currency: string }>
+	data: ActionResponse<Array<{ currency: string }>, string>
 }
 
-const CurrencySelector = ({ currencies, selected }: CurrencySelectorProps) => {
+const CurrencySelector = ({ data, selected }: CurrencySelectorProps) => {
+	const currencies = use(data)
+
 	const router = useRouter()
 
 	const list = useMemo(() => {
-		return currencies.map(({ currency }) => ({
+		if (!currencies.data) return []
+
+		return currencies.data.map(({ currency }) => ({
 			value: currency,
 			label: CURRENCY_NAMES.of(currency) ?? '',
 		}))

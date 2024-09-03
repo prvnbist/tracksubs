@@ -1,39 +1,32 @@
-import { IconInfoCircle } from '@tabler/icons-react'
-import { Paper, Group, Title, Stack, Space, Tooltip, Text } from '@mantine/core'
+import { use } from 'react'
+import { IconAlertTriangle } from '@tabler/icons-react'
+import { Group, Title, Stack, Text, Center } from '@mantine/core'
 
-const ActiveSubscriptions = ({ data }: { data: { active: number; total: number } }) => {
+import type { ActionResponse } from 'types'
+
+const ActiveSubscriptions = ({
+	data,
+}: { data: ActionResponse<{ active: number; total: number }, string> }) => {
+	const subscriptions = use(data)
+
+	if (subscriptions.status === 'ERROR')
+		return (
+			<Center py="md">
+				<Stack align="center" c="red">
+					<IconAlertTriangle size={24} />
+					<Title order={5}>Failed to load</Title>
+				</Stack>
+			</Center>
+		)
 	return (
-		<Paper p="xl" withBorder shadow="md">
-			<Group gap={8}>
-				<Title order={4}>Subscriptions</Title>
-				<Tooltip
-					multiline
-					offset={8}
-					position="top"
-					color="dark.6"
-					label={
-						<Stack gap={4} p={4}>
-							<Text>Active/Total</Text>
-							<Text c="dimmed" size="sm">
-								*Filtered by selected currency
-							</Text>
-						</Stack>
-					}
-					transitionProps={{ transition: 'fade-up', duration: 300 }}
-				>
-					<IconInfoCircle size={16} />
-				</Tooltip>
-			</Group>
-			<Space h={24} />
-			<Group gap={0}>
-				<Text title="Active" size="48px" c="green.4" ff="monospace">
-					{data.active}
-				</Text>
-				<Text title="Total" c="dimmed" size="48px" ff="monospace">
-					/{data.total}
-				</Text>
-			</Group>
-		</Paper>
+		<Group gap={0}>
+			<Text title="Active" size="48px" c="green.4" ff="monospace">
+				{subscriptions.data.active}
+			</Text>
+			<Text title="Total" c="dimmed" size="48px" ff="monospace">
+				/{subscriptions.data.total}
+			</Text>
+		</Group>
 	)
 }
 
