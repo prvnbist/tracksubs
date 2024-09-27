@@ -21,11 +21,14 @@ const CurrencySelector = ({ data, selected }: CurrencySelectorProps) => {
 	const list = useMemo(() => {
 		if (!currencies.data) return []
 
+		if (currencies.data.length === 0 && selected)
+			return [{ value: selected, label: CURRENCY_NAMES.of(selected) ?? '' }]
+
 		return currencies.data.map(({ currency }) => ({
 			value: currency,
 			label: CURRENCY_NAMES.of(currency) ?? '',
 		}))
-	}, [currencies])
+	}, [currencies, selected])
 
 	return (
 		<>
