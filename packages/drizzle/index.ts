@@ -18,8 +18,6 @@ const selectPaymentMethodSchema = createSelectSchema(schema.payment_method)
 
 const selectServiceSchema = createSelectSchema(schema.service)
 
-const insertSubscriptionReminderLogSchema = createInsertSchema(schema.subscription_reminder_log)
-
 const selectSubscriptionSchema = createSelectSchema(schema.subscription)
 
 const selectTransactionSchema = createSelectSchema(schema.transaction)
@@ -33,7 +31,6 @@ const db = drizzle(client, { schema })
 
 export {
 	insertPaymentMethodSchema,
-	insertSubscriptionReminderLogSchema,
 	insertUserSchema,
 	schema,
 	selectPaymentMethodSchema,

@@ -4,8 +4,6 @@ export { default as service } from './service'
 
 export { default as subscription } from './subscription'
 
-export { default as subscription_reminder_log } from './subscription_reminder_log'
-
 export { default as transaction } from './transaction'
 
 export { default as usage } from './usage'

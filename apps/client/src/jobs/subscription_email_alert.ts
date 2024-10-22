@@ -6,7 +6,7 @@ import { and, eq, inArray } from 'drizzle-orm'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 
-import db, { insertSubscriptionReminderLogSchema, schema } from '@tracksubs/drizzle'
+import db, { schema } from '@tracksubs/drizzle'
 
 import { client } from 'trigger'
 import RenewalAlert from 'emails/RenewalAlert'
@@ -32,7 +32,7 @@ const resend = new Resend({
 })
 
 client.defineJob({
-	version: '0.0.3',
+	version: '0.0.4',
 	integrations: { resend },
 	id: 'subscription_email_alert',
 	name: 'Subscription Reminder Alert',
@@ -104,29 +104,6 @@ client.defineJob({
 
 			await Promise.all(
 				groupedByEmail.map(async group => {
-					try {
-						await io.runTask('log-email', async () => {
-							await Promise.all(
-								group.list.map(async datum => {
-									const data = insertSubscriptionReminderLogSchema.parse({
-										amount: datum.subscription_amount,
-										currency: datum.subscription_currency,
-										executed_at: dayjs.utc().format('YYYY-MM-DDTHH:MM:ssZ'),
-										renewal_date: datum.subscription_next_billing_date,
-										subscription_id: datum.subscription_id,
-										timezone: datum.user_timezone,
-										user_id: datum.user_id,
-									})
-
-									await db
-										.insert(schema.subscription_reminder_log)
-										.values(data)
-										.returning({ id: schema.subscription_reminder_log.id })
-								})
-							)
-						})
-					} catch (error) {}
-
 					try {
 						await io.resend.emails.send('send-email', {
 							from: 'Subscription Reminder | TrackSubs <reminder@tracksubs.co>',
