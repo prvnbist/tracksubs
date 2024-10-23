@@ -74,6 +74,3 @@ export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>
 		return { status: 'ERROR', message: 'Something went wrong!' }
 	}
 }
-
-
-
