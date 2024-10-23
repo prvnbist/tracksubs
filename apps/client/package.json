@@ -21,6 +21,7 @@
 		"@mantine/notifications": "^7.9.1",
 		"@next/third-parties": "^14.2.2",
 		"@react-email/components": "0.0.16",
+		"@sentry/nextjs": "^8",
 		"@tabler/icons-react": "^3.1.0",
 		"@tanstack/react-query": "^5.29.2",
 		"@tanstack/react-query-devtools": "^5.35.1",
