@@ -45,26 +45,6 @@ export const PLANS: Record<string, Plan> = {
 		alerts: 3,
 		subscriptions: 10,
 	},
-	BASIC: {
-		title: 'Basic',
-		type: 'PAID',
-		price: {
-			amount: 4.99,
-			currency: 'USD',
-		},
-		alerts: 20,
-		subscriptions: 20,
-	},
-	PRO: {
-		title: 'Pro',
-		type: 'PAID',
-		price: {
-			amount: 9.99,
-			currency: 'USD',
-		},
-		alerts: 50,
-		subscriptions: 50,
-	},
 }
 
 export const MONTHS = [

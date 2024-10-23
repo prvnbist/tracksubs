@@ -15,10 +15,7 @@ export default function Page() {
 	return (
 		<div>
 			<Space h={24} />
-			<Group justify="space-between">
-				<Title order={2}>Plan</Title>
-				<Badge variant="default">Monthly</Badge>
-			</Group>
+			<Title order={2}>Plan</Title>
 			<Space h={16} />
 			<SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }}>
 				{Object.keys(PLANS).map((key: keyof typeof PLANS) => {
