@@ -1,50 +1,42 @@
-'use client'
-
 import dayjs from 'dayjs'
-import { use, useMemo } from 'react'
+import { and, eq, sql } from 'drizzle-orm'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
-import { BarChart } from '@mantine/charts'
 import { Center, Stack, Title } from '@mantine/core'
 
-import { MONTHS } from 'constants/index'
-import type { ActionResponse, ISubscription } from 'types'
-import { calculateMonthlyOverview, currencyFormatter } from 'utils'
+import db, { schema } from '@tracksubs/drizzle'
 
-import type { GetMonthlyOverviewReturn } from '../action'
+import MonthlyOverviewChart from './monthlyOverviewChart'
 
-type MonthlyOverviewProps = {
-	currency: string
-	data: ActionResponse<GetMonthlyOverviewReturn, string>
-}
+const MonthlyOverview = async ({ currency, user_id }: { user_id: string; currency: string }) => {
+	try {
+		const startOfCurrentMonth = dayjs().startOf('month')
+		const endOfLastMonthNextYear = dayjs().add(1, 'year').subtract(1, 'month').endOf('month')
 
-const mapChartFn = (result: Record<string, number>, month: string, year: number) => {
-	const amount = result[month] ?? 0
-	return {
-		Month: `${month} ${year.toString().replace('20', '')}`,
-		Amount: Number(amount ?? 0) / 100,
-	}
-}
+		const data = await db.query.subscription.findMany({
+			columns: {
+				amount: true,
+				interval: true,
+				next_billing_date: true,
+			},
+			where: and(
+				eq(schema.subscription.user_id, user_id),
+				eq(schema.subscription.currency, currency),
+				eq(schema.subscription.is_active, true),
+				sql`next_billing_date >= ${startOfCurrentMonth.format(
+					'YYYY-MM-DD'
+				)} and next_billing_date <= ${endOfLastMonthNextYear.format('YYYY-MM-DD')}`
+			),
+		})
 
-const MonthlyOverview = ({ currency, data }: MonthlyOverviewProps) => {
-	const subscriptions = use(data)
-
-	const chartData = useMemo(() => {
-		if (!subscriptions.data || subscriptions.data.length === 0) return []
-
-		const result = calculateMonthlyOverview(subscriptions.data)
-
-		const currentMonth = dayjs().month()
-		const currentYear = dayjs().year()
-		const nextYear = dayjs().add(1, 'year').year()
-
-		return [
-			...MONTHS.slice(currentMonth).map(month => mapChartFn(result, month, currentYear)),
-			...MONTHS.slice(0, currentMonth).map(month => mapChartFn(result, month, nextYear)),
-		]
-	}, [subscriptions.data])
-
-	if (subscriptions.status === 'ERROR')
+		if (data?.length === 0)
+			return (
+				<Center h={300}>
+					<Title order={5}>No Data</Title>
+				</Center>
+			)
+		return <MonthlyOverviewChart data={data} currency={currency} />
+	} catch (error) {
 		return (
 			<Center h={300}>
 				<Stack align="center" c="red">
@@ -53,25 +45,7 @@ const MonthlyOverview = ({ currency, data }: MonthlyOverviewProps) => {
 				</Stack>
 			</Center>
 		)
-	if (subscriptions.data?.length === 0)
-		return (
-			<Center h={300}>
-				<Title order={5}>No Data</Title>
-			</Center>
-		)
-	return (
-		<BarChart
-			h={300}
-			dataKey="Month"
-			data={chartData}
-			xAxisLabel="Month"
-			yAxisLabel="Total Amount"
-			yAxisProps={{ width: 100 }}
-			series={[{ name: 'Amount', color: 'yellow.4' }]}
-			barProps={{ radius: [12, 12, 0, 0], maxBarSize: 24 }}
-			valueFormatter={value => currencyFormatter(value, currency)}
-		/>
-	)
+	}
 }
 
 export default MonthlyOverview

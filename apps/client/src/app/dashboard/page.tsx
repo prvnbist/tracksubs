@@ -1,5 +1,8 @@
 import { Suspense } from 'react'
+import { asc, eq } from 'drizzle-orm'
+import { auth } from '@clerk/nextjs/server'
 import { IconInfoCircle } from '@tabler/icons-react'
+
 import {
 	Center,
 	Group,
@@ -13,6 +16,8 @@ import {
 	Tooltip,
 } from '@mantine/core'
 
+import db, { schema } from '@tracksubs/drizzle'
+
 import { getUserMetadata } from 'actions'
 
 import {
@@ -21,32 +26,39 @@ import {
 	MonthlyOverview,
 	RenewingSubscriptions,
 } from './components'
-import {
-	getActiveSubscriptions,
-	getCurrencies,
-	getMonthlyOverview,
-	getThisWeekMonthSubscriptions,
-} from './action'
 
 interface IPageProps {
 	searchParams: { currency?: string }
 }
 
+const FallbackLoader = () => (
+	<Center h="100%">
+		<Loader />
+	</Center>
+)
+
 export default async function Page(props: IPageProps) {
-	const { currency } = await getUserMetadata()
+	const { userId } = auth()
+
+	if (!userId) {
+		throw new Error("User isn't authorized")
+	}
+
+	const { user_id, currency } = await getUserMetadata()
 
 	const selectedCurrency = props.searchParams.currency ?? currency
 
-	const first = getCurrencies()
-	const second = getMonthlyOverview(selectedCurrency)
-	const third = getActiveSubscriptions(selectedCurrency)
-	const four = getThisWeekMonthSubscriptions(selectedCurrency)
+	const currencies = await db
+		.selectDistinct({ currency: schema.subscription.currency })
+		.from(schema.subscription)
+		.where(eq(schema.subscription.user_id, user_id))
+		.orderBy(asc(schema.subscription.currency))
 
 	return (
 		<main>
 			<Group component="header" mt="md" mb="md" justify="space-between">
 				<Title order={2}>Dashboard</Title>
-				<CurrencySelector data={first} selected={selectedCurrency} />
+				<CurrencySelector data={currencies} currency={selectedCurrency} />
 			</Group>
 			<SimpleGrid mb={16} cols={{ base: 1, sm: 2 }}>
 				<Paper p="xl" withBorder shadow="md">
@@ -71,14 +83,8 @@ export default async function Page(props: IPageProps) {
 						</Tooltip>
 					</Group>
 					<Space h={24} />
-					<Suspense
-						fallback={
-							<Center h="100%">
-								<Loader />
-							</Center>
-						}
-					>
-						<ActiveSubscriptions data={third} />
+					<Suspense fallback={<FallbackLoader />}>
+						<ActiveSubscriptions user_id={user_id} currency={selectedCurrency} />
 					</Suspense>
 				</Paper>
 				<Paper p="xl" withBorder shadow="md">
@@ -96,28 +102,16 @@ export default async function Page(props: IPageProps) {
 						</Tooltip>
 					</Group>
 					<Space h={24} />
-					<Suspense
-						fallback={
-							<Center h="100%">
-								<Loader />
-							</Center>
-						}
-					>
-						<RenewingSubscriptions data={four} />
+					<Suspense fallback={<FallbackLoader />}>
+						<RenewingSubscriptions user_id={user_id} currency={selectedCurrency} />
 					</Suspense>
 				</Paper>
 			</SimpleGrid>
 			<Paper p="xl" withBorder shadow="md">
 				<Title order={4}>Monthly Overview</Title>
 				<Space h={24} />
-				<Suspense
-					fallback={
-						<Center h="100%">
-							<Loader />
-						</Center>
-					}
-				>
-					<MonthlyOverview data={second} currency={selectedCurrency} />
+				<Suspense fallback={<FallbackLoader />}>
+					<MonthlyOverview user_id={user_id} currency={selectedCurrency} />
 				</Suspense>
 			</Paper>
 		</main>

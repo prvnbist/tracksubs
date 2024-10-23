@@ -1,41 +1,38 @@
 'use client'
 
-import { use, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { Select } from '@mantine/core'
 
-import type { ActionResponse } from 'types'
 import { CURRENCY_NAMES } from 'constants/index'
 
 type CurrencySelectorProps = {
-	selected: string | undefined
-	data: ActionResponse<Array<{ currency: string }>, string>
+	currency: string
+	data: Array<{ currency: string }>
 }
 
-const CurrencySelector = ({ data, selected }: CurrencySelectorProps) => {
-	const currencies = use(data)
-
+const CurrencySelector = ({ data, currency }: CurrencySelectorProps) => {
 	const router = useRouter()
 
 	const list = useMemo(() => {
-		if (!currencies.data) return []
+		if (!data) return []
 
-		if (currencies.data.length === 0 && selected)
-			return [{ value: selected, label: CURRENCY_NAMES.of(selected) ?? '' }]
+		if (data.length === 0 && currency)
+			return [{ value: currency, label: CURRENCY_NAMES.of(currency) ?? '' }]
 
-		return currencies.data.map(({ currency }) => ({
+		return data.map(({ currency }) => ({
 			value: currency,
 			label: CURRENCY_NAMES.of(currency) ?? '',
 		}))
-	}, [currencies, selected])
+	}, [data, currency])
 
 	return (
 		<>
 			<Select
 				searchable
 				data={list}
-				value={selected}
+				value={currency}
 				clearable={false}
 				allowDeselect={false}
 				onChange={value => router.push(`/dashboard/?currency=${value}`)}

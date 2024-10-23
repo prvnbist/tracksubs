@@ -1,15 +1,34 @@
-import { use } from 'react'
+import { and, eq } from 'drizzle-orm'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { Group, Title, Stack, Text, Center } from '@mantine/core'
 
-import type { ActionResponse } from 'types'
+import db, { schema } from '@tracksubs/drizzle'
 
-const ActiveSubscriptions = ({
-	data,
-}: { data: ActionResponse<{ active: number; total: number }, string> }) => {
-	const subscriptions = use(data)
+const ActiveSubscriptions = async ({
+	currency,
+	user_id,
+}: { user_id: string; currency: string }) => {
+	try {
+		const data = await db.query.subscription.findMany({
+			columns: { is_active: true },
+			where: and(
+				eq(schema.subscription.user_id, user_id),
+				eq(schema.subscription.currency, currency)
+			),
+		})
+		const active = data.filter(datum => datum.is_active).length
 
-	if (subscriptions.status === 'ERROR')
+		return (
+			<Group gap={0}>
+				<Text title="Active" size="48px" c="green.4" ff="monospace">
+					{active}
+				</Text>
+				<Text title="Total" c="dimmed" size="48px" ff="monospace">
+					/{data.length}
+				</Text>
+			</Group>
+		)
+	} catch (error) {
 		return (
 			<Center py="md">
 				<Stack align="center" c="red">
@@ -18,16 +37,7 @@ const ActiveSubscriptions = ({
 				</Stack>
 			</Center>
 		)
-	return (
-		<Group gap={0}>
-			<Text title="Active" size="48px" c="green.4" ff="monospace">
-				{subscriptions.data.active}
-			</Text>
-			<Text title="Total" c="dimmed" size="48px" ff="monospace">
-				/{subscriptions.data.total}
-			</Text>
-		</Group>
-	)
+	}
 }
 
 export default ActiveSubscriptions
