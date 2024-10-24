@@ -43,6 +43,7 @@ import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_active, subscriptions_delete } from '../../action'
 
+const UpdateModal = lazy(() => import('../updateModal'))
 const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
 
 dayjs.extend(utc)
@@ -51,10 +52,9 @@ dayjs.extend(relativeTime)
 
 type SubscriptionProps = {
 	subscription: ISubscription
-	onEdit: (subscription: ISubscription) => void
 }
 
-const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
+const Subscription = ({ subscription }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
 	const queryClient = useQueryClient()
 
@@ -310,7 +310,12 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 							)}
 							<Menu.Item
 								title="Edit"
-								onClick={() => onEdit(subscription)}
+								onClick={() =>
+									modals.open({
+										title: 'Edit Subscription',
+										children: <UpdateModal subscription={subscription} />,
+									})
+								}
 								leftSection={<IconPencil size={18} />}
 							>
 								Edit

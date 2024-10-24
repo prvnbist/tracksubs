@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { ModalsProvider } from '@mantine/modals'
@@ -25,11 +26,13 @@ export default async function Layout({ children }: { children: React.ReactNode }
 		<QueryProvider>
 			<GlobalProvider>
 				<ModalsProvider>
-					<Container size="lg">
-						<Header />
-						<Divider />
-						{children}
-					</Container>
+					<NuqsAdapter>
+						<Container size="lg">
+							<Header />
+							<Divider />
+							{children}
+						</Container>
+					</NuqsAdapter>
 				</ModalsProvider>
 			</GlobalProvider>
 			{process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}

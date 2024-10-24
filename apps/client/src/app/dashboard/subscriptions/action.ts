@@ -6,11 +6,10 @@ import { auth } from '@clerk/nextjs/server'
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
 import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from 'next-safe-action'
 
-import db, { insertSubscriptionSchema, schema } from '@tracksubs/drizzle'
+import db, { insertSubscriptionSchema, schema, selectSubscriptionSchema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'constants/index'
 import { getUserMetadata } from 'actions'
-import type { ActionResponse, ISubscription } from 'types'
 
 const actionClient = createSafeActionClient({
 	handleServerError(e) {
@@ -79,19 +78,20 @@ export const transaction_create = actionClient
 		return transaction
 	})
 
-export const subscriptions_list = async (
-	interval: ISubscription['interval'] | 'ALL' = 'ALL'
-): ActionResponse<ISubscription[], string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { user_id } = await getUserMetadata()
-
-		const data = await db.query.subscription.findMany({
+export const subscriptions_list = actionClient
+	.schema(
+		z.object({
+			interval: z.union([
+				z.literal('ALL'),
+				z.literal('MONTHLY'),
+				z.literal('QUARTERLY'),
+				z.literal('YEARLY'),
+			]),
+		})
+	)
+	.outputSchema(z.array(selectSubscriptionSchema))
+	.action(async ({ parsedInput: { interval }, ctx: { user_id } }) => {
+		return db.query.subscription.findMany({
 			where: (subscription, { eq }) =>
 				and(
 					eq(subscription.user_id, user_id),
@@ -105,12 +105,7 @@ export const subscriptions_list = async (
 				asc(subscription.next_billing_date),
 			],
 		})
-
-		return { status: 'SUCCESS', data }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+	})
 
 export const subscriptions_create = actionClient
 	.schema(insertSubscriptionSchema.omit({ user_id: true }))
