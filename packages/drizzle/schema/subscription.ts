@@ -3,7 +3,7 @@ import { boolean, integer, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 const subscription = pgTable('subscription', {
 	amount: integer('amount').notNull(),
 	currency: text('currency').notNull(),
-	email_alert: boolean('email_alert').default(false),
+	email_alert: boolean('email_alert').notNull().default(false),
 	id: uuid('id').primaryKey().notNull().defaultRandom(),
 	interval: text('interval').notNull().default('MONTHLY'),
 	is_active: boolean('is_active').default(true),

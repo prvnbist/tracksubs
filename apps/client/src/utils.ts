@@ -78,6 +78,7 @@ export const calculateMonthlyOverview = (
 }
 
 export const track = async (name: string, payload?: Record<string, string | number | boolean>) => {
+	if (process.env.NODE_ENV === 'development') return
 	try {
 		await window.umami.track(name, payload ?? {})
 		return

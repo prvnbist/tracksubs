@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
+import { useAction } from 'next-safe-action/hooks'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
@@ -21,18 +22,9 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 	const [paidOn, setPaidOn] = useState<Date>(new Date())
 	const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null)
 
-	const create = async () => {
-		try {
+	const { execute } = useAction(transaction_create, {
+		onSuccess: async () => {
 			await track('btn-create-transaction')
-
-			const result = await transaction_create({
-				...subscription,
-				paidOn: dayjs(paidOn).format('YYYY-MM-DD'),
-				next_billing_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
-				...(paymentMethodId && { paymentMethodId }),
-			})
-
-			if (result.status === 'ERROR') throw Error()
 
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			queryClient.invalidateQueries({ queryKey: ['transactions'] })
@@ -44,14 +36,25 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 				title: 'Success',
 				message: 'Successfully created the transaction.',
 			})
-		} catch (error) {
+		},
+		onError: () => {
 			notifications.show({
 				color: 'red',
 				title: 'Error',
 				message: 'Failed to create a transaction.',
 			})
-		}
-	}
+		},
+	})
+
+	const create = () =>
+		execute({
+			...(paymentMethodId && { paymentMethodId }),
+			amount: subscription.amount,
+			currency: subscription.currency,
+			id: subscription.id,
+			next_billing_date: dayjs(subscription.next_billing_date).format('YYYY-MM-DD'),
+			paidOn: dayjs(paidOn).format('YYYY-MM-DD'),
+		})
 
 	return (
 		<div>

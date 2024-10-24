@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { lazy } from 'react'
 import Image from 'next/image'
+import { useAction } from 'next-safe-action/hooks'
 import { useQueryClient } from '@tanstack/react-query'
 import {
 	IconBell,
@@ -40,7 +41,7 @@ import { getInitials, track } from 'utils'
 import type { ISubscription, Service } from 'types'
 import { PLANS } from 'constants/index'
 import { useGlobal } from 'state/global'
-import { subscription_alert, subscriptions_delete, subscriptions_update } from '../../action'
+import { subscription_alert, subscriptions_active, subscriptions_delete } from '../../action'
 
 const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
 
@@ -73,46 +74,93 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 
 	const plan = PLANS[user.plan]!
 
+	const { execute: setActive } = useAction(subscriptions_active, {
+		onSuccess: ({ data }) => {
+			const result = (data as Array<{ is_active: boolean; title: string }>)?.[0]!
+
+			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+
+			track(result.is_active ? 'btn-set-active' : 'btn-set-inactive')
+
+			notifications.show({
+				color: 'green',
+				title: 'Success',
+				message: result.is_active
+					? `Enabled the subscription: ${result.title}`
+					: `Disabled the subscription: ${result.title}`,
+			})
+		},
+		onError: () => {
+			notifications.show({
+				color: 'red',
+				title: 'Error',
+				message: 'Failed to update the subscription',
+			})
+		},
+	})
+
+	const { execute: setAlert } = useAction(subscription_alert, {
+		onSuccess: ({ data }) => {
+			const result = (data as Array<{ email_alert: boolean; title: string }>)?.[0]!
+
+			queryClient.invalidateQueries({ queryKey: ['user'] })
+			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+
+			track(subscription.email_alert ? 'btn-set-alert' : 'btn-unset-alert')
+
+			notifications.show({
+				color: 'green',
+				title: 'Success',
+				message: result.email_alert
+					? `You will now recieve alerts for: ${result.title}`
+					: `Disabled the email alerts for: ${result.title}`,
+			})
+		},
+		onError: () => {
+			notifications.show({
+				color: 'red',
+				title: 'Error',
+				message: 'Failed to update the subscription',
+			})
+		},
+	})
+
+	const { execute: deleteSubscriptionAction } = useAction(subscriptions_delete, {
+		onSuccess: () => {
+			track('btn-delete-subscription')
+			notifications.show({
+				color: 'green',
+				message: `Successfully deleted the subscription - ${subscription.title}`,
+			})
+
+			queryClient.invalidateQueries({ queryKey: ['user'] })
+			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+			queryClient.invalidateQueries({ queryKey: ['transactions'] })
+		},
+		onError: () => {
+			notifications.show({
+				color: 'red',
+				title: 'Error',
+				message: 'Failed to delete the subscription',
+			})
+		},
+	})
+
 	const deleteSubscription = () =>
 		modals.openConfirmModal({
 			title: 'Delete Subscription',
 			children: <Text size="sm">Are you sure you want to delete this subscription?</Text>,
 			labels: { confirm: 'Yes, Delete', cancel: 'Cancel' },
-			onConfirm: async () => {
-				try {
-					track('btn-delete-subscription')
-					const result = await subscriptions_delete(subscription.id)
-
-					if (result.status === 'ERROR') {
-						throw Error()
-					}
-
-					notifications.show({
-						color: 'green',
-						message: `Successfully deleted the subscription - ${subscription.title}`,
-					})
-
-					queryClient.invalidateQueries({ queryKey: ['user'] })
-					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
-					queryClient.invalidateQueries({ queryKey: ['transactions'] })
-				} catch (error) {
-					notifications.show({
-						color: 'red',
-						title: 'Failed',
-						message: `Failed to delete the subscription - ${subscription.title}`,
-					})
-				}
-			},
+			onConfirm: () => deleteSubscriptionAction({ id: subscription.id }),
 		})
 
-	const markPaid = () => {
+	const markPaid = () =>
 		modals.open({
 			title: 'Create Transaction',
 			children: <CreateTransactionModal subscription={subscription} />,
 		})
-	}
 
-	const setAlert = () => {
+	const toggleAlert = () => {
 		if (!subscription.email_alert && usage.total_alerts === plan.alerts) {
 			return notifications.show({
 				color: 'red.5',
@@ -132,41 +180,11 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 				</Text>
 			),
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
-			onConfirm: async () => {
-				try {
-					if (subscription.email_alert) {
-						track('btn-set-alert')
-					} else {
-						track('btn-unset-alert')
-					}
-					const result = await subscription_alert(subscription.id, !subscription.email_alert)
-
-					if (result.status === 'ERROR') {
-						return notifications.show({
-							color: 'red',
-							title: 'Error',
-							message: result.message,
-						})
-					}
-
-					queryClient.invalidateQueries({ queryKey: ['user'] })
-					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
-
-					notifications.show({
-						color: 'green',
-						title: 'Success',
-						message: subscription.email_alert
-							? `Disabled the email alerts for: ${subscription.title}`
-							: `You will now recieve alerts for: ${subscription.title}`,
-					})
-				} catch (error) {
-					notifications.show({
-						color: 'red',
-						title: 'Error',
-						message: 'Something went wrong, please try again!',
-					})
-				}
-			},
+			onConfirm: () =>
+				setAlert({
+					id: subscription.id,
+					email_alert: !subscription.email_alert,
+				}),
 		})
 	}
 
@@ -182,42 +200,11 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 				</Text>
 			),
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
-			onConfirm: async () => {
-				try {
-					if (subscription.is_active) {
-						track('btn-set-inactive')
-					} else {
-						track('btn-set-active')
-					}
-					const result = await subscriptions_update(subscription.id, {
-						is_active: !subscription.is_active,
-					})
-
-					if (result.status === 'ERROR') {
-						return notifications.show({
-							color: 'red',
-							title: 'Error',
-							message: result.message,
-						})
-					}
-
-					queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
-
-					notifications.show({
-						color: 'green',
-						title: 'Success',
-						message: subscription.is_active
-							? `Disabled the subscription: ${subscription.title}`
-							: `Enabled the subscription: ${subscription.title}`,
-					})
-				} catch (error) {
-					notifications.show({
-						color: 'red',
-						title: 'Error',
-						message: 'Something went wrong, please try again!',
-					})
-				}
-			},
+			onConfirm: () =>
+				setActive({
+					id: subscription.id,
+					is_active: !subscription.is_active,
+				}),
 		})
 	}
 
@@ -309,7 +296,7 @@ const Subscription = ({ subscription, onEdit }: SubscriptionProps) => {
 							{subscription.is_active && (
 								<Menu.Item
 									title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
-									onClick={setAlert}
+									onClick={toggleAlert}
 									leftSection={
 										subscription.email_alert ? (
 											<IconBellOff size={18} />

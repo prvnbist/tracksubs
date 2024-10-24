@@ -1,27 +1,49 @@
 'use server'
 
+import { z } from 'zod'
 import dayjs from 'dayjs'
 import { auth } from '@clerk/nextjs/server'
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
+import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from 'next-safe-action'
 
-import db, { schema } from '@tracksubs/drizzle'
+import db, { insertSubscriptionSchema, schema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'constants/index'
 import { getUserMetadata } from 'actions'
 import type { ActionResponse, ISubscription } from 'types'
 
-export const transaction_create = async (
-	subscription: ISubscription & { paidOn: string; paymentMethodId?: string }
-): ActionResponse<null, string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
+const actionClient = createSafeActionClient({
+	handleServerError(e) {
+		if (e instanceof Error) {
+			return e.message
 		}
 
-		const { user_id } = await getUserMetadata()
+		return DEFAULT_SERVER_ERROR_MESSAGE
+	},
+}).use(async ({ next }) => {
+	const { userId: authId } = auth()
 
+	if (!authId) {
+		throw new Error('User is not authorized.')
+	}
+
+	const { user_id, plan } = await getUserMetadata()
+
+	return next({ ctx: { user_id, plan } })
+})
+
+export const transaction_create = actionClient
+	.schema(
+		z.object({
+			amount: z.number(),
+			currency: z.string(),
+			id: z.string(),
+			next_billing_date: z.string(),
+			paidOn: z.string(),
+			paymentMethodId: z.string().optional(),
+		})
+	)
+	.action(async ({ parsedInput: subscription, ctx: { user_id } }) => {
 		const transaction = await db
 			.insert(schema.transaction)
 			.values({
@@ -54,11 +76,8 @@ export const transaction_create = async (
 				.returning({ id: schema.subscription.id })
 		}
 
-		return { status: 'SUCCESS', data: null }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+		return transaction
+	})
 
 export const subscriptions_list = async (
 	interval: ISubscription['interval'] | 'ALL' = 'ALL'
@@ -93,18 +112,9 @@ export const subscriptions_list = async (
 	}
 }
 
-export const subscriptions_create = async (
-	body: any
-): ActionResponse<Array<{ id: string }>, string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { plan, user_id } = await getUserMetadata()
-
+export const subscriptions_create = actionClient
+	.schema(insertSubscriptionSchema.omit({ user_id: true }))
+	.action(async ({ parsedInput: body, ctx: { user_id, plan } }) => {
 		const user_plan = PLANS[plan]!
 
 		const usage = await db.query.usage.findFirst({
@@ -132,49 +142,36 @@ export const subscriptions_create = async (
 			})
 			.where(eq(schema.usage.user_id, user_id))
 
-		return { status: 'SUCCESS', data }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+		return data
+	})
 
-export const subscriptions_update = async (
-	id: string,
-	body: any
-): ActionResponse<Array<{ id: string }>, string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { user_id } = await getUserMetadata()
-
-		const data = await db
+export const subscriptions_update = actionClient
+	.schema(z.object({ id: z.string(), body: insertSubscriptionSchema }))
+	.action(async ({ parsedInput: { id, body }, ctx: { user_id } }) => {
+		return await db
 			.update(schema.subscription)
-			.set(body)
+			.set({ ...body, user_id })
 			.where(and(eq(schema.subscription.user_id, user_id), eq(schema.subscription.id, id)))
 			.returning({ id: schema.subscription.id })
+	})
 
-		return { status: 'SUCCESS', data }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+export const subscriptions_active = actionClient
+	.schema(z.object({ id: z.string(), is_active: z.boolean() }))
+	.action(async ({ parsedInput: { id, is_active }, ctx: { user_id } }) => {
+		return await db
+			.update(schema.subscription)
+			.set({ is_active })
+			.where(and(eq(schema.subscription.user_id, user_id), eq(schema.subscription.id, id)))
+			.returning({
+				id: schema.subscription.id,
+				is_active: schema.subscription.is_active,
+				title: schema.subscription.title,
+			})
+	})
 
-export const subscriptions_delete = async (
-	id: string
-): ActionResponse<Array<{ id: string }>, string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { user_id } = await getUserMetadata()
-
+export const subscriptions_delete = actionClient
+	.schema(z.object({ id: z.string() }))
+	.action(async ({ parsedInput: { id }, ctx: { user_id } }) => {
 		const data = await db
 			.delete(schema.subscription)
 			.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
@@ -196,26 +193,13 @@ export const subscriptions_delete = async (
 				.where(eq(schema.usage.user_id, user_id))
 		}
 
-		return { status: 'SUCCESS', data }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+		return data
+	})
 
-export const subscription_alert = async (
-	id: string,
-	enabled: boolean
-): ActionResponse<Array<{ id: string }>, string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { plan, user_id } = await getUserMetadata()
-
-		if (enabled) {
+export const subscription_alert = actionClient
+	.schema(z.object({ id: z.string(), email_alert: z.boolean() }))
+	.action(async ({ parsedInput: { id, email_alert }, ctx: { user_id, plan } }) => {
+		if (email_alert) {
 			const user_plan = PLANS[plan]!
 
 			const usage = await db.query.usage.findFirst({
@@ -234,42 +218,30 @@ export const subscription_alert = async (
 
 		const data = await db
 			.update(schema.subscription)
-			.set({ email_alert: enabled })
+			.set({ email_alert })
 			.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
-			.returning({ id: schema.subscription.id })
+			.returning({
+				id: schema.subscription.id,
+				email_alert: schema.subscription.email_alert,
+				title: schema.subscription.title,
+			})
 
 		await db
 			.update(schema.usage)
 			.set({
-				total_alerts: enabled
+				total_alerts: email_alert
 					? sql`${schema.usage.total_alerts} + 1`
 					: sql`${schema.usage.total_alerts} - 1`,
 			})
 			.where(eq(schema.usage.user_id, user_id))
 
-		return { status: 'SUCCESS', data }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+		return data
+	})
 
-export const subscription_export = async (
-	columns: Record<string, string>
-): ActionResponse<Array<Record<string, any>>, string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { plan, user_id } = await getUserMetadata()
-
-		if (plan === 'FREE')
-			return {
-				status: 'ERROR',
-				message: 'Exporting subscriptions is only available for paid plans.',
-			}
+export const subscription_export = actionClient
+	.schema(z.object({ columns: z.record(z.string(), z.string()) }))
+	.action(async ({ parsedInput: { columns }, ctx: { user_id, plan } }) => {
+		if (plan === 'FREE') throw Error('Exporting subscriptions is only available for paid plans.')
 
 		const data = await db
 			.select({
@@ -285,8 +257,5 @@ export const subscription_export = async (
 			.where(eq(schema.subscription.user_id, user_id))
 			.orderBy(desc(schema.subscription.is_active), asc(schema.subscription.next_billing_date))
 
-		return { data, status: 'SUCCESS' }
-	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
-	}
-}
+		return data
+	})

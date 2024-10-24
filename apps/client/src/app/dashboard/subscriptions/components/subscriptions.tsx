@@ -24,6 +24,7 @@ import { CreateEmptyState, ErrorState } from 'components'
 import { subscriptions_list } from '../action'
 
 const CreateModal = lazy(() => import('./createModal'))
+const UpdateModal = lazy(() => import('./updateModal'))
 const Subscription = lazy(() => import('./subscription'))
 
 type Interval = ISubscription['interval'] | 'ALL'
@@ -52,19 +53,17 @@ const Subscriptions = () => {
 		}
 	}, [status, data, error])
 
-	const create = () => {
+	const create = () =>
 		modals.open({
 			title: 'Create Subscription',
 			children: <CreateModal />,
 		})
-	}
 
-	const edit = (data: ISubscription) => {
+	const edit = (data: ISubscription) =>
 		modals.open({
 			title: 'Edit Subscription',
-			children: <CreateModal subscription={data} />,
+			children: <UpdateModal subscription={data} />,
 		})
-	}
 
 	return (
 		<>

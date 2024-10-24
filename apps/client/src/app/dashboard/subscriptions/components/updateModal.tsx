@@ -11,12 +11,24 @@ import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
 import { Button, Group, NumberInput, Select, Stack, TextInput } from '@mantine/core'
 
-import { track } from 'utils'
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 import { CURRENCIES, CYCLES } from 'constants/index'
 
-import { subscriptions_create } from '../action'
+import { subscriptions_update } from '../action'
+
+const diff = (obj1: any, obj2: any) => {
+	const result: any = {}
+
+	for (const key in obj1) {
+		const _key = key as keyof ISubscription
+		if (obj2[_key] !== undefined && obj1[_key] !== obj2[_key]) {
+			result[_key] = obj2[_key]
+		}
+	}
+
+	return result
+}
 
 type ExcludedKeys =
 	| 'email_alert'
@@ -25,17 +37,18 @@ type ExcludedKeys =
 	| 'next_billing_date'
 	| 'payment_method_id'
 	| 'service'
-	| 'user_id'
 
 type FormValues = Omit<ISubscription, ExcludedKeys>
 
-const CreateModal = () => {
+const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 	const queryClient = useQueryClient()
 
 	const { user, services } = useGlobal()
-	const [service, setService] = useState<string | null>(null)
+	const [service, setService] = useState<string | null>(subscription.service || null)
 
-	const [nextBillingDate, setNextBillingDate] = useState<Date | null>(null)
+	const [nextBillingDate, setNextBillingDate] = useState<Date | null>(
+		new Date(subscription.next_billing_date) || null
+	)
 
 	const cachedCurrencies = useMemo(() => CURRENCIES, [])
 	const cachedServices = useMemo(
@@ -45,11 +58,12 @@ const CreateModal = () => {
 
 	const form = useForm<FormValues>({
 		initialValues: {
-			amount: 0,
-			currency: user.currency || 'INR',
-			interval: 'MONTHLY',
-			title: '',
-			website: '',
+			amount: subscription.amount / 100,
+			currency: subscription.currency,
+			interval: subscription.interval,
+			title: subscription.title,
+			user_id: subscription.user_id,
+			website: subscription.website,
 		},
 		validate: {
 			title: value => (!value?.trim() ? 'Please enter the service name' : ''),
@@ -57,13 +71,12 @@ const CreateModal = () => {
 		},
 	})
 
-	const { execute, isPending } = useAction(subscriptions_create, {
+	const { execute, isPending } = useAction(subscriptions_update, {
 		onSuccess: () => {
-			track('btn-create-subscription')
 			notifications.show({
 				color: 'green',
 				title: 'Success',
-				message: `Successfully created the subscription - ${form.values.title}`,
+				message: `Successfully updated the subscription - ${form.values.title}`,
 			})
 			queryClient.invalidateQueries({ queryKey: ['user'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
@@ -74,7 +87,7 @@ const CreateModal = () => {
 			notifications.show({
 				color: 'red',
 				title: 'Error',
-				message: 'Failed to create the subscription',
+				message: 'Failed to update the subscription',
 			})
 		},
 	})
@@ -104,9 +117,12 @@ const CreateModal = () => {
 		data.website = data.website || null
 
 		await execute({
-			...data,
-			service,
-			next_billing_date: dayjs(nextBillingDate).format('YYYY-MM-DD') ?? null,
+			id: subscription.id,
+			body: {
+				...data,
+				service,
+				next_billing_date: dayjs(nextBillingDate).format('YYYY-MM-DD') ?? null,
+			},
 		})
 	}
 
@@ -177,4 +193,4 @@ const CreateModal = () => {
 	)
 }
 
-export default CreateModal
+export default UpdateModal
