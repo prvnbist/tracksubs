@@ -19,6 +19,16 @@ export default function Page() {
 			<Space h={32} />
 			<Title order={2}>Changelog</Title>
 			<Space h={24} />
+			<Title order={4}>Oct 23, 2024</Title>
+			<ul>
+				<li>Sentry: Error logging</li>
+			</ul>
+			<Space h={24} />
+			<Title order={4}>Sep 3, 2024</Title>
+			<ul>
+				<li>Dashboard: Show invoice date in transactions</li>
+			</ul>
+			<Space h={24} />
 			<Title order={4}>May 19, 2024</Title>
 			<ul>
 				<li>Dashboard: Subscriptions Count Card</li>
