@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
 import type { PropsWithChildren } from 'react'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -14,27 +12,30 @@ import { payment_methods, services, user } from 'actions'
 
 import '@mantine/charts/styles.css'
 
-import Header from './Header'
 import Logo from 'assets/svgs/logo'
 import { ErrorState } from 'components'
+
+import Header from './Header'
+import { Onboarding } from './components'
 
 export const metadata: Metadata = {
 	title: 'Dashboard | TrackSubs',
 }
 
 export default async function Layout({ children }: PropsWithChildren) {
-	const { userId } = auth()
-
-	if (!userId) return redirect('/login')
-
 	try {
 		const userData = await user()
-		const servicesData = await services()
-		const paymentMethodsData = await payment_methods()
 
-		if (userData?.serverError || userData?.data?.auth_id !== userId) {
+		if (userData?.serverError || !userData?.data?.id) {
 			throw new Error()
 		}
+
+		if (!userData.data.is_onboarded) {
+			return <Onboarding />
+		}
+
+		const servicesData = await services()
+		const paymentMethodsData = await payment_methods()
 
 		return (
 			<QueryProvider>
