@@ -18,6 +18,7 @@ const selectPaymentMethodSchema = createSelectSchema(schema.payment_method)
 
 const selectServiceSchema = createSelectSchema(schema.service)
 
+const insertSubscriptionSchema = createInsertSchema(schema.subscription)
 const selectSubscriptionSchema = createSelectSchema(schema.subscription)
 
 const selectTransactionSchema = createSelectSchema(schema.transaction)
@@ -35,6 +36,7 @@ export {
 	schema,
 	selectPaymentMethodSchema,
 	selectServiceSchema,
+	insertSubscriptionSchema,
 	selectSubscriptionSchema,
 	selectTransactionSchema,
 	selectUsageSchema,
