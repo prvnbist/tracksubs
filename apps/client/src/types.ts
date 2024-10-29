@@ -20,10 +20,6 @@ export type ISubscription = z.infer<typeof selectSubscriptionSchema>
 
 export type Transaction = z.infer<typeof selectTransactionSchema>
 
-export type ActionResponse<T, E> = Promise<
-	{ status: 'SUCCESS'; data: T; message?: never } | { status: 'ERROR'; message: E; data?: never }
->
-
 export type Plan = {
 	title: string
 	alerts: number

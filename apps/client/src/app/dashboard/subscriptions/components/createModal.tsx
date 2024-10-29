@@ -63,7 +63,7 @@ const CreateModal = () => {
 			notifications.show({
 				color: 'green',
 				title: 'Success',
-				message: `Successfully created the subscription - ${form.values.title}`,
+				message: `Successfully created the subscription - ${form.getValues().title}`,
 			})
 			queryClient.invalidateQueries({ queryKey: ['user'] })
 			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })

@@ -2,28 +2,34 @@
 
 import { eq } from 'drizzle-orm'
 import { auth } from '@clerk/nextjs/server'
+import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from 'next-safe-action'
 
 import db, { schema } from '@tracksubs/drizzle'
 
 import { getUserMetadata } from 'actions'
-import type { ActionResponse, Transaction } from 'types'
 
-type ReturnTransction = Omit<Transaction, 'user_id' | 'payment_method_id' | 'subscription_id'> & {
-	payment_method: string | null
-	service: string | null
-	title: string | null
-}
-
-export const transaction_list = async (): ActionResponse<ReturnTransction[], string> => {
-	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
+const actionClient = createSafeActionClient({
+	handleServerError(e) {
+		if (e instanceof Error) {
+			return e.message
 		}
 
-		const { user_id } = await getUserMetadata()
+		return DEFAULT_SERVER_ERROR_MESSAGE
+	},
+}).use(async ({ next }) => {
+	const { userId: authId } = auth()
 
+	if (!authId) {
+		throw new Error('User is not authorized.')
+	}
+
+	const metadata = await getUserMetadata()
+
+	return next({ ctx: { authId, ...metadata } })
+})
+
+export const transaction_list = actionClient.action(async ({ ctx: { user_id } }) => {
+	try {
 		const data = await db
 			.select({
 				id: schema.transaction.id,
@@ -34,6 +40,9 @@ export const transaction_list = async (): ActionResponse<ReturnTransction[], str
 				title: schema.subscription.title,
 				service: schema.subscription.service,
 				payment_method: schema.payment_method.title,
+				user_id: schema.transaction.user_id,
+				subscription_id: schema.transaction.subscription_id,
+				payment_method_id: schema.transaction.payment_method_id,
 			})
 			.from(schema.transaction)
 			.leftJoin(
@@ -46,8 +55,8 @@ export const transaction_list = async (): ActionResponse<ReturnTransction[], str
 			)
 			.where(eq(schema.transaction.user_id, user_id))
 
-		return { status: 'SUCCESS', data }
+		return data
 	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
+		throw new Error('TRANSACTION_LIST_ERROR')
 	}
-}
+})
