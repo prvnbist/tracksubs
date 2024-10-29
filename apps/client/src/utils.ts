@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { flattenValidationErrors } from 'next-safe-action'
 
 import { MONTHS } from 'constants/index'
 import type { ISubscription } from 'types'
@@ -100,3 +101,10 @@ export const getInitials = (phrase: string) => {
 
 	return initials.toUpperCase()
 }
+
+
+export const flattenZodValidationErrors = (errors: any) =>
+	Object.values(flattenValidationErrors(errors).fieldErrors).flatMap((e: any) => {
+		if (Array.isArray(e)) return e
+		return e._errors
+	})

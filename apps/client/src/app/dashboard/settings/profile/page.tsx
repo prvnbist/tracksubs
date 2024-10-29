@@ -1,10 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useFormStatus } from 'react-dom'
 import { IconCheck } from '@tabler/icons-react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useAction } from 'next-safe-action/hooks'
 
-import { useForm } from '@mantine/form'
 import { useMediaQuery } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import type { ComboboxLikeRenderOptionInput, ComboboxItem } from '@mantine/core'
@@ -12,7 +12,6 @@ import {
 	Box,
 	Button,
 	Group,
-	Input,
 	Select,
 	SimpleGrid,
 	Space,
@@ -22,8 +21,8 @@ import {
 	Title,
 } from '@mantine/core'
 
-import type { User } from 'types'
 import { useGlobal } from 'state/global'
+import { flattenZodValidationErrors } from 'utils'
 import { CURRENCIES, TIMEZONES_DISPLAY } from 'constants/index'
 
 import { user_update } from './action'
@@ -43,32 +42,28 @@ const renderOption = ({
 	</Group>
 )
 
-interface FormState {
-	first_name: string
-	last_name: string
-	currency: string | null
-	timezone: string | null
-}
-
 export default function Page() {
 	const { user } = useGlobal()
 
 	const isMobile = useMediaQuery('(max-width: 56.25em)')
 
-	const queryClient = useQueryClient()
-
-	const form = useForm<FormState>({
-		initialValues: {
-			first_name: user.first_name ?? '',
-			last_name: user.last_name ?? '',
-			currency: user.currency,
-			timezone: user.timezone,
+	const { execute: updateUser, result } = useAction(user_update, {
+		onSuccess: () => {
+			notifications.show({
+				color: 'green',
+				title: 'Success',
+				message: 'Successfully updated the user profile.',
+			})
 		},
-		validate: {
-			first_name: (value: string) => (value.trim() ? null : 'Please enter your first name'),
-			last_name: (value: string) => (value.trim() ? null : 'Please enter your last name'),
+		onError: () => {
+			notifications.show({
+				color: 'red',
+				title: 'Error',
+				message: 'Failed to update the user profile.',
+			})
 		},
 	})
+
 
 	const timezones = useMemo(() => {
 		return TIMEZONES_DISPLAY.map(t => ({
@@ -78,73 +73,73 @@ export default function Page() {
 		}))
 	}, [])
 
-	const save = async (values: Partial<User>) => {
-		try {
-			await user_update({
-				...(user.first_name !== values.first_name && { first_name: values.first_name }),
-				...(user.last_name !== values.last_name && { last_name: values.last_name }),
-				...(user.currency !== values.currency && { currency: values.currency }),
-				...(user.timezone !== values.timezone && { timezone: values.timezone }),
-			})
-			notifications.show({ title: 'Success', message: 'Successfully saved profile details.' })
-
-			queryClient.invalidateQueries({ queryKey: ['user'] })
-		} catch (error) {
-			notifications.show({ title: 'Error', message: 'Failed to save profile details.' })
-		}
-	}
-
-	const isDirty = form.isDirty()
-
 	return (
 		<Box w={isMobile ? '100%' : 480}>
 			<Space h={24} />
 			<Title order={2}>Profile</Title>
 			<Space h={16} />
-			<form onSubmit={form.onSubmit(values => save(values))}>
+			<form action={updateUser}>
 				<SimpleGrid cols={{ base: 1, xs: 2 }}>
-					<Stack gap={4}>
-						<Input.Label>First Name</Input.Label>
-						<TextInput {...form.getInputProps('first_name')} />
-					</Stack>
-					<Stack gap={4}>
-						<Input.Label>Last Name</Input.Label>
-						<TextInput {...form.getInputProps('last_name')} />
-					</Stack>
+					<TextInput
+						name="first_name"
+						label="First Name"
+						required
+						defaultValue={user.first_name ?? ''}
+					/>
+					<TextInput
+						name="last_name"
+						label="Last Name"
+						required
+						defaultValue={user.last_name ?? ''}
+					/>
 				</SimpleGrid>
 				<Space h={16} />
-				<Stack gap={4}>
-					<Input.Label>Email</Input.Label>
-					<TextInput defaultValue={user.email} readOnly />
-				</Stack>
+				<TextInput label="Email" defaultValue={user.email} readOnly />
 				<Space h={16} />
-				<Stack gap={4}>
-					<Input.Label>Timezone</Input.Label>
-					<Select
-						searchable
-						data={timezones}
-						allowDeselect={false}
-						renderOption={renderOption}
-						placeholder="Select a timezone"
-						{...form.getInputProps('timezone')}
-					/>
-				</Stack>
+				<Select
+					required
+					searchable
+					label="Timezone"
+					data={timezones}
+					allowDeselect={false}
+					renderOption={renderOption}
+					placeholder="Select a timezone"
+					name="timezone"
+					defaultValue={user.timezone ?? null}
+				/>
 				<Space h={16} />
-				<Stack gap={4}>
-					<Input.Label>Currency</Input.Label>
-					<Select
-						searchable
-						data={CURRENCIES}
-						allowDeselect={false}
-						placeholder="Select a currency"
-						{...form.getInputProps('currency')}
-					/>
-				</Stack>
+				<Select
+					required
+					label="Currency"
+					searchable
+					data={CURRENCIES}
+					allowDeselect={false}
+					placeholder="Select a currency"
+					name="currency"
+					defaultValue={user.currency ?? null}
+				/>
 				<Space h={16} />
-				<Button fullWidth type="submit" disabled={!isDirty}>
-					Save
-				</Button>
+				<SubmitButton />
 			</form>
+			{result.validationErrors && (
+				<Stack gap={4} mt="md">
+					{flattenZodValidationErrors(result.validationErrors).map((error, index) => (
+						<Text key={error} c="red" size="sm">
+							{error}
+						</Text>
+					))}
+				</Stack>
+			)}
 		</Box>
+	)
+}
+
+function SubmitButton() {
+	const { pending } = useFormStatus()
+
+	return (
+		<Button type="submit" fullWidth disabled={pending} loading={pending}>
+			Save
+		</Button>
 	)
 }
