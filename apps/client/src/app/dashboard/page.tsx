@@ -1,6 +1,5 @@
 import { Suspense } from 'react'
 import { asc, eq } from 'drizzle-orm'
-import { auth } from '@clerk/nextjs/server'
 import { IconInfoCircle } from '@tabler/icons-react'
 
 import {
@@ -38,12 +37,6 @@ const FallbackLoader = () => (
 )
 
 export default async function Page(props: IPageProps) {
-	const { userId } = auth()
-
-	if (!userId) {
-		throw new Error("User isn't authorized")
-	}
-
 	const { user_id, currency } = await getUserMetadata()
 
 	const selectedCurrency = props.searchParams.currency ?? currency
