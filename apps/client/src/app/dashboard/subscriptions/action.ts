@@ -3,34 +3,13 @@
 import { z } from 'zod'
 import dayjs from 'dayjs'
 import { revalidatePath } from 'next/cache'
-import { auth } from '@clerk/nextjs/server'
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
-import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from 'next-safe-action'
 
 import db, { insertSubscriptionSchema, schema, selectSubscriptionSchema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'constants/index'
-import { getUserMetadata } from 'actions'
 
-const actionClient = createSafeActionClient({
-	handleServerError(e) {
-		if (e instanceof Error) {
-			return e.message
-		}
-
-		return DEFAULT_SERVER_ERROR_MESSAGE
-	},
-}).use(async ({ next }) => {
-	const { userId: authId } = auth()
-
-	if (!authId) {
-		throw new Error('User is not authorized.')
-	}
-
-	const { user_id, plan } = await getUserMetadata()
-
-	return next({ ctx: { user_id, plan } })
-})
+import { actionClient } from 'utils'
 
 export const transaction_create = actionClient
 	.schema(

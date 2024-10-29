@@ -17,7 +17,7 @@ import {
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import { getUserMetadata } from 'actions'
+import { getUserMetadata } from 'utils'
 
 import {
 	ActiveSubscriptions,

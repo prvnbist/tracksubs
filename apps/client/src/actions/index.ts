@@ -1,38 +1,11 @@
 'use server'
 
 import { asc, eq } from 'drizzle-orm'
-import { auth } from '@clerk/nextjs/server'
-import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from 'next-safe-action'
 
 import db, { schema } from '@tracksubs/drizzle'
 
 import type { Service } from 'types'
-
-export const getUserMetadata = async () => {
-	const { sessionClaims } = auth()
-
-	return sessionClaims?.metadata!
-}
-
-const actionClient = createSafeActionClient({
-	handleServerError(e) {
-		if (e instanceof Error) {
-			return e.message
-		}
-
-		return DEFAULT_SERVER_ERROR_MESSAGE
-	},
-}).use(async ({ next }) => {
-	const { userId: authId } = auth()
-
-	if (!authId) {
-		throw new Error('User is not authorized.')
-	}
-
-	const { user_id: userId, plan } = await getUserMetadata()
-
-	return next({ ctx: { authId, userId, plan } })
-})
+import { actionClient } from 'utils'
 
 export const user = actionClient.action(async ({ ctx: { authId } }) => {
 	try {
@@ -66,10 +39,10 @@ export const services = actionClient.action(async () => {
 	}
 })
 
-export const payment_methods = actionClient.action(async ({ ctx: { userId } }) => {
+export const payment_methods = actionClient.action(async ({ ctx: { user_id } }) => {
 	try {
 		const data = await db.query.payment_method.findMany({
-			where: eq(schema.payment_method.user_id, userId),
+			where: eq(schema.payment_method.user_id, user_id),
 			orderBy: asc(schema.payment_method.title),
 		})
 

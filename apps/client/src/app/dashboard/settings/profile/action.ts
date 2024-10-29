@@ -2,34 +2,13 @@
 
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
-import { asc, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
-import { auth, clerkClient } from '@clerk/nextjs/server'
-import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from 'next-safe-action'
+import { clerkClient } from '@clerk/nextjs/server'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import { getUserMetadata } from 'actions'
-
-const actionClient = createSafeActionClient({
-	handleServerError(e) {
-		if (e instanceof Error) {
-			return e.message
-		}
-
-		return DEFAULT_SERVER_ERROR_MESSAGE
-	},
-}).use(async ({ next }) => {
-	const { userId: authId } = auth()
-
-	if (!authId) {
-		throw new Error('User is not authorized.')
-	}
-
-	const metadata = await getUserMetadata()
-
-	return next({ ctx: { authId, ...metadata } })
-})
+import { actionClient } from 'utils'
 
 export const user_update = actionClient
 	.schema(
