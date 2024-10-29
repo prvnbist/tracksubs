@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { useFormStatus } from 'react-dom'
-import { useQueryClient } from '@tanstack/react-query'
+import { useAction } from 'next-safe-action/hooks'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
 
 import { useMediaQuery } from '@mantine/hooks'
@@ -20,39 +20,56 @@ import {
 
 import { track } from 'utils'
 import { useGlobal } from 'state/global'
+
 import { payment_method_create, payment_method_delete } from './action'
 
 export default function Page() {
 	const formRef = useRef<HTMLFormElement | null>(null)
 
-	const queryClient = useQueryClient()
 	const { payment_methods } = useGlobal()
 
 	const scheme = useComputedColorScheme()
 	const isMobile = useMediaQuery('(max-width: 56.25em)')
 
-	const deletePaymentMethod = async (id: string) => {
-		try {
+	const { execute: deletePaymentMethod } = useAction(payment_method_delete, {
+		onSuccess: () => {
 			track('btn-delete-payment-method')
-			const result = await payment_method_delete(id)
-			if (result.status === 'ERROR') {
-				throw Error()
-			}
-
-			queryClient.invalidateQueries({ queryKey: ['payment_methods'] })
 			notifications.show({
 				color: 'green',
 				title: 'Success',
 				message: 'Successfully deleted payment method.',
 			})
-		} catch (error) {
+		},
+		onError: () => {
 			notifications.show({
 				color: 'red',
 				title: 'Error',
 				message: 'Failed to delete payment method.',
 			})
-		}
-	}
+		},
+	})
+
+	const { execute: createPaymentMethod } = useAction(payment_method_create, {
+		onSuccess: () => {
+			track('btn-create-payment-method')
+			formRef.current?.reset()
+			notifications.show({
+				color: 'green',
+				title: 'Success',
+				message: 'Successfully created payment method.',
+			})
+		},
+		onError: ({ error }) => {
+			notifications.show({
+				color: 'red',
+				title: 'Error',
+				message:
+					error.validationErrors?.title?._errors?.[0] ?? 'Failed to create payment method.',
+			})
+		},
+	})
+
+
 	return (
 		<Box w={isMobile ? '100%' : 480}>
 			<Space h={24} />
@@ -67,7 +84,7 @@ export default function Page() {
 							type="submit"
 							title="Delete Payment"
 							variant={scheme === 'light' ? 'default' : 'subtle'}
-							onClick={() => deletePaymentMethod(payment_method.id)}
+							onClick={() => deletePaymentMethod({ id: payment_method.id })}
 						>
 							<IconTrash size={18} />
 						</ActionIcon>
@@ -75,37 +92,7 @@ export default function Page() {
 				))}
 			</Stack>
 			<Space h={8} />
-			<form
-				ref={formRef}
-				action={async (formData: FormData) => {
-					try {
-						track('btn-create-payment-method')
-						if (!(formData.get('title') as string)?.trim()) {
-							notifications.show({
-								color: 'orange',
-								title: 'Warning',
-								message: 'Please enter the payment method title',
-							})
-							return
-						}
-
-						await payment_method_create(formData)
-						queryClient.invalidateQueries({ queryKey: ['payment_methods'] })
-						formRef.current?.reset()
-						notifications.show({
-							color: 'green',
-							title: 'Success',
-							message: 'Successfully saved payment method.',
-						})
-					} catch (error) {
-						notifications.show({
-							color: 'red',
-							title: 'Error',
-							message: 'Failed to save payment method.',
-						})
-					}
-				}}
-			>
+			<form ref={formRef} action={createPaymentMethod}>
 				<Group gap={8}>
 					<Input required flex={1} placeholder="Enter payment method title" name="title" />
 					<SubmitButton />
