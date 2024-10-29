@@ -23,7 +23,7 @@ import {
 
 import { useGlobal } from 'state/global'
 import { flattenZodValidationErrors } from 'utils'
-import { CURRENCIES, TIMEZONES_DISPLAY } from 'constants/index'
+import { CURRENCIES, TIMEZONES_DISPLAY } from 'consts'
 
 import { user_update } from './action'
 

@@ -7,7 +7,7 @@ import { modals } from '@mantine/modals'
 import { ActionIcon } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
-import { PLANS } from 'constants/index'
+import { PLANS } from 'consts'
 import { useGlobal } from 'state/global'
 
 const CreateModal = lazy(() => import('./createModal'))

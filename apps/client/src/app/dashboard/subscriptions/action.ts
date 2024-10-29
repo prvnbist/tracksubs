@@ -7,7 +7,7 @@ import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
 
 import db, { insertSubscriptionSchema, schema, selectSubscriptionSchema } from '@tracksubs/drizzle'
 
-import { PLANS } from 'constants/index'
+import { PLANS } from 'consts'
 
 import { actionClient } from 'utils'
 

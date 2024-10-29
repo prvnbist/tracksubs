@@ -10,7 +10,7 @@ import db, { schema } from '@tracksubs/drizzle'
 
 import { client } from 'trigger'
 import RenewalAlert from 'emails/RenewalAlert'
-import { TIMEZONES_DISPLAY } from 'constants/index'
+import { TIMEZONES_DISPLAY } from 'consts'
 
 type Subscription = {
 	subscription_id: string

@@ -39,7 +39,7 @@ import {
 
 import { getInitials, track } from 'utils'
 import type { ISubscription, Service } from 'types'
-import { PLANS } from 'constants/index'
+import { PLANS } from 'consts'
 import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_active, subscriptions_delete } from '../../action'
 

@@ -2,7 +2,7 @@
 
 import { Card, Center, RingProgress, SimpleGrid, Space, Text, Title } from '@mantine/core'
 
-import { PLANS } from 'constants/index'
+import { PLANS } from 'consts'
 import { useGlobal } from 'state/global'
 
 const usageBasedColor = (usage: number) => {

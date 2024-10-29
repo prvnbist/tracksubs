@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 
 import { BarChart } from '@mantine/charts'
 
-import { MONTHS } from 'constants/index'
+import { MONTHS } from 'consts'
 import { calculateMonthlyOverview, currencyFormatter } from 'utils'
 
 const mapChartFn = (result: Record<string, number>, month: string, year: number) => {

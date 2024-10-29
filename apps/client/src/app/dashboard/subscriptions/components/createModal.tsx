@@ -14,7 +14,7 @@ import { Button, Group, NumberInput, Select, Stack, TextInput } from '@mantine/c
 import { track } from 'utils'
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
-import { CURRENCIES, CYCLES } from 'constants/index'
+import { CURRENCIES, CYCLES } from 'consts'
 
 import { subscriptions_create } from '../action'
 

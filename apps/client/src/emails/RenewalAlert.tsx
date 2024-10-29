@@ -15,7 +15,7 @@ import {
 } from '@react-email/components'
 
 import { currencyFormatter } from 'utils'
-import { CURRENCY_NAMES } from 'constants/index'
+import { CURRENCY_NAMES } from 'consts'
 
 type Subscription = { id: string; amount: number; currency: string; title: string }
 

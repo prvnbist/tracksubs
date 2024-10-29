@@ -13,7 +13,7 @@ import { Button, Group, NumberInput, Select, Stack, TextInput } from '@mantine/c
 
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
-import { CURRENCIES, CYCLES } from 'constants/index'
+import { CURRENCIES, CYCLES } from 'consts'
 
 import { subscriptions_update } from '../action'
 

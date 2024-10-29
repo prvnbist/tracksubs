@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import { Select } from '@mantine/core'
 
-import { CURRENCY_NAMES } from 'constants/index'
+import { CURRENCY_NAMES } from 'consts'
 
 type CurrencySelectorProps = {
 	currency: string

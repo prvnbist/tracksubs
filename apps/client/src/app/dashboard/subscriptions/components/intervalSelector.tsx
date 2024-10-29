@@ -4,7 +4,7 @@ import { useQueryState } from 'nuqs'
 
 import { SegmentedControl, useComputedColorScheme } from '@mantine/core'
 
-import { CYCLES } from 'constants/index'
+import { CYCLES } from 'consts'
 
 const IntervalSelector = () => {
 	const scheme = useComputedColorScheme()

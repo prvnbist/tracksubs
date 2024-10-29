@@ -6,7 +6,7 @@ import {
 	flattenValidationErrors,
 } from 'next-safe-action'
 
-import { MONTHS } from 'constants/index'
+import { MONTHS } from 'consts'
 import type { ISubscription } from 'types'
 
 export const getUserMetadata = async () => {
