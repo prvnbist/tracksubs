@@ -41,7 +41,8 @@
 		"recharts": "2",
 		"resend": "^3.2.0",
 		"svix": "^1.21.0",
-		"zod": "^3.23.8"
+		"zod": "^3.23.8",
+		"zod-form-data": "^2.0.2"
 	},
 	"devDependencies": {
 		"@tracksubs/typescript": "*",

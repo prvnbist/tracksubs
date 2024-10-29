@@ -2,10 +2,11 @@
 
 import { asc, eq } from 'drizzle-orm'
 import { auth } from '@clerk/nextjs/server'
+import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from 'next-safe-action'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import type { ActionResponse, PaymentMethod, Service, User } from 'types'
+import type { Service } from 'types'
 
 export const getUserMetadata = async () => {
 	const { sessionClaims } = auth()
@@ -13,64 +14,69 @@ export const getUserMetadata = async () => {
 	return sessionClaims?.metadata!
 }
 
-export const user = async (): ActionResponse<User, string> => {
-	try {
-		const { userId } = auth()
-
-		if (!userId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
+const actionClient = createSafeActionClient({
+	handleServerError(e) {
+		if (e instanceof Error) {
+			return e.message
 		}
 
+		return DEFAULT_SERVER_ERROR_MESSAGE
+	},
+}).use(async ({ next }) => {
+	const { userId: authId } = auth()
+
+	if (!authId) {
+		throw new Error('User is not authorized.')
+	}
+
+	const { user_id: userId, plan } = await getUserMetadata()
+
+	return next({ ctx: { authId, userId, plan } })
+})
+
+export const user = actionClient.action(async ({ ctx: { authId } }) => {
+	try {
 		const data = await db.query.user.findFirst({
-			where: (user, { eq }) => eq(user.auth_id, userId),
-			with: {
-				usage: true,
-			},
+			where: (user, { eq }) => eq(user.auth_id, authId),
+			with: { usage: true },
 		})
 
-		if (!data) return { status: 'ERROR', message: 'No such user found.' }
+		if (!data) throw new Error('USER_NOT_FOUND')
 
-		return { status: 'SUCCESS', data }
+		return data
 	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
+		throw new Error((error as Error).message)
 	}
-}
+})
 
-export const services = async (): ActionResponse<Record<string, Service>, string> => {
+export const services = actionClient.action(async () => {
 	try {
 		const data = await db.query.service.findMany({
 			orderBy: asc(schema.service.title),
 		})
 
-		return {
-			status: 'SUCCESS',
-			data: data.reduce((acc: Record<string, Service>, curr) => {
-				acc[curr.key] = curr
-				return acc
-			}, {}),
-		}
+		if (!data) return {}
+
+		return data.reduce((acc: Record<string, Service>, curr) => {
+			acc[curr.key] = curr
+			return acc
+		}, {})
 	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
+		throw new Error('Something went wrong!')
 	}
-}
+})
 
-export const payment_method_list = async (): ActionResponse<Array<PaymentMethod>, string> => {
+export const payment_methods = actionClient.action(async ({ ctx: { userId } }) => {
 	try {
-		const { userId: authId } = auth()
-
-		if (!authId) {
-			return { status: 'ERROR', message: 'User is not authorized.' }
-		}
-
-		const { user_id } = await getUserMetadata()
-
 		const data = await db.query.payment_method.findMany({
-			where: eq(schema.payment_method.user_id, user_id),
+			where: eq(schema.payment_method.user_id, userId),
 			orderBy: asc(schema.payment_method.title),
 		})
 
-		return { status: 'SUCCESS', data }
+		if (!data) return []
+
+		return data
 	} catch (error) {
-		return { status: 'ERROR', message: 'Something went wrong!' }
+		throw new Error('Something went wrong!')
 	}
-}
+})

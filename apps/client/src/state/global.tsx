@@ -1,14 +1,10 @@
 'use client'
 
-import { useAuth } from '@clerk/clerk-react'
 import type { PropsWithChildren } from 'react'
 import { createContext, useContext } from 'react'
-import { useQueries } from '@tanstack/react-query'
 
-import { Center, Loader } from '@mantine/core'
 
 import type { PaymentMethod, Service, User } from 'types'
-import { payment_method_list, services, user } from 'actions'
 
 interface ContextState {
 	user: User
@@ -39,50 +35,25 @@ const Context = createContext(INITITAL_STATE)
 
 export const useGlobal = () => useContext(Context)
 
-export const GlobalProvider = ({ children }: PropsWithChildren) => {
-	const { isSignedIn } = useAuth()
+type GlobalProviderProps = {
+	user: User
+	services: Record<string, Service>
+	paymentMethods: Array<PaymentMethod>
+} & PropsWithChildren
 
-	const { data, isPending } = useQueries({
-		queries: [
-			{
-				retry: 2,
-				queryKey: ['user'],
-				refetchOnWindowFocus: false,
-				queryFn: () => user(),
-				enabled: isSignedIn,
-			},
-			{
-				retry: 2,
-				queryKey: ['services'],
-				refetchOnWindowFocus: false,
-				queryFn: () => services(),
-				enabled: isSignedIn,
-			},
-			{
-				retry: 2,
-				refetchOnWindowFocus: false,
-				queryKey: ['payment_methods'],
-				queryFn: () => payment_method_list(),
-				enabled: isSignedIn,
-			},
-		],
-		combine: results => {
-			return {
-				data: {
-					user: results[0].data?.data!,
-					services: results[1].data?.data!,
-					payment_methods: results[2].data?.data!,
-				},
-				isPending: results.some(result => result.isPending),
-			}
-		},
-	})
-
-	if (isPending)
-		return (
-			<Center pt={80}>
-				<Loader />
-			</Center>
-		)
-	return <Context.Provider value={data}>{children}</Context.Provider>
-}
+export const GlobalProvider = ({
+	user,
+	services,
+	paymentMethods,
+	children,
+}: GlobalProviderProps) => (
+	<Context.Provider
+		value={{
+			user,
+			services,
+			payment_methods: paymentMethods,
+		}}
+	>
+		{children}
+	</Context.Provider>
+)
