@@ -64,7 +64,6 @@ export default function Page() {
 		},
 	})
 
-
 	const timezones = useMemo(() => {
 		return TIMEZONES_DISPLAY.map(t => ({
 			value: t.timezone,

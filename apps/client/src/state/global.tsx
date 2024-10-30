@@ -3,7 +3,6 @@
 import type { PropsWithChildren } from 'react'
 import { createContext, useContext } from 'react'
 
-
 import type { PaymentMethod, Service, User } from 'types'
 
 interface ContextState {

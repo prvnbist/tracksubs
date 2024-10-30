@@ -69,7 +69,6 @@ export default function Page() {
 		},
 	})
 
-
 	return (
 		<Box w={isMobile ? '100%' : 480}>
 			<Space h={24} />

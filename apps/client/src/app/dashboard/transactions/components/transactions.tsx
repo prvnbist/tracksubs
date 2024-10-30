@@ -9,7 +9,6 @@ import { currencyFormatter } from 'utils'
 
 import type { Transaction } from 'types'
 
-
 const noWrapStyles = {
 	whiteSpace: 'nowrap',
 }
