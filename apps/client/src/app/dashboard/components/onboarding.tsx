@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import { IconCheck } from '@tabler/icons-react'
 import { useAction } from 'next-safe-action/hooks'
 
@@ -41,6 +42,7 @@ const renderOption = ({
 )
 
 export default function Onboarding() {
+	const router = useRouter()
 	const [isLoadingOverlayVisible, toggleLoadingOverlay] = useState(false)
 
 	const timezones = TIMEZONES_DISPLAY.map(t => ({
@@ -51,6 +53,9 @@ export default function Onboarding() {
 
 	const { execute: onboardAction, result } = useAction(onboard, {
 		onExecute: () => toggleLoadingOverlay(true),
+		onSuccess: () => {
+			window.location.reload()
+		},
 		onSettled: () => toggleLoadingOverlay(false),
 	})
 

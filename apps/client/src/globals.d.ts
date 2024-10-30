@@ -5,6 +5,7 @@ declare global {
 		metadata: {
 			user_id: string
 			currency: string
+			timezone: string
 			is_onboarded: boolean
 			plan: 'FREE' | 'BASIC' | 'PRO'
 		}
