@@ -9,6 +9,13 @@ const ActiveSubscriptions = async ({
 	user_id,
 }: { user_id: string; currency: string }) => {
 	try {
+		if (!user_id)
+			return (
+				<Center py="md">
+					<Title order={5}>No Data</Title>
+				</Center>
+			)
+
 		const data = await db.query.subscription.findMany({
 			columns: { is_active: true },
 			where: and(

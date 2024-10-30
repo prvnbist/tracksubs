@@ -10,6 +10,13 @@ const RenewingSubscriptions = async ({
 	user_id,
 }: { user_id: string; currency: string }) => {
 	try {
+		if (!user_id)
+			return (
+				<Center py="md">
+					<Title order={5}>No Data</Title>
+				</Center>
+			)
+
 		const startOfWeek = dayjs().startOf('week')
 		const endOfWeek = dayjs().endOf('week')
 
@@ -47,20 +54,20 @@ const RenewingSubscriptions = async ({
 		return (
 			<SimpleGrid cols={2}>
 				<Stack>
-					<Title c="dimmed" size="13px" tt="uppercase">
-						This Week
-					</Title>
 					<Text title="Active" size="48px" ff="monospace">
 						{this_week?.count ?? 0}
 					</Text>
+					<Title c="dimmed" size="12px">
+						This Week
+					</Title>
 				</Stack>
 				<Stack>
-					<Title c="dimmed" size="13px" tt="uppercase">
-						This Month
-					</Title>
 					<Text title="Active" size="48px" ff="monospace">
 						{this_month?.count ?? 0}
 					</Text>
+					<Title c="dimmed" size="12px">
+						This Month
+					</Title>
 				</Stack>
 			</SimpleGrid>
 		)
