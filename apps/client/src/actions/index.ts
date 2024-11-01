@@ -4,8 +4,8 @@ import { asc, eq } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import type { Service } from 'types'
-import { actionClient } from 'utils'
+import type { IService } from 'types'
+import { actionClient } from 'server_utils'
 
 export const user = actionClient.action(async ({ ctx: { authId } }) => {
 	try {
@@ -30,7 +30,7 @@ export const services = actionClient.action(async () => {
 
 		if (!data) return {}
 
-		return data.reduce((acc: Record<string, Service>, curr) => {
+		return data.reduce((acc: Record<string, IService>, curr) => {
 			acc[curr.key] = curr
 			return acc
 		}, {})

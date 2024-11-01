@@ -1,26 +1,20 @@
 import type z from 'zod'
-import type {
-	selectPaymentMethodSchema,
-	selectServiceSchema,
-	selectSubscriptionSchema,
-	selectTransactionSchema,
-	selectUsageSchema,
-	selectUserSchema,
-} from '@tracksubs/drizzle'
 
-export type Usage = z.infer<typeof selectUsageSchema>
+import type { schema } from '@tracksubs/drizzle'
 
-export type User = z.infer<typeof selectUserSchema> & { usage: Usage | null }
+export type IUsage = z.infer<typeof schema.Usage>
 
-export type Service = z.infer<typeof selectServiceSchema>
+export type IUser = z.infer<typeof schema.User> & { usage: IUsage | null }
 
-export type PaymentMethod = z.infer<typeof selectPaymentMethodSchema>
+export type IService = z.infer<typeof schema.Service>
 
-export type ISubscription = z.infer<typeof selectSubscriptionSchema>
+export type IPaymentMethod = z.infer<typeof schema.PaymentMethod>
 
-export type Transaction = z.infer<typeof selectTransactionSchema>
+export type ISubscription = z.infer<typeof schema.Subscription>
 
-export type Plan = {
+export type ITransaction = z.infer<typeof schema.Transaction>
+
+export type IPlan = {
 	title: string
 	alerts: number
 	type: 'FREE' | 'PAID'

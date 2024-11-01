@@ -1,4 +1,4 @@
-import type { Plan } from 'types'
+import type { IPlan } from 'types'
 import timezones from './timezones.json'
 
 export const CYCLES = [
@@ -34,7 +34,7 @@ export const TIMEZONES_DISPLAY: Array<{
 	...POSITIVE_TIMEZONES.sort((a, b) => a.gmt_offset.localeCompare(b.gmt_offset)),
 ]
 
-export const PLANS: Record<string, Plan> = {
+export const PLANS: Record<string, IPlan> = {
 	FREE: {
 		title: 'Free',
 		type: 'FREE',

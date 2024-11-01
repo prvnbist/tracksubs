@@ -7,7 +7,7 @@ import { Group, ScrollArea, Table, Text } from '@mantine/core'
 
 import { currencyFormatter } from 'utils'
 
-import type { Transaction } from 'types'
+import type { ITransaction } from 'types'
 
 const noWrapStyles = {
 	whiteSpace: 'nowrap',
@@ -15,7 +15,7 @@ const noWrapStyles = {
 
 type TransactionsProps = {
 	list: Array<
-		Transaction & { service: string | null; title: string | null; payment_method: string | null }
+		ITransaction & { service: string | null; title: string | null; payment_method: string | null }
 	>
 }
 
