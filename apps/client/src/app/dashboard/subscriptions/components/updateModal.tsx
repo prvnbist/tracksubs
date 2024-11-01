@@ -79,7 +79,6 @@ const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 		},
 	})
 
-
 	const handleSubmit = async () => {
 		if (!nextBillingDate) {
 			return notifications.show({

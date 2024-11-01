@@ -2,7 +2,7 @@
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center center;
-	background-image: url('../assets/svgs/background.svg');
+	background-image: url("../assets/svgs/background.svg");
 }
 
 .coming_soon {

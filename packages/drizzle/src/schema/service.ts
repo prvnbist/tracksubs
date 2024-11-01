@@ -11,4 +11,3 @@ const service = pgTable('service', {
 export const Service = createSelectSchema(service)
 
 export default service
-

@@ -5,7 +5,19 @@
 		"build": {
 			"dependsOn": ["^build"],
 			"outputs": [".next/**", "!.next/cache/**"],
-			"env": []
+			"env": [
+				"CLERK_SECRET_KEY",
+				"CLERK_WEBHOOK_SECRET",
+				"RESEND_API_KEY",
+				"TRIGGER_API_KEY",
+				"TRIGGER_API_URL",
+				"DB_HOST",
+				"DB_PORT",
+				"DB_USER",
+				"DB_NAME",
+				"DB_PASS",
+				"SENTRY_AUTH_TOKEN"
+			]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]

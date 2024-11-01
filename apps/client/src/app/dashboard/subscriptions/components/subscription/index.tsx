@@ -62,7 +62,7 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 
 	const scheme = useComputedColorScheme()
 
-	const service = subscription.service ? services[subscription.service] ?? null : null
+	const service = subscription.service ? (services[subscription.service] ?? null) : null
 
 	const billing_date = dayjs.utc(subscription.next_billing_date).tz(user.timezone!, true)
 
