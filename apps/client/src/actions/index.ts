@@ -1,6 +1,6 @@
 'use server'
 
-import { asc, eq } from 'drizzle-orm'
+import { asc } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
@@ -11,7 +11,7 @@ export const user = actionClient.action(async ({ ctx: { authId } }) => {
 	try {
 		const data = await db.query.user.findFirst({
 			where: (user, { eq }) => eq(user.auth_id, authId),
-			with: { usage: true },
+			with: { usage: true, payment_methods: true },
 		})
 
 		if (!data) throw new Error('USER_NOT_FOUND')
@@ -34,21 +34,6 @@ export const services = actionClient.action(async () => {
 			acc[curr.key] = curr
 			return acc
 		}, {})
-	} catch (error) {
-		throw new Error('Something went wrong!')
-	}
-})
-
-export const payment_methods = actionClient.action(async ({ ctx: { user_id } }) => {
-	try {
-		const data = await db.query.payment_method.findMany({
-			where: eq(schema.payment_method.user_id, user_id),
-			orderBy: asc(schema.payment_method.title),
-		})
-
-		if (!data) return []
-
-		return data
 	} catch (error) {
 		throw new Error('Something went wrong!')
 	}

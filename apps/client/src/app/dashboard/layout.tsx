@@ -8,7 +8,7 @@ import { Container, Divider, Group, Title } from '@mantine/core'
 
 import QueryProvider from 'state/query'
 import { GlobalProvider } from 'state/global'
-import { payment_methods, services, user } from 'actions'
+import { services, user } from 'actions'
 
 import '@mantine/charts/styles.css'
 
@@ -24,25 +24,26 @@ export const metadata: Metadata = {
 
 export default async function Layout({ children }: PropsWithChildren) {
 	try {
-		const userData = await user()
+		const _user = await user()
 
-		if (userData?.serverError || !userData?.data?.id) {
+		if (_user?.serverError || !_user?.data?.id) {
 			throw new Error()
 		}
 
-		if (!userData.data.is_onboarded) {
+		const { data } = _user
+
+		if (!data.is_onboarded) {
 			return <Onboarding />
 		}
 
-		const servicesData = await services()
-		const paymentMethodsData = await payment_methods()
+		const _services = await services()
 
 		return (
 			<QueryProvider>
 				<GlobalProvider
-					user={userData.data}
-					services={servicesData?.data || {}}
-					paymentMethods={paymentMethodsData?.data || []}
+					user={data}
+					services={_services?.data || {}}
+					paymentMethods={data?.payment_methods || []}
 				>
 					<ModalsProvider>
 						<NuqsAdapter>
