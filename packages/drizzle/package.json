@@ -1,17 +1,17 @@
 {
 	"name": "@tracksubs/drizzle",
-	"main": "index.ts",
+	"main": "./src/index.ts",
 	"version": "0.0.0",
 	"private": true,
 	"license": "MIT",
 	"dependencies": {
-		"drizzle-orm": "^0.30.10",
+		"drizzle-orm": "^0.36.0",
 		"drizzle-zod": "^0.5.1",
-		"postgres": "^3.4.4"
+		"pg": "^8.13.1"
 	},
 	"devDependencies": {
 		"@tracksubs/typescript": "*",
-		"drizzle-kit": "^0.21.4",
+		"drizzle-kit": "^0.27.0",
 		"typescript": "^5.3.3"
 	}
 }
