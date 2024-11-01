@@ -22,11 +22,8 @@ export const downloadCSV = (csv: string, name = 'data') => {
 }
 
 const updateMonthByAmount = (acc: Record<string, number>, month: string, amount: number) => {
-	if (month in acc) {
-		acc[month] += amount
-	} else {
-		acc[month] = amount
-	}
+	acc[month] ??= 0
+	acc[month] += amount
 }
 
 type CalculateMonthlyOverviewArgs = Array<{
