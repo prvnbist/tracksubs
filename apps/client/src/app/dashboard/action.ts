@@ -8,7 +8,7 @@ import { clerkClient } from '@clerk/nextjs/server'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import { actionClient } from 'utils'
+import { actionClient } from 'server_utils'
 
 export const onboard = actionClient
 	.schema(
@@ -28,7 +28,7 @@ export const onboard = actionClient
 				.where(eq(schema.user.auth_id, authId))
 				.returning({ id: schema.user.id })
 
-			await clerkClient.users.updateUserMetadata(authId, {
+			await clerkClient().users.updateUserMetadata(authId, {
 				publicMetadata: {
 					...metadata,
 					currency,

@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import { actionClient } from 'utils'
+import { actionClient } from 'server_utils'
 
 export const transaction_list = actionClient.action(async ({ ctx: { user_id } }) => {
 	try {

@@ -5,11 +5,11 @@ import dayjs from 'dayjs'
 import { revalidatePath } from 'next/cache'
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
 
-import db, { insertSubscriptionSchema, schema, selectSubscriptionSchema } from '@tracksubs/drizzle'
+import db, { schema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'consts'
 
-import { actionClient } from 'utils'
+import { actionClient } from 'server_utils'
 
 export const transaction_create = actionClient
 	.schema(
@@ -72,7 +72,7 @@ export const subscriptions_list = actionClient
 			]),
 		})
 	)
-	.outputSchema(z.array(selectSubscriptionSchema))
+	.outputSchema(z.array(schema.Subscription))
 	.action(
 		async ({ parsedInput: { interval }, ctx: { user_id } }) => {
 			return db.query.subscription.findMany({
@@ -94,7 +94,7 @@ export const subscriptions_list = actionClient
 	)
 
 export const subscriptions_create = actionClient
-	.schema(insertSubscriptionSchema.omit({ user_id: true }))
+	.schema(schema.NewSubscription.omit({ user_id: true }))
 	.action(
 		async ({ parsedInput: body, ctx: { user_id, plan } }) => {
 			const user_plan = PLANS[plan]!
@@ -130,7 +130,7 @@ export const subscriptions_create = actionClient
 	)
 
 export const subscriptions_update = actionClient
-	.schema(z.object({ id: z.string(), body: insertSubscriptionSchema }))
+	.schema(z.object({ id: z.string(), body: schema.NewSubscription }))
 	.action(
 		async ({ parsedInput: { id, body }, ctx: { user_id } }) => {
 			return await db

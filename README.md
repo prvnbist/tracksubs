@@ -24,9 +24,8 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 2. [Clerk](https://clerk.com): Authentication
 3. [Supabase](https://supabase.com/): Database
 4. [Turbo Repo](https://turbo.build/repo): Monorepo
-5. [Knex](https://knexjs.org): SQL Migrations
-6. [Mantine](https://mantine.dev): UI Library
-7. [Resend](https://resend.com): Email Service
-8. [Trigger](https://trigger.dev): Jobs Scheduling
-9. [StatSig](https://statsig.com): Feature Flags
-10. [Drizzle](https://orm.drizzle.team): Typescript ORM
+5. [Mantine](https://mantine.dev): UI Library
+6. [Resend](https://resend.com): Email Service
+7. [Trigger](https://trigger.dev): Jobs Scheduling
+8. [StatSig](https://statsig.com): Feature Flags
+9. [Drizzle](https://orm.drizzle.team): Typescript ORM

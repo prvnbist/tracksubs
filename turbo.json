@@ -1,24 +1,11 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"globalDependencies": ["**/.env.*local"],
-	"pipeline": {
+	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
 			"outputs": [".next/**", "!.next/cache/**"],
-			"env": [
-				"DB_HOST",
-				"DB_PORT",
-				"DB_USER",
-				"DB_NAME",
-				"DB_PASS",
-				"CLERK_WEBHOOK_SECRET",
-				"NODE_ENV",
-				"NEXT_PUBLIC_STATSIG_CLIENT_KEY",
-				"NEXT_PUBLIC_STATSIG_USER_ID",
-				"RESEND_API_KEY",
-				"TRIGGER_API_KEY",
-				"TRIGGER_API_URL"
-			]
+			"env": []
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
@@ -26,10 +13,6 @@
 		"dev": {
 			"cache": false,
 			"persistent": true
-		},
-		"migrate:make": { "cache": false },
-		"migrate:up": { "cache": false },
-		"seed:make": { "cache": false },
-		"seed:up": { "cache": false }
+		}
 	}
 }

@@ -2,7 +2,7 @@
 
 import { Space, Title, Card, Table, SimpleGrid, Badge, Group } from '@mantine/core'
 
-import type { Plan as TPlan } from 'types'
+import type { IPlan } from 'types'
 import { PLANS } from 'consts'
 import { useGlobal } from 'state/global'
 import { currencyFormatter } from 'utils'
@@ -46,7 +46,7 @@ const activePlanStyles = {
 }
 
 type PlanProps = {
-	plan: TPlan
+	plan: IPlan
 	isActive: boolean
 	usage: { alerts?: number; subscriptions?: number }
 }

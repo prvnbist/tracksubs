@@ -5,7 +5,7 @@ import { Center, Group, Loader, Paper, SimpleGrid, Space, Title } from '@mantine
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import { getUserMetadata } from 'utils'
+import { getUserMetadata } from 'server_utils'
 import { CreateEmptyState } from 'components'
 
 import {

@@ -1,39 +1,8 @@
 import dayjs from 'dayjs'
-import { auth } from '@clerk/nextjs/server'
-import {
-	DEFAULT_SERVER_ERROR_MESSAGE,
-	createSafeActionClient,
-	flattenValidationErrors,
-} from 'next-safe-action'
+import { flattenValidationErrors } from 'next-safe-action'
 
 import { MONTHS } from 'consts'
 import type { ISubscription } from 'types'
-
-export const getUserMetadata = async () => {
-	const { sessionClaims } = auth()
-
-	return sessionClaims?.metadata!
-}
-
-export const actionClient = createSafeActionClient({
-	handleServerError(e) {
-		if (e instanceof Error) {
-			return e.message
-		}
-
-		return DEFAULT_SERVER_ERROR_MESSAGE
-	},
-}).use(async ({ next }) => {
-	const { userId: authId } = auth()
-
-	if (!authId) {
-		throw new Error('User is not authorized.')
-	}
-
-	const metadata = await getUserMetadata()
-
-	return next({ ctx: { authId, ...metadata } })
-})
 
 export const currencyFormatter = (amount = 0, currency = 'INR') =>
 	Intl.NumberFormat('en-US', {
@@ -53,11 +22,8 @@ export const downloadCSV = (csv: string, name = 'data') => {
 }
 
 const updateMonthByAmount = (acc: Record<string, number>, month: string, amount: number) => {
-	if (month in acc) {
-		acc[month] += amount
-	} else {
-		acc[month] = amount
-	}
+	acc[month] ??= 0
+	acc[month] += amount
 }
 
 type CalculateMonthlyOverviewArgs = Array<{

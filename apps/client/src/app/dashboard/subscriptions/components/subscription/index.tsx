@@ -38,7 +38,7 @@ import {
 } from '@mantine/core'
 
 import { getInitials, track } from 'utils'
-import type { ISubscription, Service } from 'types'
+import type { ISubscription, IService } from 'types'
 import { PLANS } from 'consts'
 import { useGlobal } from 'state/global'
 import { subscription_alert, subscriptions_active, subscriptions_delete } from '../../action'
@@ -363,7 +363,7 @@ export default Subscription
 const SubscriptionAvatar = ({
 	subscription,
 	service,
-}: { subscription: ISubscription; service: Service | null }) => {
+}: { subscription: ISubscription; service: IService | null }) => {
 	const scheme = useComputedColorScheme()
 
 	if (!service) {

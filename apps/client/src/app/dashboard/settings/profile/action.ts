@@ -8,7 +8,7 @@ import { clerkClient } from '@clerk/nextjs/server'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import { actionClient } from 'utils'
+import { actionClient } from 'server_utils'
 
 export const user_update = actionClient
 	.schema(
@@ -27,12 +27,12 @@ export const user_update = actionClient
 				.where(eq(schema.user.id, metadata.user_id))
 				.returning({ id: schema.user.id })
 
-			await clerkClient.users.updateUser(authId, {
+			await clerkClient().users.updateUser(authId, {
 				firstName: body.first_name,
 				lastName: body.last_name,
 			})
 
-			await clerkClient.users.updateUserMetadata(authId, {
+			await clerkClient().users.updateUserMetadata(authId, {
 				publicMetadata: {
 					...metadata,
 					currency: body.currency,

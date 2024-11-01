@@ -5,7 +5,7 @@ import { headers } from 'next/headers'
 import { clerkClient } from '@clerk/nextjs/server'
 import type { WebhookEvent } from '@clerk/nextjs/server'
 
-import db, { insertUserSchema, schema } from '@tracksubs/drizzle'
+import db, { schema } from '@tracksubs/drizzle'
 
 import UserSignUp from 'emails/UserSignUp'
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 			const { data } = payload
 			const email_address = data.email_addresses?.[0]?.email_address ?? ''
 
-			const values = insertUserSchema.parse({
+			const values = schema.NewUser.parse({
 				auth_id: data.id,
 				email: email_address,
 				first_name: data.first_name,
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 			}
 
 			if (user) {
-				await clerkClient.users.updateUserMetadata(data.id, {
+				await clerkClient().users.updateUserMetadata(data.id, {
 					publicMetadata: {
 						user_id: user.id,
 						plan: 'FREE',

@@ -19,7 +19,7 @@ const Header = (): JSX.Element => {
 
 	const isMobile = useMediaQuery('(max-width: 56.25em)')
 
-	const initials = getInitials(`${user.first_name} ${user.last_name}`)
+	const initials = getInitials(`${user.first_name ?? ''} ${user.last_name ?? ''}`)
 
 	return (
 		<Flex h={64} component="header" align="center" justify="space-between">

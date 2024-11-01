@@ -17,19 +17,6 @@ import { CURRENCIES, CYCLES } from 'consts'
 
 import { subscriptions_update } from '../action'
 
-const diff = (obj1: any, obj2: any) => {
-	const result: any = {}
-
-	for (const key in obj1) {
-		const _key = key as keyof ISubscription
-		if (obj2[_key] !== undefined && obj1[_key] !== obj2[_key]) {
-			result[_key] = obj2[_key]
-		}
-	}
-
-	return result
-}
-
 type ExcludedKeys =
 	| 'email_alert'
 	| 'id'
@@ -43,7 +30,7 @@ type FormValues = Omit<ISubscription, ExcludedKeys>
 const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 	const queryClient = useQueryClient()
 
-	const { user, services } = useGlobal()
+	const { services } = useGlobal()
 	const [service, setService] = useState<string | null>(subscription.service || null)
 
 	const [nextBillingDate, setNextBillingDate] = useState<Date | null>(
@@ -92,15 +79,6 @@ const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 		},
 	})
 
-	useEffect(() => {
-		if (service) {
-			const selected = services[service]
-			if (selected) {
-				form.setFieldValue('title', selected.title)
-				form.setFieldValue('website', selected.website)
-			}
-		}
-	}, [service, services, form.setFieldValue])
 
 	const handleSubmit = async () => {
 		if (!nextBillingDate) {
@@ -133,8 +111,17 @@ const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 				label="Service"
 				value={service}
 				data={cachedServices}
-				onChange={setService}
 				placeholder="Select a service"
+				onChange={service => {
+					setService(service)
+					if (service) {
+						const selected = services[service]
+						if (selected) {
+							form.setFieldValue('title', selected.title)
+							form.setFieldValue('website', selected.website)
+						}
+					}
+				}}
 			/>
 			<TextInput
 				required

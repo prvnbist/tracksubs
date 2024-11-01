@@ -2,7 +2,7 @@
 
 import dayjs from 'dayjs'
 import { useAction } from 'next-safe-action/hooks'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useForm } from '@mantine/form'
@@ -79,16 +79,6 @@ const CreateModal = () => {
 		},
 	})
 
-	useEffect(() => {
-		if (service) {
-			const selected = services[service]
-			if (selected) {
-				form.setFieldValue('title', selected.title)
-				form.setFieldValue('website', selected.website)
-			}
-		}
-	}, [service, services, form.setFieldValue])
-
 	const handleSubmit = async () => {
 		if (!nextBillingDate) {
 			return notifications.show({
@@ -117,8 +107,17 @@ const CreateModal = () => {
 				label="Service"
 				value={service}
 				data={cachedServices}
-				onChange={setService}
 				placeholder="Select a service"
+				onChange={service => {
+					setService(service)
+					if (service) {
+						const selected = services[service]
+						if (selected) {
+							form.setFieldValue('title', selected.title)
+							form.setFieldValue('website', selected.website)
+						}
+					}
+				}}
 			/>
 			<TextInput
 				required

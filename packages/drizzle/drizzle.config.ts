@@ -1,14 +1,23 @@
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
-	schema: './schema/*',
 	dialect: 'postgresql',
+	schema: './src/schema',
+	out: './src/migrations',
+	breakpoints: true,
+	strict: true,
+	verbose: true,
+	migrations: {
+		prefix: 'timestamp',
+		schema: 'public',
+		table: '__drizzle_migrations__',
+	},
 	dbCredentials: {
 		host: process.env.DB_HOST!,
 		port: Number(process.env.DB_PORT),
 		user: process.env.DB_USER!,
-		database: process.env.DB_NAME!,
 		password: process.env.DB_PASS!,
-		ssl: true,
+		database: process.env.DB_NAME!,
+		ssl: process.env.NODE_ENV === 'development' ? false : { rejectUnauthorized: false },
 	},
 })
