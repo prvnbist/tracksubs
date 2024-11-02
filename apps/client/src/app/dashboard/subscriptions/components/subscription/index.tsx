@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { lazy } from 'react'
 import Image from 'next/image'
 import { useAction } from 'next-safe-action/hooks'
-import { useQueryClient } from '@tanstack/react-query'
 import {
 	IconBell,
 	IconBellOff,
@@ -56,7 +55,6 @@ type SubscriptionProps = {
 
 const Subscription = ({ subscription }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
-	const queryClient = useQueryClient()
 
 	const usage = user.usage!
 
@@ -77,8 +75,6 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 	const { execute: setActive } = useAction(subscriptions_active, {
 		onSuccess: ({ data }) => {
 			const result = (data as Array<{ is_active: boolean; title: string }>)?.[0]!
-
-			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 
 			track(result.is_active ? 'btn-set-active' : 'btn-set-inactive')
 
@@ -102,9 +98,6 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 	const { execute: setAlert } = useAction(subscription_alert, {
 		onSuccess: ({ data }) => {
 			const result = (data as Array<{ email_alert: boolean; title: string }>)?.[0]!
-
-			queryClient.invalidateQueries({ queryKey: ['user'] })
-			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 
 			track(subscription.email_alert ? 'btn-set-alert' : 'btn-unset-alert')
 
@@ -132,10 +125,6 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 				color: 'green',
 				message: `Successfully deleted the subscription - ${subscription.title}`,
 			})
-
-			queryClient.invalidateQueries({ queryKey: ['user'] })
-			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
-			queryClient.invalidateQueries({ queryKey: ['transactions'] })
 		},
 		onError: () => {
 			notifications.show({

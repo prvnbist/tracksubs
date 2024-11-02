@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useAction } from 'next-safe-action/hooks'
-import { useQueryClient } from '@tanstack/react-query'
 
 import { modals } from '@mantine/modals'
 import { DatePickerInput } from '@mantine/dates'
@@ -15,8 +14,6 @@ import { useGlobal } from 'state/global'
 import { transaction_create } from '../../../action'
 
 const CreateTransactionModal = ({ subscription }: { subscription: ISubscription }) => {
-	const queryClient = useQueryClient()
-
 	const { payment_methods } = useGlobal()
 
 	const [paidOn, setPaidOn] = useState<Date>(new Date())
@@ -25,9 +22,6 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 	const { execute } = useAction(transaction_create, {
 		onSuccess: async () => {
 			await track('btn-create-transaction')
-
-			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
-			queryClient.invalidateQueries({ queryKey: ['transactions'] })
 
 			modals.closeAll()
 
