@@ -2,9 +2,14 @@ import type z from 'zod'
 
 import type { schema } from '@tracksubs/drizzle'
 
+export type IContact = z.infer<typeof schema.Contact> & {
+	sender: IUser
+	receiver: IUser
+}
+
 export type IUsage = z.infer<typeof schema.Usage>
 
-export type IUser = z.infer<typeof schema.User> & { usage: IUsage | null }
+export type IUser = z.infer<typeof schema.User> & { usage?: IUsage | null }
 
 export type IService = z.infer<typeof schema.Service>
 

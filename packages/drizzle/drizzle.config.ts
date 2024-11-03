@@ -18,6 +18,9 @@ export default defineConfig({
 		user: process.env.DB_USER!,
 		password: process.env.DB_PASS!,
 		database: process.env.DB_NAME!,
-		ssl: process.env.NODE_ENV === 'development' ? false : { rejectUnauthorized: false },
+		ssl:
+			!process.env.NODE_ENV || process.env.NODE_ENV === 'development'
+				? false
+				: { rejectUnauthorized: false },
 	},
 })

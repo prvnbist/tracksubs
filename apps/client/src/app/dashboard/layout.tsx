@@ -1,14 +1,12 @@
 import type { Metadata } from 'next'
 import type { PropsWithChildren } from 'react'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { ModalsProvider } from '@mantine/modals'
 import { Container, Divider, Group, Title } from '@mantine/core'
 
-import QueryProvider from 'state/query'
 import { GlobalProvider } from 'state/global'
-import { services, user } from 'actions'
+import { contacts, services, user } from 'actions'
 
 import '@mantine/charts/styles.css'
 
@@ -37,26 +35,25 @@ export default async function Layout({ children }: PropsWithChildren) {
 		}
 
 		const _services = await services()
+		const _contacts = await contacts()
 
 		return (
-			<QueryProvider>
-				<GlobalProvider
-					user={data}
-					services={_services?.data || {}}
-					paymentMethods={data?.payment_methods || []}
-				>
-					<ModalsProvider>
-						<NuqsAdapter>
-							<Container size="lg">
-								<Header />
-								<Divider />
-								{children}
-							</Container>
-						</NuqsAdapter>
-					</ModalsProvider>
-				</GlobalProvider>
-				{process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
-			</QueryProvider>
+			<GlobalProvider
+				user={data}
+				contacts={_contacts?.data || []}
+				services={_services?.data || {}}
+				paymentMethods={data?.payment_methods || []}
+			>
+				<ModalsProvider>
+					<NuqsAdapter>
+						<Container size="lg">
+							<Header />
+							<Divider />
+							{children}
+						</Container>
+					</NuqsAdapter>
+				</ModalsProvider>
+			</GlobalProvider>
 		)
 	} catch (error) {
 		return (

@@ -1,3 +1,6 @@
+export * from './contact'
+export { default as contact } from './contact'
+
 export * from './payment_method'
 export { default as payment_method } from './payment_method'
 
