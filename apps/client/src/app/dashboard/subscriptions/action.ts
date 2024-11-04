@@ -164,7 +164,11 @@ export const subscriptions_delete = actionClient.schema(z.object({ id: z.string(
 		const data = await db
 			.delete(schema.subscription)
 			.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
-			.returning({ id: schema.subscription.id, email_alert: schema.subscription.email_alert })
+			.returning({
+				id: schema.subscription.id,
+				title: schema.subscription.title,
+				email_alert: schema.subscription.email_alert,
+			})
 
 		await db
 			.update(schema.usage)
@@ -182,7 +186,7 @@ export const subscriptions_delete = actionClient.schema(z.object({ id: z.string(
 				.where(eq(schema.usage.user_id, user_id))
 		}
 
-		return data
+		return data?.[0]
 	},
 	{ onSuccess: () => revalidatePath('dashboard/subscriptions') }
 )

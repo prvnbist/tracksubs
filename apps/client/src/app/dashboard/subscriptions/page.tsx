@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
-import type { PropsWithChildren } from 'react'
-import { Flex, Group, SimpleGrid, Space, Title } from '@mantine/core'
+import { lazy, type PropsWithChildren } from 'react'
+import { Flex, Group, Space, Title } from '@mantine/core'
 
 import { subscriptions_list } from './action'
 import { CreateEmptyState, ErrorState } from 'components'
 
-import Subscription from './components/subscription'
 import IntervalSelector from './components/intervalSelector'
 import { CreateSubscriptionButton, ExportSubscriptionsButton } from './components'
+
+const Subscriptions = lazy(() => import('./components/subscriptions'))
 
 export const metadata: Metadata = {
 	title: 'Subscriptions | TrackSubs',
@@ -34,11 +35,7 @@ export default async function Page({
 		}
 		return (
 			<Shell>
-				<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-					{data?.data?.map(subscription => (
-						<Subscription key={subscription.id} subscription={subscription} />
-					))}
-				</SimpleGrid>
+				<Subscriptions subscriptions={data?.data ?? []} />
 			</Shell>
 		)
 	} catch (error) {

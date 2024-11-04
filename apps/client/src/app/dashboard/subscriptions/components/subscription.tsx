@@ -1,9 +1,5 @@
-'use client'
-
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { lazy } from 'react'
-import { useAction } from 'next-safe-action/hooks'
 import {
 	IconBell,
 	IconBellOff,
@@ -19,8 +15,6 @@ import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
-import { modals } from '@mantine/modals'
-import { notifications } from '@mantine/notifications'
 import {
 	ActionIcon,
 	Avatar,
@@ -35,27 +29,32 @@ import {
 	useComputedColorScheme,
 } from '@mantine/core'
 
-import { getInitials, track } from 'utils'
-import type { ISubscription, IService } from 'types'
-import { PLANS } from 'consts'
+import { getInitials } from 'utils'
 import { useGlobal } from 'state/global'
-import { subscription_alert, subscriptions_active, subscriptions_delete } from '../action'
-
-const UpdateModal = lazy(() => import('./updateModal'))
-const CreateTransactionModal = lazy(() => import('./createTransactionModal'))
+import type { ISubscription, IService } from 'types'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
 type SubscriptionProps = {
+	onDelete: () => void
+	onMarkPaid: () => void
+	onSetActive: () => void
+	onSetAlert: () => void
+	onUpdate: () => void
 	subscription: ISubscription
 }
 
-const Subscription = ({ subscription }: SubscriptionProps) => {
+const Subscription = ({
+	onDelete,
+	onMarkPaid,
+	onSetActive,
+	onSetAlert,
+	onUpdate,
+	subscription,
+}: SubscriptionProps) => {
 	const { user, services } = useGlobal()
-
-	const usage = user.usage!
 
 	const scheme = useComputedColorScheme()
 
@@ -68,134 +67,6 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 	const isDueThisWeek = dueIn === 0
 
 	const isPastRenewal = dayjs.utc().isAfter(billing_date)
-
-	const plan = PLANS[user.plan]!
-
-	const { execute: setActive } = useAction(subscriptions_active, {
-		onSuccess: ({ data }) => {
-			const result = (data as Array<{ is_active: boolean; title: string }>)?.[0]!
-
-			track(result.is_active ? 'btn-set-active' : 'btn-set-inactive')
-
-			notifications.show({
-				color: 'green',
-				title: 'Success',
-				message: result.is_active
-					? `Enabled the subscription: ${result.title}`
-					: `Disabled the subscription: ${result.title}`,
-			})
-		},
-		onError: () => {
-			notifications.show({
-				color: 'red',
-				title: 'Error',
-				message: 'Failed to update the subscription',
-			})
-		},
-	})
-
-	const { execute: setAlert } = useAction(subscription_alert, {
-		onSuccess: ({ data }) => {
-			const result = (data as Array<{ email_alert: boolean; title: string }>)?.[0]!
-
-			track(subscription.email_alert ? 'btn-set-alert' : 'btn-unset-alert')
-
-			notifications.show({
-				color: 'green',
-				title: 'Success',
-				message: result.email_alert
-					? `You will now recieve alerts for: ${result.title}`
-					: `Disabled the email alerts for: ${result.title}`,
-			})
-		},
-		onError: () => {
-			notifications.show({
-				color: 'red',
-				title: 'Error',
-				message: 'Failed to update the subscription',
-			})
-		},
-	})
-
-	const { execute: deleteSubscriptionAction } = useAction(subscriptions_delete, {
-		onSuccess: () => {
-			track('btn-delete-subscription')
-			notifications.show({
-				color: 'green',
-				message: `Successfully deleted the subscription - ${subscription.title}`,
-			})
-		},
-		onError: () => {
-			notifications.show({
-				color: 'red',
-				title: 'Error',
-				message: 'Failed to delete the subscription',
-			})
-		},
-	})
-
-	const deleteSubscription = () =>
-		modals.openConfirmModal({
-			title: 'Delete Subscription',
-			children: <Text size="sm">Are you sure you want to delete this subscription?</Text>,
-			labels: { confirm: 'Yes, Delete', cancel: 'Cancel' },
-			onConfirm: () => deleteSubscriptionAction({ id: subscription.id }),
-		})
-
-	const markPaid = () =>
-		modals.open({
-			title: 'Create Transaction',
-			children: <CreateTransactionModal subscription={subscription} />,
-		})
-
-	const toggleAlert = () => {
-		if (!subscription.email_alert && usage.total_alerts === plan.alerts) {
-			return notifications.show({
-				color: 'red.5',
-				title: 'Usage Alert',
-				message: `Selected plan allows upto ${plan.alerts} alerts. Please change your plan to the one that fits your needs.`,
-			})
-		}
-
-		modals.openConfirmModal({
-			title: 'Email Alert',
-			children: (
-				<Text size="sm">
-					{subscription.email_alert
-						? 'Please confirm if you want disable '
-						: 'Please confirm if you want to recieve '}
-					email alerts for the subscription: {subscription.title}
-				</Text>
-			),
-			labels: { confirm: 'Confirm', cancel: 'Cancel' },
-			onConfirm: () =>
-				setAlert({
-					id: subscription.id,
-					email_alert: !subscription.email_alert,
-				}),
-		})
-	}
-
-	const toggleActive = () => {
-		modals.openConfirmModal({
-			title: subscription.is_active ? 'Mark Inactive' : 'Mark Active',
-			children: (
-				<Text size="sm">
-					{subscription.is_active
-						? 'Please confirm if you want to disable '
-						: 'Please confirm if you want to enable '}
-					the subscription: {subscription.title}
-				</Text>
-			),
-			labels: { confirm: 'Confirm', cancel: 'Cancel' },
-			onConfirm: () =>
-				setActive({
-					id: subscription.id,
-					is_active: !subscription.is_active,
-				}),
-		})
-	}
-
 	return (
 		<Card
 			shadow="sm"
@@ -262,14 +133,14 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 							{isPastRenewal && (
 								<Menu.Item
 									title="Mark Paid"
-									onClick={markPaid}
+									onClick={onMarkPaid}
 									leftSection={<IconCreditCardPay size={18} />}
 								>
 									Mark Paid
 								</Menu.Item>
 							)}
 							<Menu.Item
-								onClick={toggleActive}
+								onClick={onSetActive}
 								leftSection={
 									subscription.is_active ? (
 										<IconCheck size={18} color="var(--mantine-color-green-5)" />
@@ -283,8 +154,8 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 							</Menu.Item>
 							{subscription.is_active && (
 								<Menu.Item
+									onClick={onSetAlert}
 									title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
-									onClick={toggleAlert}
 									leftSection={
 										subscription.email_alert ? (
 											<IconBellOff size={18} />
@@ -298,12 +169,7 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 							)}
 							<Menu.Item
 								title="Edit"
-								onClick={() =>
-									modals.open({
-										title: 'Edit Subscription',
-										children: <UpdateModal subscription={subscription} />,
-									})
-								}
+								onClick={onUpdate}
 								leftSection={<IconPencil size={18} />}
 							>
 								Edit
@@ -311,7 +177,7 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 							<Menu.Item
 								color="red"
 								title="Delete"
-								onClick={deleteSubscription}
+								onClick={onDelete}
 								leftSection={<IconTrash size={18} />}
 							>
 								Delete

@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
-import { Button, Group, NumberInput, Select, Stack, TextInput } from '@mantine/core'
+import { Button, Divider, Group, NumberInput, Select, Stack, TextInput } from '@mantine/core'
 
 import { track } from 'utils'
 import type { ISubscription } from 'types'
@@ -114,6 +114,7 @@ const CreateModal = () => {
 					}
 				}}
 			/>
+			<Divider />
 			<TextInput
 				required
 				label="Title"

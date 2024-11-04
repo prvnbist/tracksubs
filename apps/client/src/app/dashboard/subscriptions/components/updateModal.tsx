@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { DatePickerInput } from '@mantine/dates'
 import { notifications } from '@mantine/notifications'
-import { Button, Group, NumberInput, Select, Stack, TextInput } from '@mantine/core'
+import { Button, Divider, Group, NumberInput, Select, Stack, TextInput } from '@mantine/core'
 
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
@@ -117,6 +117,7 @@ const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 					}
 				}}
 			/>
+			<Divider />
 			<TextInput
 				required
 				label="Title"
