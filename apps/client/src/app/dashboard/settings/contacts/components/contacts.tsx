@@ -6,6 +6,7 @@ import type { PropsWithChildren } from 'react'
 import { useAction } from 'next-safe-action/hooks'
 import { IconCheck, IconTrash } from '@tabler/icons-react'
 
+import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 import { ActionIcon, Badge, Group, Table, Tabs, Text } from '@mantine/core'
 
@@ -20,6 +21,46 @@ const showNotification = (keyword: string, isSuccess = true) =>
 		title: isSuccess ? 'Success' : 'Error',
 		message: `${isSuccess ? 'Successfully' : 'Failed to'} ${keyword} the contact.`,
 	})
+
+type ConfirmProps = {
+	title: string
+	description: string
+	confirmLabel: string
+	callback: () => void
+}
+
+const confirm = ({ title, description, confirmLabel, callback }: ConfirmProps) =>
+	modals.openConfirmModal({
+		title: title,
+		onConfirm: callback,
+		children: <Text size="sm">{description}</Text>,
+		labels: { confirm: confirmLabel, cancel: 'Cancel' },
+	})
+
+const CONFIRM_COPY = {
+	REMOVE: {
+		title: 'Remove Contact',
+		confirmLabel: 'Yes, Remove',
+		description: 'Are you sure you want to remove this contact? This action cannot be undone.',
+	},
+	UNDO: {
+		title: 'Remove Request',
+		confirmLabel: 'Yes, Remove',
+		description:
+			'Are you sure you want to remove this contact request? This action cannot be undone.',
+	},
+	ACCEPT: {
+		title: 'Accept Request',
+		confirmLabel: 'Yes, Accept',
+		description: 'Are you sure you want to accept this contact request?',
+	},
+	REJECT: {
+		title: 'Reject Request',
+		confirmLabel: 'Yes, Reject',
+		description:
+			'Are you sure you want to reject this contact request? This action cannot be undone.',
+	},
+}
 
 const Contacts = () => {
 	const { user, contacts } = useGlobal()
@@ -66,17 +107,45 @@ const Contacts = () => {
 				list={added}
 				variant="default"
 				columns={['Name', 'Email']}
-				onRemove={id => onRemove({ id })}
+				onRemove={id =>
+					confirm({
+						callback: () => onRemove({ id }),
+						title: CONFIRM_COPY.REMOVE.title,
+						description: CONFIRM_COPY.REMOVE.description,
+						confirmLabel: CONFIRM_COPY.REMOVE.confirmLabel,
+					})
+				}
 			/>
 			<Panel
 				list={sent}
 				variant="sent"
-				onUndo={id => onUndo({ id })}
+				onUndo={id =>
+					confirm({
+						title: CONFIRM_COPY.UNDO.title,
+						callback: () => onUndo({ id }),
+						description: CONFIRM_COPY.UNDO.description,
+						confirmLabel: CONFIRM_COPY.UNDO.confirmLabel,
+					})
+				}
 				columns={['Name', 'Email', 'Sent On', 'Status']}
 			/>
 			<Panel
-				onAccept={id => onAccept({ id })}
-				onReject={id => onReject({ id })}
+				onAccept={id =>
+					confirm({
+						title: CONFIRM_COPY.ACCEPT.title,
+						callback: () => onAccept({ id }),
+						description: CONFIRM_COPY.ACCEPT.description,
+						confirmLabel: CONFIRM_COPY.ACCEPT.confirmLabel,
+					})
+				}
+				onReject={id =>
+					confirm({
+						title: CONFIRM_COPY.REJECT.title,
+						callback: () => onReject({ id }),
+						description: CONFIRM_COPY.REJECT.description,
+						confirmLabel: CONFIRM_COPY.REJECT.confirmLabel,
+					})
+				}
 				columns={['Name', 'Email', 'Received On']}
 				list={received}
 				variant="received"
