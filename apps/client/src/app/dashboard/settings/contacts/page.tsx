@@ -1,12 +1,15 @@
-import { Space, Title } from '@mantine/core'
+import { Group, Space, Title } from '@mantine/core'
 
-import { Contacts } from './components'
+import { Add, Contacts } from './components'
 
 export default function Page() {
 	return (
 		<div>
 			<Space h={24} />
-			<Title order={2}>Contacts</Title>
+			<Group>
+				<Title order={2}>Contacts</Title>
+				<Add />
+			</Group>
 			<Space h={16} />
 			<Contacts />
 		</div>

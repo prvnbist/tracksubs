@@ -41,7 +41,6 @@ export const onboard = actionClient
 
 			return data[0]
 		} catch (error) {
-			console.error('ONBOARD', { error })
 			throw new Error('USER_ONBOARDING_ERROR')
 		}
 	})
