@@ -182,6 +182,8 @@ type PanelProps = {
 }
 
 const Panel = ({ columns, list, variant, onAccept, onReject, onRemove, onUndo }: PanelProps) => {
+	const { user } = useGlobal()
+
 	if (list.length === 0)
 		return (
 			<Tabs.Panel value={variant} py="sm">
@@ -206,7 +208,12 @@ const Panel = ({ columns, list, variant, onAccept, onReject, onRemove, onUndo }:
 				</Table.Thead>
 				<Table.Tbody>
 					{list.map(contact => (
-						<Contact key={contact.id} contact={contact} variant={variant}>
+						<Contact
+							key={contact.id}
+							contact={contact}
+							variant={variant}
+							isSender={user.id === contact.sender_id}
+						>
 							{variant === 'default' && (
 								<ActionIcon
 									size="sm"
@@ -263,14 +270,15 @@ const Panel = ({ columns, list, variant, onAccept, onReject, onRemove, onUndo }:
 
 interface ContactProps extends PropsWithChildren {
 	contact: IContact
+	isSender: boolean
 	variant?: 'default' | 'sent' | 'received'
 }
 
-const Contact = ({ contact, variant = 'default', children }: ContactProps) => {
-	const isSender = variant === 'sent'
+const Contact = ({ contact, variant = 'default', isSender = false, children }: ContactProps) => {
+	const _isSender = isSender || variant === 'sent'
 	const person =
 		variant === 'default'
-			? contact[isSender ? 'receiver' : 'sender']
+			? contact[_isSender ? 'receiver' : 'sender']
 			: variant === 'sent'
 				? contact.receiver
 				: contact.sender
