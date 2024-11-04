@@ -3,16 +3,18 @@
 import type { PropsWithChildren } from 'react'
 import { createContext, useContext } from 'react'
 
-import type { IPaymentMethod, IService, IUser } from 'types'
+import type { IContact, IPaymentMethod, IService, IUser } from 'types'
 
 interface ContextState {
 	user: IUser
+	contacts: Array<IContact>
 	services: Record<string, IService>
 	payment_methods: Array<IPaymentMethod>
 }
 
 const INITITAL_STATE: ContextState = {
 	services: {},
+	contacts: [],
 	payment_methods: [],
 	user: {
 		id: '',
@@ -36,12 +38,14 @@ export const useGlobal = () => useContext(Context)
 
 type GlobalProviderProps = {
 	user: IUser
+	contacts: Array<IContact>
 	services: Record<string, IService>
 	paymentMethods: Array<IPaymentMethod>
 } & PropsWithChildren
 
 export const GlobalProvider = ({
 	user,
+	contacts,
 	services,
 	paymentMethods,
 	children,
@@ -49,6 +53,7 @@ export const GlobalProvider = ({
 	<Context.Provider
 		value={{
 			user,
+			contacts,
 			services,
 			payment_methods: paymentMethods,
 		}}

@@ -4,6 +4,11 @@
 	"version": "0.0.0",
 	"private": true,
 	"license": "MIT",
+	"scripts": {
+		"studio": "drizzle-kit studio",
+		"generate": "drizzle-kit generate",
+		"migrate": "drizzle-kit migrate"
+	},
 	"dependencies": {
 		"drizzle-orm": "^0.36.0",
 		"drizzle-zod": "^0.5.1",

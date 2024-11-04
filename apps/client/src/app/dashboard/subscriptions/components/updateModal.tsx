@@ -2,8 +2,7 @@
 
 import dayjs from 'dayjs'
 import { useAction } from 'next-safe-action/hooks'
-import { useEffect, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
@@ -28,8 +27,6 @@ type ExcludedKeys =
 type FormValues = Omit<ISubscription, ExcludedKeys>
 
 const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
-	const queryClient = useQueryClient()
-
 	const { services } = useGlobal()
 	const [service, setService] = useState<string | null>(subscription.service || null)
 
@@ -65,8 +62,6 @@ const UpdateModal = ({ subscription }: { subscription: ISubscription }) => {
 				title: 'Success',
 				message: `Successfully updated the subscription - ${form.values.title}`,
 			})
-			queryClient.invalidateQueries({ queryKey: ['user'] })
-			queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
 			form.reset()
 			modals.closeAll()
 		},

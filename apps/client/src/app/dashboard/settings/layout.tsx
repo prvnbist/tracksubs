@@ -1,7 +1,13 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { IconChartPie2, IconCreditCard, IconFileInvoice, IconUser } from '@tabler/icons-react'
+import {
+	IconAddressBook,
+	IconChartPie2,
+	IconCreditCard,
+	IconFileInvoice,
+	IconUser,
+} from '@tabler/icons-react'
 
 import { useMediaQuery } from '@mantine/hooks'
 import { Box, Tabs } from '@mantine/core'
@@ -24,6 +30,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			<Tabs.List>
 				<Tabs.Tab value="profile" leftSection={<IconUser size={18} />}>
 					Profile
+				</Tabs.Tab>
+				<Tabs.Tab value="contacts" leftSection={<IconAddressBook size={18} />}>
+					Contacts
 				</Tabs.Tab>
 				<Tabs.Tab value="plan" leftSection={<IconFileInvoice size={18} />}>
 					Plan

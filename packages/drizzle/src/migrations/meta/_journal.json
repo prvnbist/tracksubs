@@ -50,6 +50,13 @@
 			"when": 1730457297389,
 			"tag": "20241101103457_transaction",
 			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1730482321849,
+			"tag": "20241101173201_contact",
+			"breakpoints": true
 		}
 	]
 }

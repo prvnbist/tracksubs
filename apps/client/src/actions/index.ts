@@ -11,10 +11,29 @@ export const user = actionClient.action(async ({ ctx: { authId } }) => {
 	try {
 		const data = await db.query.user.findFirst({
 			where: (user, { eq }) => eq(user.auth_id, authId),
-			with: { usage: true, payment_methods: true },
+			with: {
+				usage: true,
+				payment_methods: true,
+			},
 		})
 
 		if (!data) throw new Error('USER_NOT_FOUND')
+
+		return data
+	} catch (error) {
+		throw new Error((error as Error).message)
+	}
+})
+
+export const contacts = actionClient.action(async ({ ctx: { user_id } }) => {
+	try {
+		const data = await db.query.contact.findMany({
+			with: { sender: true, receiver: true },
+			where: (contact, { eq, or }) =>
+				or(eq(contact.sender_id, user_id), eq(contact.receiver_id, user_id)),
+		})
+
+		if (!Array.isArray(data)) throw new Error('CONTACTS_NOT_FOUND')
 
 		return data
 	} catch (error) {
