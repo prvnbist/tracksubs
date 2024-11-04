@@ -1,10 +1,10 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { createSelectSchema, createInsertSchema } from 'drizzle-zod'
 import { check, date, integer, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
 
-import user from './user'
-import subscription from './subscription'
 import payment_method from './payment_method'
+import subscription from './subscription'
+import user from './user'
 
 const transaction = pgTable(
 	'transaction',
@@ -32,5 +32,23 @@ const transaction = pgTable(
 
 export const Transaction = createSelectSchema(transaction)
 export const NewTransaction = createInsertSchema(transaction)
+
+export const transactionRelations = relations(transaction, ({ one }) => ({
+	user: one(user, {
+		fields: [transaction.user_id],
+		references: [user.id],
+		relationName: 'user',
+	}),
+	subscription: one(subscription, {
+		fields: [transaction.subscription_id],
+		references: [subscription.id],
+		relationName: 'transaction',
+	}),
+	payment_method: one(payment_method, {
+		fields: [transaction.payment_method_id],
+		references: [payment_method.id],
+		relationName: 'payment_method',
+	}),
+}))
 
 export default transaction

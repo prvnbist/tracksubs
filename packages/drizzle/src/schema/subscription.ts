@@ -1,10 +1,11 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { createSelectSchema, createInsertSchema } from 'drizzle-zod'
 import { boolean, check, date, integer, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core'
 
-import user from './user'
-import service from './service'
 import payment_method from './payment_method'
+import service from './service'
+import transaction from './transaction'
+import user from './user'
 
 const subscription = pgTable(
 	'subscription',
@@ -36,5 +37,26 @@ const subscription = pgTable(
 
 export const Subscription = createSelectSchema(subscription)
 export const NewSubscription = createInsertSchema(subscription)
+
+export const subscriptionRelations = relations(subscription, ({ one, many }) => ({
+	transactions: many(transaction, {
+		relationName: 'transaction',
+	}),
+	user: one(user, {
+		fields: [subscription.user_id],
+		references: [user.id],
+		relationName: 'user',
+	}),
+	service: one(service, {
+		fields: [subscription.service],
+		references: [service.key],
+		relationName: 'service',
+	}),
+	payment_method: one(payment_method, {
+		fields: [subscription.payment_method_id],
+		references: [payment_method.id],
+		relationName: 'payment_method',
+	}),
+}))
 
 export default subscription
