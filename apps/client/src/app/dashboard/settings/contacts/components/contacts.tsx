@@ -8,10 +8,11 @@ import { IconCheck, IconTrash } from '@tabler/icons-react'
 
 import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { ActionIcon, Badge, Group, Table, Tabs, Text } from '@mantine/core'
+import { ActionIcon, Badge, Box, Group, Table, Tabs, Text } from '@mantine/core'
 
-import { useGlobal } from 'state/global'
 import type { IContact } from 'types'
+import { useGlobal } from 'state/global'
+import { CreateEmptyState } from 'components'
 
 import { accept, reject, remove, undo } from '../action'
 
@@ -181,6 +182,17 @@ type PanelProps = {
 }
 
 const Panel = ({ columns, list, variant, onAccept, onReject, onRemove, onUndo }: PanelProps) => {
+	if (list.length === 0)
+		return (
+			<Tabs.Panel value={variant} py="sm">
+				<Box>
+					<CreateEmptyState
+						title="No contacts yet"
+						description="You will see your contacts once you add someone or accept a request you have received."
+					/>
+				</Box>
+			</Tabs.Panel>
+		)
 	return (
 		<Tabs.Panel value={variant} py="sm">
 			<Table striped withTableBorder withColumnBorders>
