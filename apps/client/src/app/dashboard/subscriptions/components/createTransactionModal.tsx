@@ -11,7 +11,7 @@ import { track } from 'utils'
 import type { ISubscription } from 'types'
 import { useGlobal } from 'state/global'
 
-import { transaction_create } from '../../../action'
+import { transaction_create } from '../action'
 
 const CreateTransactionModal = ({ subscription }: { subscription: ISubscription }) => {
 	const { payment_methods } = useGlobal()

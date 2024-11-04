@@ -3,7 +3,6 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { lazy } from 'react'
-import Image from 'next/image'
 import { useAction } from 'next-safe-action/hooks'
 import {
 	IconBell,
@@ -40,10 +39,10 @@ import { getInitials, track } from 'utils'
 import type { ISubscription, IService } from 'types'
 import { PLANS } from 'consts'
 import { useGlobal } from 'state/global'
-import { subscription_alert, subscriptions_active, subscriptions_delete } from '../../action'
+import { subscription_alert, subscriptions_active, subscriptions_delete } from '../action'
 
-const UpdateModal = lazy(() => import('../updateModal'))
-const CreateTransactionModal = lazy(() => import('./component/createTransactionModal'))
+const UpdateModal = lazy(() => import('./updateModal'))
+const CreateTransactionModal = lazy(() => import('./createTransactionModal'))
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -350,28 +349,10 @@ const Subscription = ({ subscription }: SubscriptionProps) => {
 export default Subscription
 
 const SubscriptionAvatar = ({
-	subscription,
 	service,
-}: { subscription: ISubscription; service: IService | null }) => {
-	const scheme = useComputedColorScheme()
-
-	if (!service) {
-		return (
-			<Avatar color="blue" radius="sm" fw={300}>
-				{getInitials(subscription.title)}
-			</Avatar>
-		)
-	}
-	return (
-		<Image
-			width={40}
-			height={40}
-			alt={subscription.title}
-			src={`/services/${service.key}.svg`}
-			style={{
-				borderRadius: scheme === 'light' ? '4px' : 0,
-				border: scheme === 'light' ? '1px solid var(--mantine-color-gray-2)' : 'none',
-			}}
-		/>
-	)
-}
+	subscription,
+}: { subscription: ISubscription; service: IService | null }) => (
+	<Avatar fw={300} radius="sm" color="blue" src={service ? `/services/${service.key}.svg` : null}>
+		{getInitials(subscription.title)}
+	</Avatar>
+)
