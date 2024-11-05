@@ -218,7 +218,12 @@ const SubscriptionAvatar = ({
 	service,
 	subscription,
 }: { subscription: ISubscription; service: IService | null }) => (
-	<Avatar fw={300} radius="sm" color="blue" src={service ? `/services/${service.key}.svg` : null}>
-		{getInitials(subscription.title)}
-	</Avatar>
+	<Avatar
+		fw={300}
+		radius="sm"
+		color="blue"
+		autoCapitalize="on"
+		name={getInitials(subscription.title)}
+		src={service ? `/services/${service.key}.svg` : null}
+	/>
 )

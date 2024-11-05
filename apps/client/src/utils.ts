@@ -96,7 +96,7 @@ export const getInitials = (phrase: string) => {
 		initials += words?.[i]?.charAt(0) ?? ''
 	}
 
-	return initials.toUpperCase()
+	return initials
 }
 
 export const flattenZodValidationErrors = (errors: any) =>

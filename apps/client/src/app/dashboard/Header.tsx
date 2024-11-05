@@ -31,12 +31,13 @@ const Header = (): JSX.Element => {
 				<Menu.Target>
 					<Avatar
 						size={30}
+						color="blue"
+						name={initials}
+						autoCapitalize="on"
 						src={user.image_url}
 						alt={`${user.first_name} ${user.last_name}`}
 						title={`${user.first_name} ${user.last_name}`}
-					>
-						{initials}
-					</Avatar>
+					/>
 				</Menu.Target>
 
 				<Menu.Dropdown>
