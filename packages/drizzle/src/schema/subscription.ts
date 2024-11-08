@@ -2,6 +2,7 @@ import { relations, sql } from 'drizzle-orm'
 import { createSelectSchema, createInsertSchema } from 'drizzle-zod'
 import { boolean, check, date, integer, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core'
 
+import collaborator from './collaborator'
 import payment_method from './payment_method'
 import service from './service'
 import transaction from './transaction'
@@ -29,6 +30,7 @@ const subscription = pgTable(
 		payment_method_id: uuid().references(() => payment_method.id, {
 			onDelete: 'set null',
 		}),
+		split_strategy: varchar({ length: 20 }),
 	},
 	table => ({
 		amountConstraint: check('amount', sql`${table.amount} > 0`),
@@ -41,6 +43,9 @@ export const NewSubscription = createInsertSchema(subscription)
 export const subscriptionRelations = relations(subscription, ({ one, many }) => ({
 	transactions: many(transaction, {
 		relationName: 'transaction',
+	}),
+	collaborators: many(collaborator, {
+		relationName: 'collaborator',
 	}),
 	user: one(user, {
 		fields: [subscription.user_id],

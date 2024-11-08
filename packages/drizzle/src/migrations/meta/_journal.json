@@ -57,6 +57,20 @@
 			"when": 1730482321849,
 			"tag": "20241101173201_contact",
 			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1730801385006,
+			"tag": "20241105100945_collaborator",
+			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1730804614517,
+			"tag": "20241105110334_collborator_column_type",
+			"breakpoints": true
 		}
 	]
 }
