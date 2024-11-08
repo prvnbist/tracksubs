@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { flattenValidationErrors } from 'next-safe-action'
 
 import { MONTHS } from 'consts'
-import type { ISubscription } from 'types'
+import type { ISubscription, IMinimalUser } from 'types'
 
 export const currencyFormatter = (amount = 0, currency = 'INR') =>
 	Intl.NumberFormat('en-US', {
@@ -104,3 +104,6 @@ export const flattenZodValidationErrors = (errors: any) =>
 		if (Array.isArray(e)) return e
 		return e._errors
 	})
+
+export const getUserName = (user: IMinimalUser) =>
+	`${user.first_name ?? ''} ${user.last_name ?? ''}`.trim()

@@ -4,7 +4,7 @@ import { asc } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import type { IContact, IMinimalUser, IService } from 'types'
+import type { IService } from 'types'
 import { actionClient } from 'server_utils'
 
 export const user = actionClient.action(async ({ ctx: { authId } }) => {

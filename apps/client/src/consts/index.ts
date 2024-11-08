@@ -1,4 +1,4 @@
-import type { IPlan } from 'types'
+import type { IPlan, ISplitStrategy } from 'types'
 import timezones from './timezones.json'
 
 export const CYCLES = [
@@ -61,3 +61,9 @@ export const MONTHS = [
 	'Nov',
 	'Dec',
 ] as const
+
+export const SPLITTING_STRATEGIES: Array<{ label: string; value: ISplitStrategy }> = [
+	{ label: 'Equally', value: 'EQUALLY' },
+	{ label: 'Unequally', value: 'UNEQUALLY' },
+	{ label: 'Percentage', value: 'PERCENTAGE' },
+]

@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { lazy, type PropsWithChildren } from 'react'
 import { Flex, Group, Space, Title } from '@mantine/core'
 
-import { subscriptions_list } from './action'
+import type { ISubscription } from 'types'
 import { CreateEmptyState, ErrorState } from 'components'
 
+import { subscriptions_list } from './action'
 import IntervalSelector from './components/intervalSelector'
 import { CreateSubscriptionButton, ExportSubscriptionsButton } from './components'
 
@@ -21,7 +22,7 @@ export default async function Page({
 	const { interval = 'ALL' } = searchParams
 
 	try {
-		const data = await subscriptions_list({ interval })
+		const data = (await subscriptions_list({ interval })) as { data: Array<ISubscription> }
 
 		if (data?.data?.length === 0) {
 			return (

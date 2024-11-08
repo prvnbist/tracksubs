@@ -76,6 +76,15 @@ export const subscriptions_list = actionClient
 	.action(
 		async ({ parsedInput: { interval }, ctx: { user_id } }) => {
 			return db.query.subscription.findMany({
+				with: {
+					collaborators: {
+						with: {
+							user: {
+								columns: { id: true, first_name: true, last_name: true, image_url: true },
+							},
+						},
+					},
+				},
 				where: (subscription, { eq }) =>
 					and(
 						eq(subscription.user_id, user_id),
@@ -257,3 +266,139 @@ export const subscription_export = actionClient
 
 		return data
 	})
+
+const CollaboratorsSchema = z.object({
+	amount: z.number(),
+	percentage: z.number(),
+	user_id: z.string(),
+})
+
+export const manage_collaborators = actionClient
+	.schema(
+		z.object({
+			subscription_id: z.string(),
+			split_strategy: z.union([
+				z.literal('EQUALLY'),
+				z.literal('UNEQUALLY'),
+				z.literal('PERCENTAGE'),
+			]),
+			collaborators: z.array(CollaboratorsSchema),
+		})
+	)
+	.action(
+		async ({
+			ctx: { user_id },
+			parsedInput: { collaborators, split_strategy, subscription_id },
+		}) => {
+			try {
+				const subscription = await db.query.subscription.findFirst({
+					with: {
+						collaborators: {
+							columns: {
+								id: true,
+								user_id: true,
+								amount: true,
+								percentage: true,
+							},
+						},
+					},
+					where: and(
+						eq(schema.subscription.id, subscription_id),
+						eq(schema.subscription.user_id, user_id)
+					),
+				})
+
+				if (!subscription) throw Error('SUBSCRIPTION_NOT_FOUND')
+
+				const added: Array<{
+					amount: number
+					percentage: string
+					subscription_id: string
+					user_id: string
+				}> = []
+				const removed: Array<string> = []
+				const changes: Array<{ id: string; amount?: number; percentage?: string }> = []
+
+				if (subscription.collaborators.length === 0) {
+					for (const collaborator of collaborators) {
+						const amount = Math.trunc(collaborator.amount * 100)
+						const percentage = collaborator.percentage.toFixed(2)
+						added.push({ amount, percentage, subscription_id, user_id: collaborator.user_id })
+					}
+				} else {
+					const previous_map = new Map(subscription.collaborators.map(c => [c.user_id, c]))
+
+					for (const [user_id, previous] of previous_map) {
+						if (collaborators.findIndex(c => c.user_id === user_id) === -1) {
+							removed.push(previous.id)
+						}
+					}
+
+					for (const collaborator of collaborators) {
+						const old = previous_map.get(collaborator.user_id)
+
+						const amount = Math.trunc(collaborator.amount * 100)
+						const percentage = collaborator.percentage.toFixed(2)
+
+						if (!old) {
+							added.push({
+								amount,
+								percentage,
+								subscription_id,
+								user_id: collaborator.user_id,
+							})
+							continue
+						}
+
+						const hasAmountChanged = old.amount !== amount
+						const hasPercentageChanged = Number(old.percentage) !== Number(percentage)
+
+						if (!hasAmountChanged && !hasPercentageChanged) continue
+
+						changes.push({
+							id: old.id,
+							...(hasAmountChanged && { amount, percentage: '0.00' }),
+							...(hasPercentageChanged && { amount: 0, percentage }),
+						})
+					}
+				}
+
+				if (added.length === 0 && removed.length === 0 && changes.length === 0)
+					throw Error('NO_CHANGES')
+
+				await db.transaction(async tx => {
+					if (subscription.split_strategy !== split_strategy) {
+						await tx
+							.update(schema.subscription)
+							.set({ split_strategy })
+							.where(eq(schema.subscription.id, subscription_id))
+					}
+
+					if (removed.length > 0) {
+						await tx
+							.delete(schema.collaborator)
+							.where(inArray(schema.collaborator.id, removed))
+					}
+
+					if (added.length > 0) {
+						await tx.insert(schema.collaborator).values(added)
+					}
+
+					if (changes.length > 0) {
+						await Promise.all(
+							changes.map(async ({ id, ...rest }) => {
+								await tx
+									.update(schema.collaborator)
+									.set(rest)
+									.where(eq(schema.collaborator.id, id))
+							})
+						)
+					}
+				})
+
+				revalidatePath('dashboard/subscriptions')
+			} catch (error) {
+				throw Error('SERVER_ERROR')
+			}
+		}
+	)

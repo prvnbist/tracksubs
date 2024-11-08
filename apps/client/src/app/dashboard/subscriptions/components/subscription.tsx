@@ -8,6 +8,7 @@ import {
 	IconDotsVertical,
 	IconPencil,
 	IconTrash,
+	IconUsersPlus,
 	IconX,
 } from '@tabler/icons-react'
 
@@ -18,6 +19,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import {
 	ActionIcon,
 	Avatar,
+	AvatarGroup,
 	Badge,
 	Card,
 	Group,
@@ -26,10 +28,11 @@ import {
 	Stack,
 	Text,
 	Title,
+	Tooltip,
 	useComputedColorScheme,
 } from '@mantine/core'
 
-import { getInitials } from 'utils'
+import { getInitials, getUserName } from 'utils'
 import { useGlobal } from 'state/global'
 import type { ISubscription, IService } from 'types'
 
@@ -39,6 +42,7 @@ dayjs.extend(relativeTime)
 
 type SubscriptionProps = {
 	onDelete: () => void
+	onManageCollaborators: () => void
 	onMarkPaid: () => void
 	onSetActive: () => void
 	onSetAlert: () => void
@@ -48,6 +52,7 @@ type SubscriptionProps = {
 
 const Subscription = ({
 	onDelete,
+	onManageCollaborators,
 	onMarkPaid,
 	onSetActive,
 	onSetAlert,
@@ -67,6 +72,8 @@ const Subscription = ({
 	const isDueThisWeek = dueIn === 0
 
 	const isPastRenewal = dayjs.utc().isAfter(billing_date)
+
+	const hasCollaborators = subscription.collaborators.length > 0
 	return (
 		<Card
 			shadow="sm"
@@ -123,67 +130,97 @@ const Subscription = ({
 							)}
 						</Stack>
 					</Group>
-					<Menu shadow="md" width={160} position="bottom-end">
-						<Menu.Target>
-							<ActionIcon variant={scheme === 'light' ? 'default' : 'subtle'}>
-								<IconDotsVertical size={18} />
-							</ActionIcon>
-						</Menu.Target>
-						<Menu.Dropdown>
-							{isPastRenewal && (
-								<Menu.Item
-									title="Mark Paid"
-									onClick={onMarkPaid}
-									leftSection={<IconCreditCardPay size={18} />}
+					<Group gap={8}>
+						<AvatarGroup>
+							{subscription.collaborators.slice(0, 3).map(collaborator => (
+								<Tooltip
+									key={collaborator.id}
+									label={getUserName(collaborator.user)}
+									withArrow
 								>
-									Mark Paid
-								</Menu.Item>
+									<Avatar
+										size="sm"
+										color="blue"
+										src={collaborator.user.image_url}
+										name={getUserName(collaborator.user)}
+									/>
+								</Tooltip>
+							))}
+							{subscription.collaborators.length > 3 && (
+								<Avatar size="sm" color="blue">
+									+{subscription.collaborators.length - 2}
+								</Avatar>
 							)}
-							<Menu.Item
-								onClick={onSetActive}
-								leftSection={
-									subscription.is_active ? (
-										<IconCheck size={18} color="var(--mantine-color-green-5)" />
-									) : (
-										<IconX size={18} color="var(--mantine-color-gray-5)" />
-									)
-								}
-								title={`Mark ${subscription.is_active ? 'Inactive' : 'Active'}`}
-							>
-								Mark {subscription.is_active ? 'Inactive' : 'Active'}
-							</Menu.Item>
-							{subscription.is_active && (
+						</AvatarGroup>
+						<Menu shadow="md" width={240} position="bottom-end">
+							<Menu.Target>
+								<ActionIcon variant={scheme === 'light' ? 'default' : 'subtle'}>
+									<IconDotsVertical size={18} />
+								</ActionIcon>
+							</Menu.Target>
+							<Menu.Dropdown>
 								<Menu.Item
-									onClick={onSetAlert}
-									title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+									onClick={onManageCollaborators}
+									leftSection={<IconUsersPlus size={18} />}
+									title={hasCollaborators ? 'Manage Collaborators' : 'Add Collaborators'}
+								>
+									{hasCollaborators ? 'Manage Collaborators' : 'Add Collaborators'}
+								</Menu.Item>
+								{isPastRenewal && (
+									<Menu.Item
+										title="Mark Paid"
+										onClick={onMarkPaid}
+										leftSection={<IconCreditCardPay size={18} />}
+									>
+										Mark Paid
+									</Menu.Item>
+								)}
+								<Menu.Item
+									onClick={onSetActive}
 									leftSection={
-										subscription.email_alert ? (
-											<IconBellOff size={18} />
+										subscription.is_active ? (
+											<IconCheck size={18} color="var(--mantine-color-green-5)" />
 										) : (
-											<IconBell size={18} />
+											<IconX size={18} color="var(--mantine-color-gray-5)" />
 										)
 									}
+									title={`Mark ${subscription.is_active ? 'Inactive' : 'Active'}`}
 								>
-									{subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+									Mark {subscription.is_active ? 'Inactive' : 'Active'}
 								</Menu.Item>
-							)}
-							<Menu.Item
-								title="Edit"
-								onClick={onUpdate}
-								leftSection={<IconPencil size={18} />}
-							>
-								Edit
-							</Menu.Item>
-							<Menu.Item
-								color="red"
-								title="Delete"
-								onClick={onDelete}
-								leftSection={<IconTrash size={18} />}
-							>
-								Delete
-							</Menu.Item>
-						</Menu.Dropdown>
-					</Menu>
+								{subscription.is_active && (
+									<Menu.Item
+										onClick={onSetAlert}
+										title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+										leftSection={
+											subscription.email_alert ? (
+												<IconBellOff size={18} />
+											) : (
+												<IconBell size={18} />
+											)
+										}
+									>
+										{subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+									</Menu.Item>
+								)}
+								<Menu.Item
+									title="Edit"
+									onClick={onUpdate}
+									leftSection={<IconPencil size={18} />}
+								>
+									Edit
+								</Menu.Item>
+								<Menu.Item
+									color="red"
+									title="Delete"
+									onClick={onDelete}
+									leftSection={<IconTrash size={18} />}
+								>
+									Delete
+								</Menu.Item>
+							</Menu.Dropdown>
+						</Menu>
+					</Group>
 				</Group>
 			</Card.Section>
 			<Card.Section p={16}>

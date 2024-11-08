@@ -2,10 +2,12 @@ import type z from 'zod'
 
 import type { schema } from '@tracksubs/drizzle'
 
+export type IMinimalUser = Pick<IUser, 'id' | 'first_name' | 'last_name' | 'image_url'>
+
 export type IContact = z.infer<typeof schema.Contact> & {
-	sender: IUser
-	receiver: IUser
-}
+		sender: IMinimalUser
+		receiver: IMinimalUser
+	}
 
 export type IUsage = z.infer<typeof schema.Usage>
 
@@ -15,7 +17,14 @@ export type IService = z.infer<typeof schema.Service>
 
 export type IPaymentMethod = z.infer<typeof schema.PaymentMethod>
 
-export type ISubscription = z.infer<typeof schema.Subscription>
+export type ICollaborator = z.infer<typeof schema.Collaborator> & { user: IMinimalUser }
+
+export type ISplitStrategy = 'EQUALLY' | 'UNEQUALLY' | 'PERCENTAGE'
+
+export type ISubscription = z.infer<typeof schema.Subscription> & {
+	collaborators: Array<ICollaborator>
+	split_strategy: ISplitStrategy | null
+}
 
 export type ITransaction = z.infer<typeof schema.Transaction>
 

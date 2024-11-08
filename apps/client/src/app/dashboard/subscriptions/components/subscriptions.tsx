@@ -16,6 +16,7 @@ import Subscription from './subscription'
 import { subscriptions_active, subscription_alert, subscriptions_delete } from '../action'
 
 const UpdateModal = lazy(() => import('./updateModal'))
+const CollaboratorsModal = lazy(() => import('./collaboratorsModal'))
 const CreateTransactionModal = lazy(() => import('./createTransactionModal'))
 
 const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscription> }) => {
@@ -153,17 +154,24 @@ const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscript
 			children: <UpdateModal subscription={subscription} />,
 		})
 
+	const onManageCollaborators = (subscription: ISubscription) =>
+		modals.open({
+			title: 'Manage Collaborators',
+			children: <CollaboratorsModal subscription={subscription} />,
+		})
+
 	return (
 		<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
 			{subscriptions.map(subscription => (
 				<Subscription
 					key={subscription.id}
 					onDelete={() => onDelete(subscription)}
+					onManageCollaborators={() => onManageCollaborators(subscription)}
 					onMarkPaid={() => onMarkPaid(subscription)}
 					onSetActive={() => onSetActive(subscription)}
 					onSetAlert={() => onSetAlert(subscription)}
-					subscription={subscription}
 					onUpdate={() => onUpdate(subscription)}
+					subscription={subscription}
 				/>
 			))}
 		</SimpleGrid>
