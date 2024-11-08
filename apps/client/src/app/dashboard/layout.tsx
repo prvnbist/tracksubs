@@ -40,9 +40,9 @@ export default async function Layout({ children }: PropsWithChildren) {
 		return (
 			<GlobalProvider
 				user={data}
-				contacts={_contacts?.data || []}
 				services={_services?.data || {}}
 				paymentMethods={data?.payment_methods || []}
+				contacts={new Map(_contacts?.data?.map(contact => [contact.id, contact]) ?? [])}
 			>
 				<ModalsProvider>
 					<NuqsAdapter>

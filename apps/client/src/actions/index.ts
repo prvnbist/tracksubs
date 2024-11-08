@@ -4,7 +4,7 @@ import { asc } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
-import type { IService } from 'types'
+import type { IContact, IMinimalUser, IService } from 'types'
 import { actionClient } from 'server_utils'
 
 export const user = actionClient.action(async ({ ctx: { authId } }) => {
@@ -28,7 +28,10 @@ export const user = actionClient.action(async ({ ctx: { authId } }) => {
 export const contacts = actionClient.action(async ({ ctx: { user_id } }) => {
 	try {
 		const data = await db.query.contact.findMany({
-			with: { sender: true, receiver: true },
+			with: {
+				sender: { columns: { id: true, first_name: true, last_name: true, image_url: true } },
+				receiver: { columns: { id: true, first_name: true, last_name: true, image_url: true } },
+			},
 			where: (contact, { eq, or }) =>
 				or(eq(contact.sender_id, user_id), eq(contact.receiver_id, user_id)),
 		})

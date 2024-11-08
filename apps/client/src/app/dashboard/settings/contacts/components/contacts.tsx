@@ -67,11 +67,12 @@ const Contacts = () => {
 	const { user, contacts } = useGlobal()
 
 	const [added, sent, received] = useMemo(() => {
-		const added = contacts.filter(contact => contact.status === 'ACCEPTED')
-		const sent = contacts.filter(
+		const _contacts = [...contacts.values()]
+		const added = _contacts.filter(contact => contact.status === 'ACCEPTED')
+		const sent = _contacts.filter(
 			contact => contact.sender_id === user.id && contact.status === 'PENDING'
 		)
-		const received = contacts.filter(
+		const received = _contacts.filter(
 			contact => contact.receiver_id === user.id && contact.status === 'PENDING'
 		)
 		return [added, sent, received]
