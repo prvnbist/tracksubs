@@ -20,6 +20,7 @@ import { track } from 'utils'
 import Logo from 'assets/svgs/logo'
 
 import classes from './page.module.css'
+import IconGrid from './components/IconGrid'
 
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()
@@ -28,7 +29,8 @@ export default function Page(): JSX.Element {
 
 	return (
 		<main>
-			<Flex component="header" align="center" h="90dvh" className={classes.header}>
+			<Flex component="header" align="center" h="90dvh">
+				<IconGrid />
 				<Flex direction="column" align="center" justify="center" w="100%">
 					<Logo size={120} />
 					<Space h={8} />
