@@ -5,16 +5,17 @@ import Image from 'next/image'
 import { useUser } from '@clerk/nextjs'
 import {
 	Anchor,
+	Box,
 	Button,
 	Container,
 	Flex,
 	Group,
+	Image as MantineImage,
 	Skeleton,
 	Space,
 	Stack,
 	Text,
 	Title,
-	useComputedColorScheme,
 } from '@mantine/core'
 
 import { track } from 'utils'
@@ -28,10 +29,10 @@ export default function Page(): JSX.Element {
 
 	return (
 		<main>
-			<Flex component="header" align="center" h="90dvh">
+			<Flex component="header" justify="center" h="90dvh">
 				<IconGrid />
-				<Flex direction="column" align="center" justify="center" w="100%">
-					<Logo size={120} />
+				<Stack gap={0} align="center" pt={180}>
+					<Logo size={64} />
 					<Space h={8} />
 					<Title>Track Subs</Title>
 					<Space h={8} />
@@ -54,15 +55,22 @@ export default function Page(): JSX.Element {
 					) : (
 						<Skeleton h={36} w={140} />
 					)}
-				</Flex>
+				</Stack>
 			</Flex>
-			<Flex
-				align="center"
-				component="section"
-				bg="var(--mantine-color-dark-6)"
-				className={classes.fold_1_wrapper}
-			>
-				<Container w="100%" className={classes.fold_1_content}>
+			<Container pb={120} fluid component="section" bg="var(--mantine-color-dark-6)">
+				<Container>
+					<Box
+						style={{
+							overflow: 'hidden',
+							transform: 'translateY(-120px)',
+							borderRadius: 'var(--mantine-radius-md)',
+							border: '2px solid var(--mantine-color-dark-6)',
+						}}
+					>
+						<MantineImage alt="Homepage Screenshot" width="100%" src="homepage.jpg" />
+					</Box>
+				</Container>
+				<Container className={classes.fold_1_content}>
 					<div>
 						<div
 							style={{
@@ -102,7 +110,7 @@ export default function Page(): JSX.Element {
 						</Text>
 					</div>
 				</Container>
-			</Flex>
+			</Container>
 			<Group py={16} gap={16} justify="center">
 				<Anchor
 					target="_blank"

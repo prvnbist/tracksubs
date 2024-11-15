@@ -5,10 +5,6 @@
 	transform: translate(-50%, -50%);
 }
 
-.fold_1_wrapper {
-	height: 560px;
-}
-
 .fold_1_content {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -50,11 +46,6 @@
 
 	.tagline {
 		width: calc(100% - 32px);
-	}
-
-	.fold_1_wrapper {
-		height: auto;
-		padding: 40px 0;
 	}
 
 	.fold_1_content {

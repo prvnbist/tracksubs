@@ -19,7 +19,7 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 	const [paidOn, setPaidOn] = useState<Date>(new Date())
 	const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null)
 
-	const { execute } = useAction(transaction_create, {
+	const { execute, isPending } = useAction(transaction_create, {
 		onSuccess: async () => {
 			await track('btn-create-transaction')
 
@@ -97,7 +97,7 @@ const CreateTransactionModal = ({ subscription }: { subscription: ISubscription 
 				data={payment_methods.map(pm => ({ value: pm.id, label: pm.title }))}
 			/>
 			<Space h={16} />
-			<Button fullWidth disabled={!paidOn} onClick={create}>
+			<Button fullWidth disabled={!paidOn || isPending} onClick={create}>
 				Create Transaction
 			</Button>
 		</div>
