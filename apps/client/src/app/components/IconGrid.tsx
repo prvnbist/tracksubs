@@ -32,6 +32,7 @@ const Line = (props: LineProps) => {
 
 	const theme = useMantineTheme()
 	const isVertical = orientation === 'vertical'
+
 	const bg = getGradient(
 		{
 			deg: isVertical ? 180 : 0,

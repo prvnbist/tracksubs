@@ -2,13 +2,11 @@
 
 import { useQueryState } from 'nuqs'
 
-import { SegmentedControl, useComputedColorScheme } from '@mantine/core'
+import { SegmentedControl } from '@mantine/core'
 
 import { CYCLES } from 'consts'
 
 const IntervalSelector = () => {
-	const scheme = useComputedColorScheme()
-
 	const [interval, setInterval] = useQueryState('interval', {
 		defaultValue: 'ALL',
 		history: 'push',
@@ -18,9 +16,9 @@ const IntervalSelector = () => {
 		<SegmentedControl
 			size="sm"
 			radius="sm"
+			bg="dark.8"
 			value={interval}
 			withItemsBorders={false}
-			bg={scheme === 'light' ? 'gray.3' : 'dark.8'}
 			onChange={value => setInterval(value)}
 			data={[{ value: 'ALL', label: 'All' }, ...CYCLES]}
 		/>

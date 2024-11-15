@@ -7,16 +7,7 @@ import { IconPlus, IconTrash } from '@tabler/icons-react'
 
 import { useMediaQuery } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
-import {
-	ActionIcon,
-	Box,
-	Group,
-	Input,
-	Space,
-	Stack,
-	Title,
-	useComputedColorScheme,
-} from '@mantine/core'
+import { ActionIcon, Box, Group, Input, Space, Stack, Title } from '@mantine/core'
 
 import { track } from 'utils'
 import { useGlobal } from 'state/global'
@@ -28,7 +19,6 @@ export default function Page() {
 
 	const { payment_methods } = useGlobal()
 
-	const scheme = useComputedColorScheme()
 	const isMobile = useMediaQuery('(max-width: 56.25em)')
 
 	const { execute: deletePaymentMethod } = useAction(payment_method_delete, {
@@ -81,8 +71,8 @@ export default function Page() {
 						<ActionIcon
 							size="lg"
 							type="submit"
+							variant="subtle"
 							title="Delete Payment"
-							variant={scheme === 'light' ? 'default' : 'subtle'}
 							onClick={() => deletePaymentMethod({ id: payment_method.id })}
 						>
 							<IconTrash size={18} />

@@ -26,7 +26,6 @@ import {
 	Stack,
 	Text,
 	Title,
-	useComputedColorScheme,
 } from '@mantine/core'
 
 import { getInitials } from 'utils'
@@ -56,8 +55,6 @@ const Subscription = ({
 }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
 
-	const scheme = useComputedColorScheme()
-
 	const service = subscription.service ? (services[subscription.service] ?? null) : null
 
 	const billing_date = dayjs.utc(subscription.next_billing_date).tz(user.timezone!, true)
@@ -80,11 +77,7 @@ const Subscription = ({
 				},
 			}}
 		>
-			<Card.Section
-				p={16}
-				withBorder
-				bg={scheme === 'light' ? 'transparent' : 'var(--mantine-color-dark-7)'}
-			>
+			<Card.Section p={16} withBorder bg="var(--mantine-color-dark-7)">
 				<Group justify="space-between">
 					<Group gap={16}>
 						<Indicator
@@ -108,10 +101,7 @@ const Subscription = ({
 						<Stack gap={0}>
 							<Title order={5}>{subscription.title}</Title>
 							{subscription.is_active ? (
-								<Text
-									size="sm"
-									c={isDueThisWeek ? (scheme === 'light' ? 'red.7' : 'red.4') : 'dark.2'}
-								>
+								<Text size="sm" c={isDueThisWeek ? 'red.4' : 'dark.2'}>
 									{isDueThisWeek
 										? `Due ${billing_date.fromNow()}`
 										: `Due: ${billing_date.format('MMM DD, YYYY')}`}
@@ -125,7 +115,7 @@ const Subscription = ({
 					</Group>
 					<Menu shadow="md" width={160} position="bottom-end">
 						<Menu.Target>
-							<ActionIcon variant={scheme === 'light' ? 'default' : 'subtle'}>
+							<ActionIcon variant="subtle">
 								<IconDotsVertical size={18} />
 							</ActionIcon>
 						</Menu.Target>
@@ -195,7 +185,7 @@ const Subscription = ({
 						}).format(subscription.amount / 100)}
 					</Text>
 					<Badge
-						variant={scheme === 'light' ? 'default' : 'light'}
+						variant="light"
 						c={
 							subscription.interval === 'MONTHLY'
 								? 'teal'
