@@ -22,6 +22,15 @@ export type ISelectedCollaborator = {
 	percentageAmount: string
 }
 
+const ERROR_MESSAGES = {
+	SUBSCRIPTION_NOT_FOUND: 'No such subscription exists.',
+	NO_CHANGES: 'There are no changes to update.',
+	SERVER_ERROR: 'Something went wrong, please refresh the page.',
+	COLLABORATOR_NOT_FOUND: "One or more users you're trying to add don't exist.",
+	COLLABORATOR_SUBSCRIPTION_LIMIT_EXCEEDED:
+		'One or more users have reached their subscription limit.',
+} as const
+
 const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) => {
 	const { user, contacts } = useGlobal()
 
@@ -77,27 +86,11 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 			modals.closeAll()
 		},
 		onError: ({ error }) => {
-			if (error.serverError === 'SUBSCRIPTION_NOT_FOUND') {
+			if (error.serverError && error.serverError in ERROR_MESSAGES) {
 				return notifications.show({
 					color: 'red',
 					title: 'Error',
-					message: 'No such subscription exists.',
-				})
-			}
-
-			if (error.serverError === 'NO_CHANGES') {
-				return notifications.show({
-					color: 'red',
-					title: 'Error',
-					message: 'There are no changes to update.',
-				})
-			}
-
-			if (error.serverError === 'SERVER_ERROR') {
-				return notifications.show({
-					color: 'red',
-					title: 'Error',
-					message: 'Something went wrong, please refresh the page.',
+					message: ERROR_MESSAGES[error.serverError as keyof typeof ERROR_MESSAGES],
 				})
 			}
 		},

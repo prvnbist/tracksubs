@@ -8,7 +8,6 @@ import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
 import db, { schema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'consts'
-
 import { actionClient } from 'server_utils'
 
 export const transaction_create = actionClient
@@ -366,6 +365,37 @@ export const manage_collaborators = actionClient
 				if (added.length === 0 && removed.length === 0 && changes.length === 0)
 					throw Error('NO_CHANGES')
 
+				if (added.length > 0) {
+					const count = await db.$count(
+						schema.user,
+						inArray(
+							schema.user.id,
+							added.map(c => c.user_id)
+						)
+					)
+
+					if (added.length !== count) throw Error('COLLABORATOR_NOT_FOUND')
+
+					const users = await db.query.user.findMany({
+						columns: { id: true, plan: true },
+						with: { usage: { columns: { total_subscriptions: true } } },
+						where: inArray(
+							schema.user.id,
+							added.map(c => c.user_id)
+						),
+					})
+
+					for (const user of users) {
+						const plan = user.plan
+						if (
+							plan === 'FREE' &&
+							user.usage.total_subscriptions === PLANS[plan].subscriptions
+						) {
+							throw Error('COLLABORATOR_SUBSCRIPTION_LIMIT_EXCEEDED')
+						}
+					}
+				}
+
 				await db.transaction(async tx => {
 					if (subscription.split_strategy !== split_strategy) {
 						await tx
@@ -375,13 +405,41 @@ export const manage_collaborators = actionClient
 					}
 
 					if (removed.length > 0) {
-						await tx
+						const removed_collaborators = await tx
 							.delete(schema.collaborator)
 							.where(inArray(schema.collaborator.id, removed))
+							.returning({
+								email_alert: schema.collaborator.email_alert,
+								user_id: schema.collaborator.user_id,
+							})
+
+						for (const collaborator of removed_collaborators) {
+							await tx
+								.update(schema.usage)
+								.set({
+									...(collaborator.email_alert && {
+										total_alerts: sql`${schema.usage.total_alerts} - 1`,
+									}),
+									total_subscriptions: sql`${schema.usage.total_subscriptions} - 1`,
+								})
+								.where(eq(schema.usage.user_id, collaborator.user_id))
+						}
 					}
 
 					if (added.length > 0) {
 						await tx.insert(schema.collaborator).values(added)
+
+						await tx
+							.update(schema.usage)
+							.set({
+								total_subscriptions: sql`${schema.usage.total_subscriptions} + 1`,
+							})
+							.where(
+								inArray(
+									schema.usage.user_id,
+									added.map(c => c.user_id)
+								)
+							)
 					}
 
 					if (changes.length > 0) {
