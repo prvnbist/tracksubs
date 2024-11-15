@@ -9,6 +9,7 @@ import {
 	Container,
 	Flex,
 	Group,
+	Skeleton,
 	Space,
 	Stack,
 	Text,
@@ -35,7 +36,7 @@ export default function Page(): JSX.Element {
 					<Title>Track Subs</Title>
 					<Space h={8} />
 					<Text ta="center" size="18px" className={classes.tagline}>
-						Streamline your finances and stay on top of recurring expenses effortlessly.
+						Streamline your finances and stay on top of your subscriptions effortlessly.
 					</Text>
 					<Space h={16} />
 					{isLoaded ? (
@@ -46,11 +47,13 @@ export default function Page(): JSX.Element {
 								</Link>
 							) : (
 								<Link href="/login" onClick={() => track('btn-login')}>
-									<Button>Get Started</Button>
+									<Button>Get started — It's Free</Button>
 								</Link>
 							)}
 						</Group>
-					) : null}
+					) : (
+						<Skeleton h={36} w={140} />
+					)}
 				</Flex>
 			</Flex>
 			<Flex
