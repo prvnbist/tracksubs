@@ -1,76 +1,83 @@
 {
-	"version": "7",
-	"dialect": "postgresql",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "7",
-			"when": 1730452502292,
-			"tag": "20241101091502_user",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1730453310360,
-			"tag": "20241101092830_usage",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "7",
-			"when": 1730453372149,
-			"tag": "20241101092932_user_on_insert_trigger",
-			"breakpoints": true
-		},
-		{
-			"idx": 3,
-			"version": "7",
-			"when": 1730457116039,
-			"tag": "20241101103156_service",
-			"breakpoints": true
-		},
-		{
-			"idx": 4,
-			"version": "7",
-			"when": 1730457158393,
-			"tag": "20241101103238_payment_method",
-			"breakpoints": true
-		},
-		{
-			"idx": 5,
-			"version": "7",
-			"when": 1730457245416,
-			"tag": "20241101103405_subscription",
-			"breakpoints": true
-		},
-		{
-			"idx": 6,
-			"version": "7",
-			"when": 1730457297389,
-			"tag": "20241101103457_transaction",
-			"breakpoints": true
-		},
-		{
-			"idx": 7,
-			"version": "7",
-			"when": 1730482321849,
-			"tag": "20241101173201_contact",
-			"breakpoints": true
-		},
-		{
-			"idx": 8,
-			"version": "7",
-			"when": 1730801385006,
-			"tag": "20241105100945_collaborator",
-			"breakpoints": true
-		},
-		{
-			"idx": 9,
-			"version": "7",
-			"when": 1730804614517,
-			"tag": "20241105110334_collborator_column_type",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1730452502292,
+      "tag": "20241101091502_user",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1730453310360,
+      "tag": "20241101092830_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1730453372149,
+      "tag": "20241101092932_user_on_insert_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1730457116039,
+      "tag": "20241101103156_service",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1730457158393,
+      "tag": "20241101103238_payment_method",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1730457245416,
+      "tag": "20241101103405_subscription",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1730457297389,
+      "tag": "20241101103457_transaction",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1730482321849,
+      "tag": "20241101173201_contact",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1730801385006,
+      "tag": "20241105100945_collaborator",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1730804614517,
+      "tag": "20241105110334_collborator_column_type",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1731322084930,
+      "tag": "20241111104804_collaborator_email_alert",
+      "breakpoints": true
+    }
+  ]
 }

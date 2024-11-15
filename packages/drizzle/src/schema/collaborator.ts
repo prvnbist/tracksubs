@@ -1,6 +1,15 @@
 import { relations, sql } from 'drizzle-orm'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { check, integer, numeric, pgTable, timestamp, unique, uuid } from 'drizzle-orm/pg-core'
+import {
+	boolean,
+	check,
+	integer,
+	numeric,
+	pgTable,
+	timestamp,
+	unique,
+	uuid,
+} from 'drizzle-orm/pg-core'
 
 import user from './user'
 import subscription from './subscription'
@@ -18,6 +27,7 @@ const collaborator = pgTable(
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
 		created_at: timestamp().notNull().defaultNow(),
+		email_alert: boolean().default(false).notNull(),
 	},
 	table => ({
 		percentageConstraint: check(

@@ -1,0 +1,1 @@
+ALTER TABLE "collaborator" ADD COLUMN "email_alert" boolean DEFAULT false NOT NULL;
