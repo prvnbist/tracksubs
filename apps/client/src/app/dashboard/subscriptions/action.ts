@@ -3,13 +3,13 @@
 import { z } from 'zod'
 import dayjs from 'dayjs'
 import { revalidatePath } from 'next/cache'
-import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, getTableColumns, inArray, or, sql } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'consts'
 import { actionClient } from 'server_utils'
-import type { ISubscription } from 'types'
+import type { ICollaborator } from 'types'
 
 export const transaction_create = actionClient
 	.schema(
@@ -72,74 +72,55 @@ export const subscriptions_list = actionClient
 			]),
 		})
 	)
-	.action(
-		async ({ parsedInput: { interval }, ctx: { user_id } }) => {
-			const intervals = sql.join(
-				interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval],
-				sql`,`
-			)
+	.action(async ({ parsedInput: { interval }, ctx: { user_id } }) => {
+		const collaboratorsQuery = sql<Array<ICollaborator>>`
+			COALESCE(
+				JSON_AGG(
+					JSON_BUILD_OBJECT(
+						'id', collaborator.id,
+						'amount', collaborator.amount,
+						'percentage', collaborator.percentage,
+						'user_id', collaborator.user_id,
+						'email_alert', collaborator.email_alert,
+						'user', JSON_BUILD_OBJECT(
+							'id',"user".id,
+							'first_name',"user".first_name,
+							'last_name',"user".last_name,
+							'image_url',"user".image_url
+						)
+					)
+				) 
+				FILTER (WHERE collaborator.id IS NOT NULL),
+				'[]'
+			)`
 
-			const rawColumns = (columns: Array<string>) =>
-				sql.join(
-					columns.map(col => sql.raw(col)),
-					sql`,`
+		const data = await db
+			.select({
+				...getTableColumns(schema.subscription),
+				collaborators: collaboratorsQuery,
+			})
+			.from(schema.subscription)
+			.leftJoin(
+				schema.collaborator,
+				eq(schema.collaborator.subscription_id, schema.subscription.id)
+			)
+			.leftJoin(schema.user, eq(schema.user.id, schema.collaborator.user_id))
+			.where(
+				and(
+					or(
+						eq(schema.subscription.user_id, user_id),
+						eq(schema.collaborator.user_id, user_id)
+					),
+					inArray(
+						schema.subscription.interval,
+						interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval]
+					)
 				)
-
-			const subquery_columns = rawColumns([
-				's.id',
-				's.user_id',
-				's.title',
-				's.website',
-				's.currency',
-				's.amount',
-				's.next_billing_date',
-				's.interval',
-				's.email_alert',
-				's.is_active',
-				's.service',
-				's.payment_method_id',
-				's.split_strategy',
-				'c.id AS c_id',
-				'c.amount AS c_amount',
-				'c.percentage AS c_percentage',
-				'c.user_id AS c_user_id',
-				'c.email_alert AS c_email_alert',
-				'u.id AS u_id',
-				'u.first_name AS u_first_name',
-				'u.last_name AS u_last_name',
-				'u.image_url AS u_image_url',
-			])
-
-			const columns = rawColumns([
-				'id',
-				'user_id',
-				'title',
-				'website',
-				'currency',
-				'amount',
-				'next_billing_date',
-				'interval',
-				'email_alert',
-				'is_active',
-				'service',
-				'payment_method_id',
-				'split_strategy',
-			])
-
-			const collaboratorsQuery = sql.raw(
-				`COALESCE(JSON_AGG(JSON_BUILD_OBJECT('id',c_id,'amount',c_amount,'percentage',c_percentage,'user_id',c_user_id,'email_alert',c_email_alert,'user',JSON_BUILD_OBJECT('id',u_id,'first_name',u_first_name,'last_name',u_last_name,'image_url',u_image_url))) FILTER (WHERE c_id IS NOT NULL),'[]') AS collaborators`
 			)
-
-			const result = await db.execute<ISubscription>(
-				sql`with filtered_subscriptions as (SELECT ${subquery_columns} FROM SUBSCRIPTION AS s LEFT JOIN collaborator AS c ON c.subscription_id = s.id LEFT JOIN "user" AS u ON u.id = c.user_id WHERE (s.user_id = ${user_id} OR c.user_id = ${user_id}) AND s.interval IN (${intervals})) SELECT ${columns}, ${collaboratorsQuery} FROM filtered_subscriptions GROUP BY ${columns} ORDER BY is_active DESC, next_billing_date ASC;`
-			)
-
-			if (!result.rows) throw Error('SERVER_ERROR')
-
-			return result.rows
-		},
-		{ onSuccess: () => revalidatePath('dashboard/subscriptions') }
-	)
+			.groupBy(schema.subscription.id)
+			.orderBy(desc(schema.subscription.is_active), asc(schema.subscription.next_billing_date))
+		return data
+	})
 
 export const subscriptions_create = actionClient
 	.schema(schema.NewSubscription.omit({ user_id: true }))

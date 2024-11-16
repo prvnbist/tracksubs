@@ -22,7 +22,9 @@ export default async function Page({
 	const { interval = 'ALL' } = searchParams
 
 	try {
-		const data = (await subscriptions_list({ interval })) as { data: Array<ISubscription> }
+		const data = await subscriptions_list({ interval })
+
+		if (data?.serverError) throw Error()
 
 		if (data?.data?.length === 0) {
 			return (
@@ -36,7 +38,7 @@ export default async function Page({
 		}
 		return (
 			<Shell>
-				<Subscriptions subscriptions={data?.data ?? []} />
+				<Subscriptions subscriptions={(data?.data as Array<ISubscription>) ?? []} />
 			</Shell>
 		)
 	} catch (error) {

@@ -24,6 +24,7 @@ const ERRORS = {
 }
 
 const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscription> }) => {
+
 	const { execute: setActive } = useAction(subscriptions_active, {
 		onSuccess: ({ data }) => {
 			const result = (data as Array<{ is_active: boolean; title: string }>)?.[0]!
