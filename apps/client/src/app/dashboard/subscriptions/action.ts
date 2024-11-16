@@ -250,25 +250,35 @@ export const subscription_alert = actionClient
 					where: eq(schema.usage.user_id, user_id),
 				})
 
-				if (!usage) throw Error()
+				if (!usage) throw Error('SERVER_ERROR')
 
 				if (usage.total_alerts === user_plan?.alerts) {
-					return {
-						status: 'ERROR',
-						message: `Selected plan allows upto ${user_plan.alerts} alerts. Please change your plan to the one that fits your needs.`,
-					}
+					throw Error('EMAIL_ALERT_LIMIT_EXCEEDED')
 				}
 			}
 
-			const data = await db
-				.update(schema.subscription)
-				.set({ email_alert })
-				.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
-				.returning({
-					id: schema.subscription.id,
-					email_alert: schema.subscription.email_alert,
-					title: schema.subscription.title,
-				})
+			const subscription = await db.query.subscription.findFirst({
+				where: (subscription, { eq }) => eq(subscription.id, id),
+			})
+
+			if (!subscription) throw Error('SUBSCRIPTION_NOT_FOUND')
+
+			if (subscription.user_id === user_id) {
+				await db
+					.update(schema.subscription)
+					.set({ email_alert })
+					.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
+			} else {
+				await db
+					.update(schema.collaborator)
+					.set({ email_alert })
+					.where(
+						and(
+							eq(schema.collaborator.user_id, user_id),
+							eq(schema.collaborator.subscription_id, id)
+						)
+					)
+			}
 
 			await db
 				.update(schema.usage)
@@ -279,7 +289,7 @@ export const subscription_alert = actionClient
 				})
 				.where(eq(schema.usage.user_id, user_id))
 
-			return data
+			return { title: subscription.title, email_alert }
 		},
 		{ onSuccess: () => revalidatePath('dashboard/subscriptions') }
 	)

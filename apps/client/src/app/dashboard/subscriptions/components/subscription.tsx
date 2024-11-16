@@ -45,7 +45,7 @@ type SubscriptionProps = {
 	onManageCollaborators: () => void
 	onMarkPaid: () => void
 	onSetActive: () => void
-	onSetAlert: () => void
+	onSetAlert: (isEmailAlertOn: boolean) => void
 	onUpdate: () => void
 	subscription: ISubscription
 }
@@ -63,6 +63,8 @@ const Subscription = ({
 
 	const scheme = useComputedColorScheme()
 
+	const isOwner = subscription.user_id === user.id
+
 	const service = subscription.service ? (services[subscription.service] ?? null) : null
 
 	const billing_date = dayjs.utc(subscription.next_billing_date).tz(user.timezone!, true)
@@ -74,6 +76,14 @@ const Subscription = ({
 	const isPastRenewal = dayjs.utc().isAfter(billing_date)
 
 	const hasCollaborators = subscription.collaborators.length > 0
+
+	const amount =
+		(isOwner ? subscription.amount : (subscription.collaborators?.[0]?.amount ?? 0)) / 100
+
+	const isEmailAlertOn = isOwner
+		? subscription.email_alert
+		: subscription.collaborators?.[0]?.email_alert
+
 	return (
 		<Card
 			shadow="sm"
@@ -83,7 +93,10 @@ const Subscription = ({
 			styles={{
 				root: {
 					...(!subscription.is_active && { filter: 'grayscale(1)' }),
-					...(isPastRenewal && { borderWidth: 2, borderColor: 'var(--mantine-color-red-5)' }),
+					...(isPastRenewal && {
+						borderWidth: 2,
+						borderColor: 'var(--mantine-color-red-5)',
+					}),
 				},
 			}}
 		>
@@ -98,7 +111,8 @@ const Subscription = ({
 							size={12}
 							withBorder
 							color="green"
-							disabled={!subscription.email_alert}
+							disabled={!isEmailAlertOn}
+							title={isEmailAlertOn ? 'Email Alert Enabled' : ''}
 						>
 							{subscription.website ? (
 								<Link
@@ -131,27 +145,29 @@ const Subscription = ({
 						</Stack>
 					</Group>
 					<Group gap={8}>
-						<AvatarGroup>
-							{subscription.collaborators.slice(0, 3).map(collaborator => (
-								<Tooltip
-									key={collaborator.id}
-									label={getUserName(collaborator.user)}
-									withArrow
-								>
-									<Avatar
-										size="sm"
-										color="blue"
-										src={collaborator.user.image_url}
-										name={getUserName(collaborator.user)}
-									/>
-								</Tooltip>
-							))}
-							{subscription.collaborators.length > 3 && (
-								<Avatar size="sm" color="blue">
-									+{subscription.collaborators.length - 2}
-								</Avatar>
-							)}
-						</AvatarGroup>
+						{isOwner && (
+							<AvatarGroup>
+								{subscription.collaborators.slice(0, 3).map(collaborator => (
+									<Tooltip
+										key={collaborator.id}
+										label={getUserName(collaborator.user)}
+										withArrow
+									>
+										<Avatar
+											size="sm"
+											color="blue"
+											src={collaborator.user.image_url}
+											name={getUserName(collaborator.user)}
+										/>
+									</Tooltip>
+								))}
+								{subscription.collaborators.length > 3 && (
+									<Avatar size="sm" color="blue">
+										+{subscription.collaborators.length - 2}
+									</Avatar>
+								)}
+							</AvatarGroup>
+						)}
 						<Menu shadow="md" width={240} position="bottom-end">
 							<Menu.Target>
 								<ActionIcon variant={scheme === 'light' ? 'default' : 'subtle'}>
@@ -159,14 +175,18 @@ const Subscription = ({
 								</ActionIcon>
 							</Menu.Target>
 							<Menu.Dropdown>
-								<Menu.Item
-									onClick={onManageCollaborators}
-									leftSection={<IconUsersPlus size={18} />}
-									title={hasCollaborators ? 'Manage Collaborators' : 'Add Collaborators'}
-								>
-									{hasCollaborators ? 'Manage Collaborators' : 'Add Collaborators'}
-								</Menu.Item>
-								{isPastRenewal && (
+								{isOwner && (
+									<Menu.Item
+										onClick={onManageCollaborators}
+										leftSection={<IconUsersPlus size={18} />}
+										title={
+											hasCollaborators ? 'Manage Collaborators' : 'Add Collaborators'
+										}
+									>
+										{hasCollaborators ? 'Manage Collaborators' : 'Add Collaborators'}
+									</Menu.Item>
+								)}
+								{isOwner && isPastRenewal && (
 									<Menu.Item
 										title="Mark Paid"
 										onClick={onMarkPaid}
@@ -175,49 +195,51 @@ const Subscription = ({
 										Mark Paid
 									</Menu.Item>
 								)}
-								<Menu.Item
-									onClick={onSetActive}
-									leftSection={
-										subscription.is_active ? (
-											<IconCheck size={18} color="var(--mantine-color-green-5)" />
-										) : (
-											<IconX size={18} color="var(--mantine-color-gray-5)" />
-										)
-									}
-									title={`Mark ${subscription.is_active ? 'Inactive' : 'Active'}`}
-								>
-									Mark {subscription.is_active ? 'Inactive' : 'Active'}
-								</Menu.Item>
-								{subscription.is_active && (
+								{isOwner && (
 									<Menu.Item
-										onClick={onSetAlert}
-										title={subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+										onClick={onSetActive}
 										leftSection={
-											subscription.email_alert ? (
-												<IconBellOff size={18} />
+											subscription.is_active ? (
+												<IconCheck size={18} color="var(--mantine-color-green-5)" />
 											) : (
-												<IconBell size={18} />
+												<IconX size={18} color="var(--mantine-color-gray-5)" />
 											)
 										}
+										title={`Mark ${subscription.is_active ? 'Inactive' : 'Active'}`}
 									>
-										{subscription.email_alert ? 'Unset Alert' : 'Set Alert'}
+										Mark {subscription.is_active ? 'Inactive' : 'Active'}
 									</Menu.Item>
 								)}
-								<Menu.Item
-									title="Edit"
-									onClick={onUpdate}
-									leftSection={<IconPencil size={18} />}
-								>
-									Edit
-								</Menu.Item>
-								<Menu.Item
-									color="red"
-									title="Delete"
-									onClick={onDelete}
-									leftSection={<IconTrash size={18} />}
-								>
-									Delete
-								</Menu.Item>
+								{subscription.is_active && (
+									<Menu.Item
+										onClick={() => onSetAlert(!isEmailAlertOn)}
+										title={isEmailAlertOn ? 'Unset Alert' : 'Set Alert'}
+										leftSection={
+											isEmailAlertOn ? <IconBellOff size={18} /> : <IconBell size={18} />
+										}
+									>
+										{isEmailAlertOn ? 'Unset Alert' : 'Set Alert'}
+									</Menu.Item>
+								)}
+								{isOwner && (
+									<Menu.Item
+										title="Edit"
+										onClick={onUpdate}
+										leftSection={<IconPencil size={18} />}
+									>
+										Edit
+									</Menu.Item>
+								)}
+								{isOwner && (
+									<Menu.Item
+										color="red"
+										title="Delete"
+										onClick={onDelete}
+										leftSection={<IconTrash size={18} />}
+									>
+										Delete
+									</Menu.Item>
+								)}
 							</Menu.Dropdown>
 						</Menu>
 					</Group>
@@ -229,7 +251,7 @@ const Subscription = ({
 						{new Intl.NumberFormat('en-IN', {
 							style: 'currency',
 							currency: subscription.currency,
-						}).format(subscription.amount / 100)}
+						}).format(amount)}
 					</Text>
 					<Badge
 						variant={scheme === 'light' ? 'default' : 'light'}

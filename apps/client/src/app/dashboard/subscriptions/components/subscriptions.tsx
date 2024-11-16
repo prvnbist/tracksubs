@@ -19,12 +19,13 @@ const UpdateModal = lazy(() => import('./updateModal'))
 const CollaboratorsModal = lazy(() => import('./collaboratorsModal'))
 const CreateTransactionModal = lazy(() => import('./createTransactionModal'))
 
+const ERRORS = {
+	SUBSCRIPTION_NOT_FOUND: 'No such subscription exists',
+	SERVER_ERROR: 'Failed to update the subscription',
+	EMAIL_ALERT_LIMIT_EXCEEDED: "You've exceeded your allowed email alert limit.",
+}
+
 const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscription> }) => {
-	const { user } = useGlobal()
-
-	const usage = user.usage!
-	const plan = PLANS[user.plan]!
-
 	const { execute: setActive } = useAction(subscriptions_active, {
 		onSuccess: ({ data }) => {
 			const result = (data as Array<{ is_active: boolean; title: string }>)?.[0]!
@@ -50,24 +51,26 @@ const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscript
 
 	const { execute: setAlert } = useAction(subscription_alert, {
 		onSuccess: ({ data }) => {
-			const result = (data as Array<{ email_alert: boolean; title: string }>)?.[0]!
+			if (data) {
+				track(data.email_alert ? 'btn-set-alert' : 'btn-unset-alert')
 
-			track(result.email_alert ? 'btn-set-alert' : 'btn-unset-alert')
-
-			notifications.show({
-				color: 'green',
-				title: 'Success',
-				message: result.email_alert
-					? `You will now recieve alerts for: ${result.title}`
-					: `Disabled the email alerts for: ${result.title}`,
-			})
+				notifications.show({
+					color: 'green',
+					title: 'Success',
+					message: data.email_alert
+						? `You will now recieve alerts for: ${data.title}`
+						: `Disabled the email alerts for: ${data.title}`,
+				})
+			}
 		},
-		onError: () => {
-			notifications.show({
-				color: 'red',
-				title: 'Error',
-				message: 'Failed to update the subscription',
-			})
+		onError: ({ error }) => {
+			let message = 'Failed to update the subscription'
+
+			if (error.serverError && error.serverError in ERRORS) {
+				message = error.serverError
+			}
+
+			notifications.show({ color: 'red', title: 'Error', message })
 		},
 	})
 
@@ -105,20 +108,12 @@ const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscript
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 		})
 
-	const onSetAlert = (subscription: ISubscription) => {
-		if (!subscription.email_alert && usage.total_alerts === plan.alerts) {
-			return notifications.show({
-				color: 'red.5',
-				title: 'Usage Alert',
-				message: `Selected plan allows upto ${plan.alerts} alerts. Please change your plan to the one that fits your needs.`,
-			})
-		}
-
+	const onSetAlert = (subscription: ISubscription, isEmailAlertOn: boolean) => {
 		modals.openConfirmModal({
 			title: 'Email Alert',
 			children: (
 				<Text size="sm">
-					{subscription.email_alert
+					{isEmailAlertOn
 						? 'Please confirm if you want disable '
 						: 'Please confirm if you want to recieve '}
 					email alerts for the subscription: {subscription.title}
@@ -128,7 +123,7 @@ const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscript
 			onConfirm: () =>
 				setAlert({
 					id: subscription.id,
-					email_alert: !subscription.email_alert,
+					email_alert: isEmailAlertOn,
 				}),
 		})
 	}
@@ -169,7 +164,7 @@ const Subscriptions = ({ subscriptions = [] }: { subscriptions: Array<ISubscript
 					onManageCollaborators={() => onManageCollaborators(subscription)}
 					onMarkPaid={() => onMarkPaid(subscription)}
 					onSetActive={() => onSetActive(subscription)}
-					onSetAlert={() => onSetAlert(subscription)}
+					onSetAlert={isEmailAlertOn => onSetAlert(subscription, isEmailAlertOn)}
 					onUpdate={() => onUpdate(subscription)}
 					subscription={subscription}
 				/>
