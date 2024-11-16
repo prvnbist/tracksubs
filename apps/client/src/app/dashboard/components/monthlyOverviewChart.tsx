@@ -4,7 +4,6 @@ import { BarChart } from '@mantine/charts'
 
 import { currencyFormatter } from 'utils'
 
-
 type MonthlyOverviewChartProps = {
 	currency: string
 	data: Array<{

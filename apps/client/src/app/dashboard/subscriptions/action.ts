@@ -420,7 +420,7 @@ export const manage_collaborators = actionClient
 						const plan = user.plan
 						if (
 							plan === 'FREE' &&
-							user.usage.total_subscriptions === PLANS[plan].subscriptions
+							user.usage.total_subscriptions === PLANS[plan]?.subscriptions
 						) {
 							throw Error('COLLABORATOR_SUBSCRIPTION_LIMIT_EXCEEDED')
 						}

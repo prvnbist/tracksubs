@@ -2,12 +2,12 @@ import type z from 'zod'
 
 import type { schema } from '@tracksubs/drizzle'
 
-export type IMinimalUser = Pick<IUser, 'id' | 'first_name' | 'last_name' | 'image_url'>
+export type IMinimalUser = Pick<IUser, 'id' | 'first_name' | 'last_name' | 'image_url' | 'email'>
 
 export type IContact = z.infer<typeof schema.Contact> & {
-		sender: IMinimalUser
-		receiver: IMinimalUser
-	}
+	sender: IMinimalUser
+	receiver: IMinimalUser
+}
 
 export type IUsage = z.infer<typeof schema.Usage>
 

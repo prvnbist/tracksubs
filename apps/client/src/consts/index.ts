@@ -34,7 +34,7 @@ export const TIMEZONES_DISPLAY: Array<{
 	...POSITIVE_TIMEZONES.sort((a, b) => a.gmt_offset.localeCompare(b.gmt_offset)),
 ]
 
-export const PLANS: Record<'FREE', IPlan> = {
+export const PLANS: Record<string, IPlan> = {
 	FREE: {
 		title: 'Free',
 		type: 'FREE',
