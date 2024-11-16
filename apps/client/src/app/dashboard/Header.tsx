@@ -8,9 +8,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
 import { Avatar, Burger, Button, Flex, Menu, useComputedColorScheme } from '@mantine/core'
 
-import { getInitials } from 'utils'
 import Logo from 'assets/svgs/logo'
 import { useGlobal } from 'state/global'
+import { getInitials, getUserName } from 'utils'
 
 const Header = (): JSX.Element => {
 	const router = useRouter()
@@ -19,7 +19,7 @@ const Header = (): JSX.Element => {
 
 	const isMobile = useMediaQuery('(max-width: 56.25em)')
 
-	const initials = getInitials(`${user.first_name ?? ''} ${user.last_name ?? ''}`)
+	const initials = getInitials(getUserName(user))
 
 	return (
 		<Flex h={64} component="header" align="center" justify="space-between">

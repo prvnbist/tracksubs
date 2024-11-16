@@ -52,7 +52,7 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 				]
 			: subscription.collaborators.map(collaborator => ({
 					user_id: collaborator.user_id,
-					amount: collaborator.amount,
+					amount: collaborator.amount / 100,
 					percentage: Number(collaborator.percentage),
 					percentageAmount: String(
 						Math.trunc(
