@@ -77,8 +77,12 @@ const Subscription = ({
 
 	const hasCollaborators = subscription.collaborators.length > 0
 
-	const amount =
-		(isOwner ? subscription.amount : (subscription.collaborators?.[0]?.amount ?? 0)) / 100
+	const amount = isOwner
+		? subscription.amount / 100
+		: subscription.split_strategy === 'PERCENTAGE'
+			? (subscription.amount / 100) *
+				(Number(subscription.collaborators?.[0]?.percentage ?? 0) / 100)
+			: (subscription.collaborators?.[0]?.amount ?? 0) / 100
 
 	const isEmailAlertOn = isOwner
 		? subscription.email_alert
