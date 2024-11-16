@@ -8,8 +8,6 @@ import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
 
 import { track } from 'utils'
-import { PLANS } from 'consts'
-import { useGlobal } from 'state/global'
 import type { ISubscription } from 'types'
 
 import Subscription from './subscription'

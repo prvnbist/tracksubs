@@ -251,24 +251,43 @@ const Subscription = ({
 			</Card.Section>
 			<Card.Section p={16}>
 				<Group justify="space-between">
-					<Text size="xl" ff="monospace">
-						{new Intl.NumberFormat('en-IN', {
-							style: 'currency',
-							currency: subscription.currency,
-						}).format(amount)}
-					</Text>
-					<Badge
-						variant={scheme === 'light' ? 'default' : 'light'}
-						c={
-							subscription.interval === 'MONTHLY'
-								? 'teal'
-								: subscription.interval === 'QUARTERLY'
-									? 'yellow'
-									: 'red'
-						}
-					>
-						{subscription.interval}
-					</Badge>
+					<Group gap={0} align="center">
+						<Text size="md" ff="monospace">
+							{new Intl.NumberFormat('en-IN', {
+								style: 'currency',
+								currency: subscription.currency,
+							}).format(amount)}
+						</Text>
+						{!isOwner && (
+							<Text size="md" c="dimmed" ff="monospace">
+								(
+								{new Intl.NumberFormat('en-IN', {
+									style: 'currency',
+									currency: subscription.currency,
+								}).format(subscription.amount / 100)}
+								)
+							</Text>
+						)}
+					</Group>
+					<Group gap={8}>
+						{!isOwner && (
+							<Badge variant="light" c="blue">
+								Split
+							</Badge>
+						)}
+						<Badge
+							variant={scheme === 'light' ? 'default' : 'light'}
+							c={
+								subscription.interval === 'MONTHLY'
+									? 'teal'
+									: subscription.interval === 'QUARTERLY'
+										? 'yellow'
+										: 'red'
+							}
+						>
+							{subscription.interval}
+						</Badge>
+					</Group>
 				</Group>
 			</Card.Section>
 		</Card>
