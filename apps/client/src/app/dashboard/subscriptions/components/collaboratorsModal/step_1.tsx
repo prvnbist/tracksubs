@@ -117,12 +117,14 @@ const Step1 = ({ contacts, collaborators, handlers, subscription }: Contributors
 
 					if (!contact?.user) return null
 
+					const isOwner = collaborator.user_id === user.id
+
 					return (
 						<Pill
 							pl={3}
 							bg="dark.5"
 							key={collaborator.user_id}
-							withRemoveButton
+							withRemoveButton={!isOwner}
 							onRemove={() => onRemove(collaborator.user_id)}
 						>
 							<Group h="100%" align="center" gap={8} wrap="nowrap">
@@ -132,7 +134,7 @@ const Step1 = ({ contacts, collaborators, handlers, subscription }: Contributors
 									name={getUserName(contact.user)}
 								/>
 								<Text size="xs" lh={0}>
-									{getUserName(contact.user)}
+									{isOwner ? 'You' : getUserName(contact.user)}
 								</Text>
 							</Group>
 						</Pill>

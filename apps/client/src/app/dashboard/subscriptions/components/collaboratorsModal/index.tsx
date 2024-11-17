@@ -5,7 +5,7 @@ import { IconUsers, IconCheck, IconChartPie3 } from '@tabler/icons-react'
 import { modals } from '@mantine/modals'
 import { useListState } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
-import { Stepper, Divider, Group, Button } from '@mantine/core'
+import { Stepper, Divider, Group, Button, Text } from '@mantine/core'
 
 import { useGlobal } from 'state/global'
 import type { ISubscription, IMinimalUser, ISplitStrategy } from 'types'
@@ -30,6 +30,25 @@ const ERROR_MESSAGES = {
 	COLLABORATOR_SUBSCRIPTION_LIMIT_EXCEEDED:
 		'One or more users have reached their subscription limit.',
 } as const
+
+const onSuccess = () => {
+	notifications.show({
+		color: 'green',
+		title: 'Success',
+		message: 'Collaborators updated successfully.',
+	})
+	modals.closeAll()
+}
+
+const onError = ({ error }: any) => {
+	if (error.serverError && error.serverError in ERROR_MESSAGES) {
+		return notifications.show({
+			color: 'red',
+			title: 'Error',
+			message: ERROR_MESSAGES[error.serverError as keyof typeof ERROR_MESSAGES],
+		})
+	}
+}
 
 const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) => {
 	const { user, contacts } = useGlobal()
@@ -76,27 +95,30 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 		)
 	}, [user, contacts])
 
-	const { execute, isPending } = useAction(manage_collaborators, {
-		onSuccess: () => {
-			notifications.show({
-				color: 'green',
-				title: 'Success',
-				message: 'Collaborators updated successfully.',
-			})
-			modals.closeAll()
-		},
-		onError: ({ error }) => {
-			if (error.serverError && error.serverError in ERROR_MESSAGES) {
-				return notifications.show({
-					color: 'red',
-					title: 'Error',
-					message: ERROR_MESSAGES[error.serverError as keyof typeof ERROR_MESSAGES],
-				})
-			}
-		},
+	const { execute, executeAsync, isPending } = useAction(manage_collaborators, {
+		onSuccess,
+		onError,
 	})
 
 	const onNextStep = () => {
+		if (active === 0 && collaborators.length === 1 && subscription.collaborators.length > 1) {
+			return modals.openConfirmModal({
+				title: 'Remove Collaborators',
+				closeOnConfirm: false,
+				onConfirm: () => {
+					executeAsync({
+						subscription_id: subscription.id,
+						split_strategy: null,
+						collaborators: [],
+					})
+						.then(onSuccess)
+						.catch(onError)
+				},
+				children: <Text size="sm">Are you sure you want to remove all the collaborators?</Text>,
+				labels: { confirm: 'Yes, Remove', cancel: 'Cancel' },
+			})
+		}
+
 		if (active === 1) {
 			execute({
 				subscription_id: subscription.id,
@@ -147,7 +169,7 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 				<Button variant="default" onClick={onPreviousStep} disabled={active === 0}>
 					Back
 				</Button>
-				<Button onClick={onNextStep} disabled={isPending || collaborators.length === 1}>
+				<Button onClick={onNextStep} disabled={isPending}>
 					{active === 0 ? 'Next' : 'Save'}
 				</Button>
 			</Group>

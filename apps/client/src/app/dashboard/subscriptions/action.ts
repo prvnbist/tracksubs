@@ -307,11 +307,9 @@ export const manage_collaborators = actionClient
 	.schema(
 		z.object({
 			subscription_id: z.string(),
-			split_strategy: z.union([
-				z.literal('EQUALLY'),
-				z.literal('UNEQUALLY'),
-				z.literal('PERCENTAGE'),
-			]),
+			split_strategy: z
+				.union([z.literal('EQUALLY'), z.literal('UNEQUALLY'), z.literal('PERCENTAGE')])
+				.nullable(),
 			collaborators: z.array(CollaboratorsSchema),
 		})
 	)
@@ -426,6 +424,8 @@ export const manage_collaborators = actionClient
 						}
 					}
 				}
+
+				console.dir({ added, removed, changes }, { depth: null })
 
 				await db.transaction(async tx => {
 					if (subscription.split_strategy !== split_strategy) {
