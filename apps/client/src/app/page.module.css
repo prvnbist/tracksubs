@@ -1,19 +1,8 @@
-.header {
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-image: url("../assets/svgs/background.svg");
-}
-
 .coming_soon {
 	position: absolute;
 	top: 24px;
 	left: 50%;
 	transform: translate(-50%, -50%);
-}
-
-.fold_1_wrapper {
-	height: 560px;
 }
 
 .fold_1_content {
@@ -57,11 +46,6 @@
 
 	.tagline {
 		width: calc(100% - 32px);
-	}
-
-	.fold_1_wrapper {
-		height: auto;
-		padding: 40px 0;
 	}
 
 	.fold_1_content {

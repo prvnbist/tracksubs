@@ -3540,6 +3540,13 @@ framer-motion@10.17.4:
   optionalDependencies:
     "@emotion/is-prop-valid" "^0.8.2"
 
+framer-motion@^11.11.17:
+  version "11.11.17"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-11.11.17.tgz#fff0fd26b9b5c16dc0cc7e450f9af7db13fb35d0"
+  integrity sha512-O8QzvoKiuzI5HSAHbcYuL6xU+ZLXbrH7C8Akaato4JzQbX2ULNeniqC2Vo5eiCtFktX9XsJ+7nUhxcl2E2IjpA==
+  dependencies:
+    tslib "^2.4.0"
+
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
@@ -4128,6 +4135,14 @@ module-details-from-path@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/module-details-from-path/-/module-details-from-path-1.0.3.tgz#114c949673e2a8a35e9d35788527aa37b679da2b"
   integrity sha512-ySViT69/76t8VhE1xXHK6Ch4NcDd26gx0MzKXLO+F7NOtnqH68d9zF94nT8ZWSxXh8ELOERsnJO/sWt1xZYw5A==
+
+motion@^11.11.17:
+  version "11.11.17"
+  resolved "https://registry.yarnpkg.com/motion/-/motion-11.11.17.tgz#f8c9ea68f0629d4af8674faacfb0c733882e1578"
+  integrity sha512-y6mXYElvJ5HHwPBUpYG/5wclKVGW4hJhqPkTjWccib5/WrcRM185adg3+4aSmG5iD10XKFt5uBOAiKwuzMHPPQ==
+  dependencies:
+    framer-motion "^11.11.17"
+    tslib "^2.4.0"
 
 ms@^2.1.3:
   version "2.1.3"
@@ -4731,6 +4746,18 @@ react-email@2.1.1:
     tailwind-merge "2.2.0"
     tailwindcss "3.4.0"
     typescript "5.1.6"
+
+react-from-dom@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/react-from-dom/-/react-from-dom-0.7.3.tgz#60e75fde2369ceb0a8f87d88f9cfbeb67b730e43"
+  integrity sha512-9IK6R7+eD1wOAMC2ZCrENev0eK1625cb7vX+cnnOR9LBRNbjKiaJk4ij2zQbcefEXTWjXFhA7CTO1cd8wMONnw==
+
+react-inlinesvg@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/react-inlinesvg/-/react-inlinesvg-4.1.5.tgz#5d6b4f9008d442e4f184ec25e135360d993dc47e"
+  integrity sha512-DcCnmHhpKAUNp6iLPEEB2HJP3simDlyiy8JPZ1DwGCynrQQGQD04GJTFtai8JK8vRhCmoiBV6hSgj31D42Z3Lg==
+  dependencies:
+    react-from-dom "^0.7.3"
 
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"

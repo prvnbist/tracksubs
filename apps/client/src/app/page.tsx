@@ -5,37 +5,39 @@ import Image from 'next/image'
 import { useUser } from '@clerk/nextjs'
 import {
 	Anchor,
+	Box,
 	Button,
 	Container,
 	Flex,
 	Group,
+	Image as MantineImage,
+	Skeleton,
 	Space,
 	Stack,
 	Text,
 	Title,
-	useComputedColorScheme,
 } from '@mantine/core'
 
 import { track } from 'utils'
 import Logo from 'assets/svgs/logo'
 
 import classes from './page.module.css'
+import IconGrid from './components/IconGrid'
 
 export default function Page(): JSX.Element {
 	const { isLoaded, isSignedIn } = useUser()
 
-	const scheme = useComputedColorScheme()
-
 	return (
 		<main>
-			<Flex component="header" align="center" h="90dvh" className={classes.header}>
-				<Flex direction="column" align="center" justify="center" w="100%">
-					<Logo size={120} />
+			<Flex component="header" justify="center" h="90dvh">
+				<IconGrid />
+				<Stack gap={0} align="center" pt={180}>
+					<Logo size={64} />
 					<Space h={8} />
 					<Title>Track Subs</Title>
 					<Space h={8} />
 					<Text ta="center" size="18px" className={classes.tagline}>
-						Streamline your finances and stay on top of recurring expenses effortlessly.
+						Streamline your finances and stay on top of your subscriptions effortlessly.
 					</Text>
 					<Space h={16} />
 					{isLoaded ? (
@@ -46,27 +48,33 @@ export default function Page(): JSX.Element {
 								</Link>
 							) : (
 								<Link href="/login" onClick={() => track('btn-login')}>
-									<Button>Get Started</Button>
+									<Button>Get started — It's Free</Button>
 								</Link>
 							)}
 						</Group>
-					) : null}
-				</Flex>
+					) : (
+						<Skeleton h={36} w={140} />
+					)}
+				</Stack>
 			</Flex>
-			<Flex
-				align="center"
-				component="section"
-				className={classes.fold_1_wrapper}
-				bg={scheme === 'light' ? 'var(--mantine-color-gray-2)' : 'var(--mantine-color-dark-6)'}
-			>
-				<Container w="100%" className={classes.fold_1_content}>
+			<Container pb={120} fluid component="section" bg="var(--mantine-color-dark-6)">
+				<Container>
+					<Box
+						style={{
+							overflow: 'hidden',
+							transform: 'translateY(-120px)',
+							borderRadius: 'var(--mantine-radius-md)',
+							border: '2px solid var(--mantine-color-dark-6)',
+						}}
+					>
+						<MantineImage alt="Homepage Screenshot" width="100%" src="homepage.jpg" />
+					</Box>
+				</Container>
+				<Container className={classes.fold_1_content}>
 					<div>
 						<div
 							style={{
-								backgroundColor:
-									scheme === 'light'
-										? 'var(--mantine-color-gray-4)'
-										: 'var(--mantine-color-dark-7)',
+								backgroundColor: 'var(--mantine-color-dark-7)',
 							}}
 						>
 							<Stack gap={4}>
@@ -102,10 +110,9 @@ export default function Page(): JSX.Element {
 						</Text>
 					</div>
 				</Container>
-			</Flex>
+			</Container>
 			<Group py={16} gap={16} justify="center">
 				<Anchor
-					c={scheme === 'light' ? 'gray.8' : 'white'}
 					target="_blank"
 					component={Link}
 					underline="hover"
@@ -115,28 +122,13 @@ export default function Page(): JSX.Element {
 				>
 					Github
 				</Anchor>
-				<Anchor
-					c={scheme === 'light' ? 'gray.8' : 'white'}
-					component={Link}
-					href="/changelog"
-					underline="hover"
-				>
+				<Anchor component={Link} href="/changelog" underline="hover">
 					Changelog
 				</Anchor>
-				<Anchor
-					c={scheme === 'light' ? 'gray.8' : 'white'}
-					component={Link}
-					href="/privacy"
-					underline="hover"
-				>
+				<Anchor component={Link} href="/privacy" underline="hover">
 					Privacy
 				</Anchor>
-				<Anchor
-					c={scheme === 'light' ? 'gray.8' : 'white'}
-					component={Link}
-					href="/terms-of-service"
-					underline="hover"
-				>
+				<Anchor component={Link} href="/terms-of-service" underline="hover">
 					Terms of Service
 				</Anchor>
 			</Group>
