@@ -63,7 +63,5 @@ export const MONTHS = [
 ] as const
 
 export const SPLITTING_STRATEGIES: Array<{ label: string; value: ISplitStrategy }> = [
-	{ label: 'Equally', value: 'EQUALLY' },
-	{ label: 'Unequally', value: 'UNEQUALLY' },
-	{ label: 'Percentage', value: 'PERCENTAGE' },
+	{ label: 'Custom', value: 'CUSTOM' },
 ]

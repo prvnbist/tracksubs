@@ -299,7 +299,6 @@ export const subscription_export = actionClient
 
 const CollaboratorsSchema = z.object({
 	amount: z.number(),
-	percentage: z.number(),
 	user_id: z.string(),
 })
 
@@ -307,9 +306,7 @@ export const manage_collaborators = actionClient
 	.schema(
 		z.object({
 			subscription_id: z.string(),
-			split_strategy: z
-				.union([z.literal('EQUALLY'), z.literal('UNEQUALLY'), z.literal('PERCENTAGE')])
-				.nullable(),
+			split_strategy: z.literal('CUSTOM').nullable(),
 			collaborators: z.array(CollaboratorsSchema),
 		})
 	)
@@ -326,7 +323,6 @@ export const manage_collaborators = actionClient
 								id: true,
 								user_id: true,
 								amount: true,
-								percentage: true,
 							},
 						},
 					},
@@ -340,18 +336,16 @@ export const manage_collaborators = actionClient
 
 				const added: Array<{
 					amount: number
-					percentage: string
 					subscription_id: string
 					user_id: string
 				}> = []
 				const removed: Array<string> = []
-				const changes: Array<{ id: string; amount?: number; percentage?: string }> = []
+				const changes: Array<{ id: string; amount?: number }> = []
 
 				if (subscription.collaborators.length === 0) {
 					for (const collaborator of collaborators) {
 						const amount = Math.trunc(collaborator.amount * 100)
-						const percentage = collaborator.percentage.toFixed(2)
-						added.push({ amount, percentage, subscription_id, user_id: collaborator.user_id })
+						added.push({ amount, subscription_id, user_id: collaborator.user_id })
 					}
 				} else {
 					const previous_map = new Map(subscription.collaborators.map(c => [c.user_id, c]))
@@ -366,12 +360,10 @@ export const manage_collaborators = actionClient
 						const old = previous_map.get(collaborator.user_id)
 
 						const amount = Math.trunc(collaborator.amount * 100)
-						const percentage = collaborator.percentage.toFixed(2)
 
 						if (!old) {
 							added.push({
 								amount,
-								percentage,
 								subscription_id,
 								user_id: collaborator.user_id,
 							})
@@ -379,14 +371,12 @@ export const manage_collaborators = actionClient
 						}
 
 						const hasAmountChanged = old.amount !== amount
-						const hasPercentageChanged = Number(old.percentage) !== Number(percentage)
 
-						if (!hasAmountChanged && !hasPercentageChanged) continue
+						if (!hasAmountChanged) continue
 
 						changes.push({
 							id: old.id,
 							...(hasAmountChanged && { amount, percentage: '0.00' }),
-							...(hasPercentageChanged && { amount: 0, percentage }),
 						})
 					}
 				}
@@ -424,8 +414,6 @@ export const manage_collaborators = actionClient
 						}
 					}
 				}
-
-				console.dir({ added, removed, changes }, { depth: null })
 
 				await db.transaction(async tx => {
 					if (subscription.split_strategy !== split_strategy) {

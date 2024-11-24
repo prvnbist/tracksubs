@@ -12,15 +12,12 @@ import type { ISubscription, IMinimalUser, ISplitStrategy } from 'types'
 
 import Step2 from './step_2'
 import Step1 from './step_1'
-import { calculateShare } from './utils'
 import { manage_collaborators } from '../../action'
 
 export type ISelectedCollaborator = {
-	user_id: string
-	amount: number
-	percentage: number
-	percentageAmount: string
-}
+		user_id: string
+		amount: number
+	}
 
 const ERROR_MESSAGES = {
 	SUBSCRIPTION_NOT_FOUND: 'No such subscription exists.',
@@ -53,31 +50,16 @@ const onError = ({ error }: any) => {
 const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) => {
 	const { user, contacts } = useGlobal()
 
-	const [active, setActive] = useState(0)
+	const [active, setActive] = useState(subscription.collaborators.length > 0 ? 1 : 0)
 
-	const [splitStrategy, setSplitStrategy] = useState<ISplitStrategy>(
-		subscription.split_strategy || 'EQUALLY'
-	)
+	const [splitStrategy] = useState<ISplitStrategy>(subscription.split_strategy || 'CUSTOM')
 
 	const [collaborators, handlers] = useListState<ISelectedCollaborator>(
 		subscription.collaborators.length === 0
-			? [
-					calculateShare(
-						user.id,
-						subscription.amount / 100,
-						1,
-						subscription.split_strategy === 'PERCENTAGE'
-					),
-				]
+			? [{ user_id: user.id, amount: 0 }]
 			: subscription.collaborators.map(collaborator => ({
 					user_id: collaborator.user_id,
 					amount: collaborator.amount / 100,
-					percentage: Number(collaborator.percentage),
-					percentageAmount: String(
-						Math.trunc(
-							(subscription.amount / 100) * (Number(collaborator.percentage) / 100) * 100
-						) / 100
-					),
 				}))
 	)
 
@@ -119,6 +101,15 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 			})
 		}
 
+		if (active === 0 && collaborators.length === 1 && subscription.collaborators.length === 0) {
+			notifications.show({
+				color: 'orange',
+				title: 'Warning',
+				message: 'Please add atleast one more collaborator to begin!',
+			})
+			return
+		}
+
 		if (active === 1) {
 			execute({
 				subscription_id: subscription.id,
@@ -126,7 +117,6 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 				collaborators: collaborators.map(c => ({
 					user_id: c.user_id,
 					amount: c.amount,
-					percentage: c.percentage,
 				})),
 			})
 
@@ -158,9 +148,7 @@ const CollaboratorsModal = ({ subscription }: { subscription: ISubscription }) =
 						handlers={handlers}
 						contacts={_contacts}
 						subscription={subscription}
-						splitStrategy={splitStrategy}
 						collaborators={collaborators}
-						setSplitStrategy={setSplitStrategy}
 					/>
 				</Stepper.Step>
 			</Stepper>

@@ -10,7 +10,6 @@ import { getUserName } from 'utils'
 import { useGlobal } from 'state/global'
 import type { IMinimalUser, ISubscription } from 'types'
 
-import { calculateShare } from './utils'
 import type { ISelectedCollaborator } from '.'
 import type { CustomComboboxItem } from '../../types'
 
@@ -64,18 +63,13 @@ const Step1 = ({ contacts, collaborators, handlers, subscription }: Contributors
 	}, [contacts, collaborators])
 
 	const onSelect = (value: string | null) => {
-		const isPercentage = subscription.split_strategy === 'PERCENTAGE'
-
 		handlers.setState(existing => {
-			const modified = [
-				...existing,
-				{ user_id: value, amount: 0, percentage: 0, percentageAmount: '0.00' },
-			]
-			const count = modified.length
+			const modified = [...existing, { user_id: value, amount: 0 }]
 
-			return modified.map(item =>
-				calculateShare(item.user_id!, subscription.amount / 100, count, isPercentage)
-			)
+			return modified.map(item => ({
+				user_id: item.user_id!,
+				amount: 0,
+			}))
 		})
 	}
 
@@ -87,15 +81,12 @@ const Step1 = ({ contacts, collaborators, handlers, subscription }: Contributors
 				message: 'You cannot remove yourself as a collaborator.',
 			})
 		}
-		const isPercentage = subscription.split_strategy === 'PERCENTAGE'
 
 		handlers.setState(existing => {
 			const modified = existing.filter(e => e.user_id !== id)
 			const count = modified.length
 
-			return modified.map(item =>
-				calculateShare(item.user_id!, subscription.amount / 100, count, isPercentage)
-			)
+			return modified.map(item => ({ user_id: item.user_id, amount: subscription.amount / 100 }))
 		})
 	}
 

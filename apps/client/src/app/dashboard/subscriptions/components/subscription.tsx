@@ -76,10 +76,7 @@ const Subscription = ({
 
 	const amount = isOwner
 		? subscription.amount / 100
-		: subscription.split_strategy === 'PERCENTAGE'
-			? (subscription.amount / 100) *
-				(Number(subscription.collaborators?.[0]?.percentage ?? 0) / 100)
-			: (subscription.collaborators?.[0]?.amount ?? 0) / 100
+		: (subscription.collaborators?.[0]?.amount ?? 0) / 100
 
 	const isEmailAlertOn = isOwner
 		? subscription.email_alert
@@ -143,9 +140,13 @@ const Subscription = ({
 							<AvatarGroup>
 								{subscription.collaborators.slice(0, 3).map(collaborator => (
 									<Tooltip
-										key={collaborator.id}
-										label={getUserName(collaborator.user)}
 										withArrow
+										key={collaborator.id}
+										label={
+											collaborator.user_id === user.id
+												? 'You'
+												: getUserName(collaborator.user)
+										}
 									>
 										<Avatar
 											size="sm"
@@ -164,7 +165,7 @@ const Subscription = ({
 						)}
 						<Menu shadow="md" width={240} position="bottom-end">
 							<Menu.Target>
-								<ActionIcon variant={scheme === 'light' ? 'default' : 'subtle'}>
+								<ActionIcon variant="subtle">
 									<IconDotsVertical size={18} />
 								</ActionIcon>
 							</Menu.Target>
@@ -266,7 +267,7 @@ const Subscription = ({
 							</Badge>
 						)}
 						<Badge
-							variant={scheme === 'light' ? 'default' : 'light'}
+							variant="light"
 							c={
 								subscription.interval === 'MONTHLY'
 									? 'teal'

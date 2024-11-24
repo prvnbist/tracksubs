@@ -19,12 +19,12 @@ export type IPaymentMethod = z.infer<typeof schema.PaymentMethod>
 
 export type ICollaborator = z.infer<typeof schema.Collaborator> & { user: IMinimalUser }
 
-export type ISplitStrategy = 'EQUALLY' | 'UNEQUALLY' | 'PERCENTAGE'
+export type ISplitStrategy = 'CUSTOM' | null
 
 export type ISubscription = z.infer<typeof schema.Subscription> & {
-	collaborators: Array<ICollaborator>
-	split_strategy: ISplitStrategy | null
-}
+		collaborators: Array<ICollaborator>
+		split_strategy: ISplitStrategy
+	}
 
 export type ITransaction = z.infer<typeof schema.Transaction>
 
