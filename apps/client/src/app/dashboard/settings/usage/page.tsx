@@ -23,7 +23,7 @@ export default function Page() {
 
 	const plan = PLANS[user.plan]!
 
-	if (!user.usage) return null
+	if (!user.usage || !plan) return null
 	return (
 		<div>
 			<Space h={24} />
