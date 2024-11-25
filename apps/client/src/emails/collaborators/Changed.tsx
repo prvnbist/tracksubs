@@ -23,7 +23,6 @@ type ChangedProps = {
 	subscriptionTitle: string
 	subscriptionAmount: number
 	subscriptionCurrency: string
-	subscriptionSplitStrategy: 'CUSTOM'
 }
 
 export default function Changed({
@@ -32,9 +31,7 @@ export default function Changed({
 	collaboratorName = 'Sumit',
 	ownerName = 'Praveen',
 	subscriptionTitle = 'Netflix',
-	subscriptionAmount = 649,
 	subscriptionCurrency = 'INR',
-	subscriptionSplitStrategy = 'CUSTOM',
 }: ChangedProps) {
 	return (
 		<Html>

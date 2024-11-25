@@ -69,7 +69,6 @@ const MobileMenu = () => {
 
 	const [opened, { open, close }] = useDisclosure()
 
-
 	const goto = (path: string) => {
 		router.push(path)
 		close()

@@ -33,7 +33,6 @@ type CommonProps = {
 	subscriptionCurrency: string
 	subscriptionInterval: Interval
 	subscriptionNextBillingDate: string
-	subscriptionSplitStrategy: 'CUSTOM'
 	subscriptionTitle: string
 	type: 'ADDED' | 'REMOVED'
 }
@@ -46,7 +45,6 @@ export default function Common({
 	subscriptionCurrency = 'INR',
 	subscriptionInterval = 'MONTHLY',
 	subscriptionNextBillingDate = '2024-11-15',
-	subscriptionSplitStrategy = 'CUSTOM',
 	subscriptionTitle = 'Netflix',
 	type = 'ADDED',
 }: CommonProps) {

@@ -15,9 +15,9 @@ import Step1 from './step_1'
 import { manage_collaborators } from '../../action'
 
 export type ISelectedCollaborator = {
-		user_id: string
-		amount: number
-	}
+	user_id: string
+	amount: number
+}
 
 const ERROR_MESSAGES = {
 	SUBSCRIPTION_NOT_FOUND: 'No such subscription exists.',

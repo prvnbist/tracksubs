@@ -22,9 +22,9 @@ export type ICollaborator = z.infer<typeof schema.Collaborator> & { user: IMinim
 export type ISplitStrategy = 'CUSTOM' | null
 
 export type ISubscription = z.infer<typeof schema.Subscription> & {
-		collaborators: Array<ICollaborator>
-		split_strategy: ISplitStrategy
-	}
+	collaborators: Array<ICollaborator>
+	split_strategy: ISplitStrategy
+}
 
 export type ITransaction = z.infer<typeof schema.Transaction>
 
