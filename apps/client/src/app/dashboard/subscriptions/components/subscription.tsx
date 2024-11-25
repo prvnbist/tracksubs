@@ -31,6 +31,7 @@ import {
 	Tooltip,
 } from '@mantine/core'
 
+import { PLANS } from 'consts'
 import { getInitials, getUserName } from 'utils'
 import { useGlobal } from 'state/global'
 import type { ISubscription, IService } from 'types'
@@ -59,6 +60,10 @@ const Subscription = ({
 	subscription,
 }: SubscriptionProps) => {
 	const { user, services } = useGlobal()
+
+	const plan = PLANS[user.plan]
+
+	const isFreePlan = plan?.type === 'FREE'
 
 	const isOwner = subscription.user_id === user.id
 
@@ -136,7 +141,7 @@ const Subscription = ({
 						</Stack>
 					</Group>
 					<Group gap={8}>
-						{isOwner && (
+						{isOwner && !isFreePlan && (
 							<AvatarGroup>
 								{subscription.collaborators.slice(0, 3).map(collaborator => (
 									<Tooltip
@@ -170,7 +175,7 @@ const Subscription = ({
 								</ActionIcon>
 							</Menu.Target>
 							<Menu.Dropdown>
-								{isOwner && (
+								{isOwner && !isFreePlan && (
 									<Menu.Item
 										onClick={onManageCollaborators}
 										leftSection={<IconUsersPlus size={18} />}
