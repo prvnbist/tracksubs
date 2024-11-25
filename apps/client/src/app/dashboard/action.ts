@@ -158,7 +158,7 @@ export const monthlyOverview = actionClient
 				next_billing_date: schema.subscription.next_billing_date,
 				collaborators: sql<
 					Array<ICollaborator>
-				>`COALESCE(JSON_AGG(JSON_BUILD_OBJECT('id',collaborator.id,'amount',collaborator.amount,'percentage',collaborator.percentage,'user_id',collaborator.user_id)) FILTER (WHERE collaborator.id IS NOT NULL),'[]')`,
+				>`COALESCE(JSON_AGG(JSON_BUILD_OBJECT('id',collaborator.id,'amount',collaborator.amount,'user_id',collaborator.user_id)) FILTER (WHERE collaborator.id IS NOT NULL),'[]')`,
 			})
 			.from(schema.subscription)
 			.leftJoin(

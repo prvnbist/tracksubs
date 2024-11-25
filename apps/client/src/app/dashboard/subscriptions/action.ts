@@ -79,7 +79,6 @@ export const subscriptions_list = actionClient
 					JSON_BUILD_OBJECT(
 						'id', collaborator.id,
 						'amount', collaborator.amount,
-						'percentage', collaborator.percentage,
 						'user_id', collaborator.user_id,
 						'email_alert', collaborator.email_alert,
 						'user', JSON_BUILD_OBJECT(
@@ -376,7 +375,7 @@ export const manage_collaborators = actionClient
 
 						changes.push({
 							id: old.id,
-							...(hasAmountChanged && { amount, percentage: '0.00' }),
+							...(hasAmountChanged && { amount }),
 						})
 					}
 				}

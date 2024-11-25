@@ -19,7 +19,6 @@ const collaborator = pgTable(
 	{
 		id: uuid().primaryKey().notNull().defaultRandom(),
 		amount: integer().notNull().default(0),
-		percentage: numeric({ precision: 5, scale: 2 }).notNull().default(sql`0.00`),
 		subscription_id: uuid()
 			.notNull()
 			.references(() => subscription.id, { onDelete: 'cascade' }),
@@ -30,10 +29,6 @@ const collaborator = pgTable(
 		email_alert: boolean().default(false).notNull(),
 	},
 	table => ({
-		percentageConstraint: check(
-			'percentage',
-			sql`${table.percentage} >= 0 AND ${table.percentage} <= 100`
-		),
 		uniqueConstraint: unique('subscription_id_user_id').on(table.subscription_id, table.user_id),
 	})
 )
