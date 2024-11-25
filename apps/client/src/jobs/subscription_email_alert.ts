@@ -13,15 +13,18 @@ import RenewalAlert from 'emails/RenewalAlert'
 import { TIMEZONES_DISPLAY } from 'consts'
 
 type Subscription = {
-	subscription_id: string
-	subscription_title: string
-	subscription_amount: number
-	subscription_currency: string
-	subscription_next_billing_date: string
-	user_id: string
-	user_email: string
-	user_timezone: string | null
-	user_first_name: string | null
+	subscription: {
+		id: string
+		title: string
+		amount: number
+		currency: string
+		next_billing_date: string
+	}
+	user: {
+		id: string
+		email: string
+		first_name: string | null
+	}
 }
 
 type GroupByEmail = Record<string, { first_name: string; email: string; list: Array<Subscription> }>
@@ -54,17 +57,20 @@ client.defineJob({
 				return acc
 			}, [])
 
-			return db
+			let result = await db
 				.select({
-					subscription_id: schema.subscription.id,
-					subscription_title: schema.subscription.title,
-					subscription_amount: schema.subscription.amount,
-					subscription_currency: schema.subscription.currency,
-					subscription_next_billing_date: schema.subscription.next_billing_date,
-					user_id: schema.user.id,
-					user_email: schema.user.email,
-					user_timezone: schema.user.timezone,
-					user_first_name: schema.user.first_name,
+					subscription: {
+						id: schema.subscription.id,
+						title: schema.subscription.title,
+						amount: schema.subscription.amount,
+						currency: schema.subscription.currency,
+						next_billing_date: schema.subscription.next_billing_date,
+					},
+					user: {
+						id: schema.user.id,
+						email: schema.user.email,
+						first_name: schema.user.first_name,
+					},
 				})
 				.from(schema.subscription)
 				.innerJoin(
@@ -77,10 +83,47 @@ client.defineJob({
 				.where(
 					and(
 						eq(schema.subscription.is_active, true),
+						// TODO: in case of collaborators, for the owner of the subscription collaborator.email_alert should be considered
 						eq(schema.subscription.email_alert, true),
 						eq(schema.subscription.next_billing_date, tomorrow)
 					)
 				)
+
+			result = (
+				await Promise.all(
+					result.map(async subscription => {
+						const collaborators = await db
+							.select({
+								user: {
+									id: schema.user.id,
+									email: schema.user.email,
+									first_name: schema.user.first_name,
+								},
+								collaborator: {
+									amount: schema.collaborator.amount,
+								},
+							})
+							.from(schema.collaborator)
+							.leftJoin(schema.user, eq(schema.user.id, schema.collaborator.user_id))
+							.where(
+								and(
+									eq(schema.collaborator.subscription_id, subscription.subscription.id),
+									eq(schema.collaborator.email_alert, true)
+								)
+							)
+
+						if (collaborators.length === 0) return subscription
+
+						const result = collaborators.map(c => ({
+							subscription: { ...subscription.subscription, amount: c.collaborator.amount },
+							user: c.user!,
+						}))
+						return result
+					})
+				)
+			).flat()
+
+			return result
 		})
 
 		if (Array.isArray(result) && result.length === 0) return
@@ -88,14 +131,18 @@ client.defineJob({
 		await io.runTask('process-emails', async () => {
 			const groupedByEmail = Object.values(
 				result.reduce((acc: GroupByEmail, curr) => {
-					const { user_email: email, user_first_name: first_name } = curr
+					const { user } = curr
 
-					const item = acc[email]
+					const item = acc[user.email]
 
 					if (item) {
 						item.list.push(curr)
 					} else {
-						acc[email] = { email, first_name: first_name ?? '', list: [curr] }
+						acc[user.email] = {
+							email: user.email,
+							first_name: user.first_name ?? '',
+							list: [curr],
+						}
 					}
 
 					return acc
@@ -112,10 +159,10 @@ client.defineJob({
 							react: RenewalAlert({
 								firstName: group.first_name,
 								subscriptions: group.list.map(datum => ({
-									id: datum.subscription_id,
-									title: datum.subscription_title,
-									amount: datum.subscription_amount,
-									currency: datum.subscription_currency,
+									id: datum.subscription.id,
+									title: datum.subscription.title,
+									amount: datum.subscription.amount,
+									currency: datum.subscription.currency,
 								})),
 							}),
 						})
