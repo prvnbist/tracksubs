@@ -7,14 +7,14 @@ import type { IContact, IPaymentMethod, IService, IUser } from 'types'
 
 interface ContextState {
 	user: IUser
-	contacts: Array<IContact>
+	contacts: Map<string, IContact>
 	services: Record<string, IService>
 	payment_methods: Array<IPaymentMethod>
 }
 
 const INITITAL_STATE: ContextState = {
 	services: {},
-	contacts: [],
+	contacts: new Map([]),
 	payment_methods: [],
 	user: {
 		id: '',
@@ -38,7 +38,7 @@ export const useGlobal = () => useContext(Context)
 
 type GlobalProviderProps = {
 	user: IUser
-	contacts: Array<IContact>
+	contacts: Map<string, IContact>
 	services: Record<string, IService>
 	paymentMethods: Array<IPaymentMethod>
 } & PropsWithChildren

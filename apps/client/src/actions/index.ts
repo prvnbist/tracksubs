@@ -28,7 +28,26 @@ export const user = actionClient.action(async ({ ctx: { authId } }) => {
 export const contacts = actionClient.action(async ({ ctx: { user_id } }) => {
 	try {
 		const data = await db.query.contact.findMany({
-			with: { sender: true, receiver: true },
+			with: {
+				sender: {
+					columns: {
+						id: true,
+						first_name: true,
+						last_name: true,
+						image_url: true,
+						email: true,
+					},
+				},
+				receiver: {
+					columns: {
+						id: true,
+						first_name: true,
+						last_name: true,
+						image_url: true,
+						email: true,
+					},
+				},
+			},
 			where: (contact, { eq, or }) =>
 				or(eq(contact.sender_id, user_id), eq(contact.receiver_id, user_id)),
 		})

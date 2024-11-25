@@ -1,6 +1,6 @@
 ## TrackSubs 🚧
 
-Streamline your finances and stay on top of recurring expenses effortlessly.
+Streamline your finances and stay on top of  subscriptions effortlessly.
 
 ![Architecture](https://res.cloudinary.com/prvnbist/image/upload/v1724309486/tracksubs/architecture.svg)
 
@@ -27,5 +27,4 @@ Streamline your finances and stay on top of recurring expenses effortlessly.
 5. [Mantine](https://mantine.dev): UI Library
 6. [Resend](https://resend.com): Email Service
 7. [Trigger](https://trigger.dev): Jobs Scheduling
-8. [StatSig](https://statsig.com): Feature Flags
-9. [Drizzle](https://orm.drizzle.team): Typescript ORM
+8. [Drizzle](https://orm.drizzle.team): Typescript ORM

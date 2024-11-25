@@ -23,6 +23,8 @@ type ExcludedKeys =
 	| 'next_billing_date'
 	| 'payment_method_id'
 	| 'service'
+	| 'split_strategy'
+	| 'collaborators'
 
 type FormValues = Omit<ISubscription, ExcludedKeys>
 

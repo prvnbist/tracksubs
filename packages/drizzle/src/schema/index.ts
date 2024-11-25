@@ -1,3 +1,6 @@
+export * from './collaborator'
+export { default as collaborator } from './collaborator'
+
 export * from './contact'
 export { default as contact } from './contact'
 

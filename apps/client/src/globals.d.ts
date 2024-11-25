@@ -7,7 +7,7 @@ declare global {
 			currency: string
 			timezone: string
 			is_onboarded: boolean
-			plan: 'FREE' | 'BASIC' | 'PRO'
+			plan: 'FREE'
 		}
 	}
 }

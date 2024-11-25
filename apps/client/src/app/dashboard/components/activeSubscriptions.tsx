@@ -1,8 +1,7 @@
-import { and, eq } from 'drizzle-orm'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { Group, Title, Stack, Text, Center } from '@mantine/core'
 
-import db, { schema } from '@tracksubs/drizzle'
+import { activeSubscriptions } from '../action'
 
 const ActiveSubscriptions = async ({
 	currency,
@@ -16,14 +15,9 @@ const ActiveSubscriptions = async ({
 				</Center>
 			)
 
-		const data = await db.query.subscription.findMany({
-			columns: { is_active: true },
-			where: and(
-				eq(schema.subscription.user_id, user_id),
-				eq(schema.subscription.currency, currency)
-			),
-		})
-		const active = data.filter(datum => datum.is_active).length
+		const data = await activeSubscriptions({ currency })
+
+		const { total = 0, active = 0 } = data?.data ?? {}
 
 		return (
 			<Group gap={0}>
@@ -31,7 +25,7 @@ const ActiveSubscriptions = async ({
 					{active}
 				</Text>
 				<Text title="Total" c="dimmed" size="48px" ff="monospace">
-					/{data.length}
+					/{total}
 				</Text>
 			</Group>
 		)

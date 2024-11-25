@@ -3,13 +3,13 @@
 import { z } from 'zod'
 import dayjs from 'dayjs'
 import { revalidatePath } from 'next/cache'
-import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, getTableColumns, inArray, or, sql } from 'drizzle-orm'
 
 import db, { schema } from '@tracksubs/drizzle'
 
 import { PLANS } from 'consts'
-
 import { actionClient } from 'server_utils'
+import type { ICollaborator } from 'types'
 
 export const transaction_create = actionClient
 	.schema(
@@ -72,26 +72,54 @@ export const subscriptions_list = actionClient
 			]),
 		})
 	)
-	.outputSchema(z.array(schema.Subscription))
-	.action(
-		async ({ parsedInput: { interval }, ctx: { user_id } }) => {
-			return db.query.subscription.findMany({
-				where: (subscription, { eq }) =>
-					and(
-						eq(subscription.user_id, user_id),
-						inArray(
-							subscription.interval,
-							interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval]
+	.action(async ({ parsedInput: { interval }, ctx: { user_id } }) => {
+		const collaboratorsQuery = sql<Array<ICollaborator>>`
+			COALESCE(
+				JSON_AGG(
+					JSON_BUILD_OBJECT(
+						'id', collaborator.id,
+						'amount', collaborator.amount,
+						'user_id', collaborator.user_id,
+						'email_alert', collaborator.email_alert,
+						'user', JSON_BUILD_OBJECT(
+							'id',"user".id,
+							'first_name',"user".first_name,
+							'last_name',"user".last_name,
+							'image_url',"user".image_url
 						)
-					),
-				orderBy: (subscription, { asc, desc }) => [
-					desc(subscription.is_active),
-					asc(subscription.next_billing_date),
-				],
+					)
+				) 
+				FILTER (WHERE collaborator.id IS NOT NULL),
+				'[]'
+			)`
+
+		const data = await db
+			.select({
+				...getTableColumns(schema.subscription),
+				collaborators: collaboratorsQuery,
 			})
-		},
-		{ onSuccess: () => revalidatePath('dashboard/subscriptions') }
-	)
+			.from(schema.subscription)
+			.leftJoin(
+				schema.collaborator,
+				eq(schema.collaborator.subscription_id, schema.subscription.id)
+			)
+			.leftJoin(schema.user, eq(schema.user.id, schema.collaborator.user_id))
+			.where(
+				and(
+					or(
+						eq(schema.subscription.user_id, user_id),
+						eq(schema.collaborator.user_id, user_id)
+					),
+					inArray(
+						schema.subscription.interval,
+						interval === 'ALL' ? ['MONTHLY', 'QUARTERLY', 'YEARLY'] : [interval]
+					)
+				)
+			)
+			.groupBy(schema.subscription.id)
+			.orderBy(desc(schema.subscription.is_active), asc(schema.subscription.next_billing_date))
+		return data
+	})
 
 export const subscriptions_create = actionClient
 	.schema(schema.NewSubscription.omit({ user_id: true }))
@@ -202,25 +230,35 @@ export const subscription_alert = actionClient
 					where: eq(schema.usage.user_id, user_id),
 				})
 
-				if (!usage) throw Error()
+				if (!usage) throw Error('SERVER_ERROR')
 
 				if (usage.total_alerts === user_plan?.alerts) {
-					return {
-						status: 'ERROR',
-						message: `Selected plan allows upto ${user_plan.alerts} alerts. Please change your plan to the one that fits your needs.`,
-					}
+					throw Error('EMAIL_ALERT_LIMIT_EXCEEDED')
 				}
 			}
 
-			const data = await db
-				.update(schema.subscription)
-				.set({ email_alert })
-				.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
-				.returning({
-					id: schema.subscription.id,
-					email_alert: schema.subscription.email_alert,
-					title: schema.subscription.title,
-				})
+			const subscription = await db.query.subscription.findFirst({
+				where: (subscription, { eq }) => eq(subscription.id, id),
+			})
+
+			if (!subscription) throw Error('SUBSCRIPTION_NOT_FOUND')
+
+			if (subscription.user_id === user_id) {
+				await db
+					.update(schema.subscription)
+					.set({ email_alert })
+					.where(and(eq(schema.subscription.id, id), eq(schema.subscription.user_id, user_id)))
+			} else {
+				await db
+					.update(schema.collaborator)
+					.set({ email_alert })
+					.where(
+						and(
+							eq(schema.collaborator.user_id, user_id),
+							eq(schema.collaborator.subscription_id, id)
+						)
+					)
+			}
 
 			await db
 				.update(schema.usage)
@@ -231,7 +269,7 @@ export const subscription_alert = actionClient
 				})
 				.where(eq(schema.usage.user_id, user_id))
 
-			return data
+			return { title: subscription.title, email_alert }
 		},
 		{ onSuccess: () => revalidatePath('dashboard/subscriptions') }
 	)
@@ -257,3 +295,186 @@ export const subscription_export = actionClient
 
 		return data
 	})
+
+const CollaboratorsSchema = z.object({
+	amount: z.number(),
+	user_id: z.string(),
+})
+
+export const manage_collaborators = actionClient
+	.schema(
+		z.object({
+			subscription_id: z.string(),
+			split_strategy: z.literal('CUSTOM').nullable(),
+			collaborators: z.array(CollaboratorsSchema),
+		})
+	)
+	.action(
+		async ({
+			ctx: { user_id },
+			parsedInput: { collaborators, split_strategy, subscription_id },
+		}) => {
+			try {
+				const subscription = await db.query.subscription.findFirst({
+					with: {
+						collaborators: {
+							columns: {
+								id: true,
+								user_id: true,
+								amount: true,
+							},
+						},
+					},
+					where: and(
+						eq(schema.subscription.id, subscription_id),
+						eq(schema.subscription.user_id, user_id)
+					),
+				})
+
+				if (!subscription) throw Error('SUBSCRIPTION_NOT_FOUND')
+
+				const added: Array<{
+					amount: number
+					subscription_id: string
+					user_id: string
+				}> = []
+				const removed: Array<string> = []
+				const changes: Array<{ id: string; amount?: number }> = []
+
+				if (subscription.collaborators.length === 0) {
+					for (const collaborator of collaborators) {
+						const amount = Math.trunc(collaborator.amount * 100)
+						added.push({ amount, subscription_id, user_id: collaborator.user_id })
+					}
+				} else {
+					const previous_map = new Map(subscription.collaborators.map(c => [c.user_id, c]))
+
+					for (const [user_id, previous] of previous_map) {
+						if (collaborators.findIndex(c => c.user_id === user_id) === -1) {
+							removed.push(previous.id)
+						}
+					}
+
+					for (const collaborator of collaborators) {
+						const old = previous_map.get(collaborator.user_id)
+
+						const amount = Math.trunc(collaborator.amount * 100)
+
+						if (!old) {
+							added.push({
+								amount,
+								subscription_id,
+								user_id: collaborator.user_id,
+							})
+							continue
+						}
+
+						const hasAmountChanged = old.amount !== amount
+
+						if (!hasAmountChanged) continue
+
+						changes.push({
+							id: old.id,
+							...(hasAmountChanged && { amount }),
+						})
+					}
+				}
+
+				if (added.length === 0 && removed.length === 0 && changes.length === 0)
+					throw Error('NO_CHANGES')
+
+				if (added.length > 0) {
+					const count = await db.$count(
+						schema.user,
+						inArray(
+							schema.user.id,
+							added.map(c => c.user_id)
+						)
+					)
+
+					if (added.length !== count) throw Error('COLLABORATOR_NOT_FOUND')
+
+					const users = await db.query.user.findMany({
+						columns: { id: true, plan: true },
+						with: { usage: { columns: { total_subscriptions: true } } },
+						where: inArray(
+							schema.user.id,
+							added.map(c => c.user_id)
+						),
+					})
+
+					for (const user of users) {
+						const plan = user.plan
+						if (
+							plan === 'FREE' &&
+							user.usage.total_subscriptions === PLANS[plan]?.subscriptions
+						) {
+							throw Error('COLLABORATOR_SUBSCRIPTION_LIMIT_EXCEEDED')
+						}
+					}
+				}
+
+				await db.transaction(async tx => {
+					if (subscription.split_strategy !== split_strategy) {
+						await tx
+							.update(schema.subscription)
+							.set({ split_strategy })
+							.where(eq(schema.subscription.id, subscription_id))
+					}
+
+					if (removed.length > 0) {
+						const removed_collaborators = await tx
+							.delete(schema.collaborator)
+							.where(inArray(schema.collaborator.id, removed))
+							.returning({
+								email_alert: schema.collaborator.email_alert,
+								user_id: schema.collaborator.user_id,
+							})
+
+						for (const collaborator of removed_collaborators) {
+							await tx
+								.update(schema.usage)
+								.set({
+									...(collaborator.email_alert && {
+										total_alerts: sql`${schema.usage.total_alerts} - 1`,
+									}),
+									total_subscriptions: sql`${schema.usage.total_subscriptions} - 1`,
+								})
+								.where(eq(schema.usage.user_id, collaborator.user_id))
+						}
+					}
+
+					if (added.length > 0) {
+						await tx.insert(schema.collaborator).values(added)
+
+						await tx
+							.update(schema.usage)
+							.set({
+								total_subscriptions: sql`${schema.usage.total_subscriptions} + 1`,
+							})
+							.where(
+								inArray(
+									schema.usage.user_id,
+									added.map(c => c.user_id)
+								)
+							)
+					}
+
+					if (changes.length > 0) {
+						await Promise.all(
+							changes.map(async ({ id, ...rest }) => {
+								await tx
+									.update(schema.collaborator)
+									.set(rest)
+									.where(eq(schema.collaborator.id, id))
+							})
+						)
+					}
+				})
+
+				revalidatePath('dashboard/subscriptions')
+			} catch (error) {
+				throw Error('SERVER_ERROR')
+			}
+		}
+	)

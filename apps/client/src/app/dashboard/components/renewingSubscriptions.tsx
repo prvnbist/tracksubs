@@ -1,9 +1,7 @@
-import dayjs from 'dayjs'
-import { and, count, eq, sql } from 'drizzle-orm'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { Title, Stack, Text, SimpleGrid, Center } from '@mantine/core'
 
-import db, { schema } from '@tracksubs/drizzle'
+import { renewingSubscriptions } from '../action'
 
 const RenewingSubscriptions = async ({
 	currency,
@@ -17,45 +15,15 @@ const RenewingSubscriptions = async ({
 				</Center>
 			)
 
-		const startOfWeek = dayjs().startOf('week')
-		const endOfWeek = dayjs().endOf('week')
+		const data = await renewingSubscriptions({ currency })
 
-		const [this_week] = await db
-			.select({ count: count() })
-			.from(schema.subscription)
-			.where(
-				and(
-					eq(schema.subscription.user_id, user_id),
-					eq(schema.subscription.currency, currency),
-					eq(schema.subscription.is_active, true),
-					sql`next_billing_date >= ${startOfWeek.format(
-						'YYYY-MM-DD'
-					)} and next_billing_date <= ${endOfWeek.format('YYYY-MM-DD')}`
-				)
-			)
-
-		const startOfMonth = dayjs().startOf('month')
-		const endOfMonth = dayjs().endOf('month')
-
-		const [this_month] = await db
-			.select({ count: count() })
-			.from(schema.subscription)
-			.where(
-				and(
-					eq(schema.subscription.user_id, user_id),
-					eq(schema.subscription.currency, currency),
-					eq(schema.subscription.is_active, true),
-					sql`next_billing_date >= ${startOfMonth.format(
-						'YYYY-MM-DD'
-					)} and next_billing_date <= ${endOfMonth.format('YYYY-MM-DD')}`
-				)
-			)
+		const { this_week = 0, this_month = 0 } = data?.data ?? {}
 
 		return (
 			<SimpleGrid cols={2}>
 				<Stack>
 					<Text title="Active" size="48px" ff="monospace">
-						{this_week?.count ?? 0}
+						{this_week}
 					</Text>
 					<Title c="dimmed" size="12px">
 						This Week
@@ -63,7 +31,7 @@ const RenewingSubscriptions = async ({
 				</Stack>
 				<Stack>
 					<Text title="Active" size="48px" ff="monospace">
-						{this_month?.count ?? 0}
+						{this_month}
 					</Text>
 					<Title c="dimmed" size="12px">
 						This Month

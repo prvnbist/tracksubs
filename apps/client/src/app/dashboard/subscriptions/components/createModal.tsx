@@ -25,6 +25,8 @@ type ExcludedKeys =
 	| 'payment_method_id'
 	| 'service'
 	| 'user_id'
+	| 'split_strategy'
+	| 'collaborators'
 
 type FormValues = Omit<ISubscription, ExcludedKeys>
 
