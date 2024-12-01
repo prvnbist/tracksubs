@@ -29,9 +29,9 @@ export type ISubscription = z.infer<typeof schema.Subscription> & {
 export type ITransaction = z.infer<typeof schema.Transaction>
 
 export type IPlan = {
-	title: string
-	alerts: number
-	type: 'FREE' | 'PAID'
-	subscriptions: number
-	price: { amount: number; currency: string }
-}
+		title: string
+		alerts: number
+		type: 'FREE' | 'LIFETIME'
+		subscriptions: number
+		price: { amount: number; currency: string }
+	}

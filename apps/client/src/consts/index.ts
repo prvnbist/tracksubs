@@ -45,6 +45,16 @@ export const PLANS: Record<string, IPlan> = {
 		alerts: 3,
 		subscriptions: 10,
 	},
+	LIFETIME: {
+		title: 'Lifetime',
+		type: 'LIFETIME',
+		price: {
+			amount: 49.99,
+			currency: 'USD',
+		},
+		alerts: 50,
+		subscriptions: 50,
+	},
 }
 
 export const MONTHS = [
